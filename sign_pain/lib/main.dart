@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-final painScale = [1,2,3,4,5,6,7,8,9,10];
+final painScale = [0,1,2,3,4,5,6,7,8,9,10];
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -70,40 +70,58 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(  
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text("SignPain"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: .center,
-          children: [
-            const Text('Select your pain level'),
 
-            RadioGroup<int>(
-              groupValue: painLevel,
-              onChanged: (int? value) {
-                setState(() {
-                  painLevel = value;
-                });
-              }, 
-              child: Column(
-                children: <Widget>[
-                  for (var i in painScale) 
-                    ListTile(
-                    title: Text(i.toString()),
-                    leading: Radio<int>(value: i))
-                ],
-              )),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: reset,
-        tooltip: 'reset',
-        child: const Icon(Icons.reset_tv),
-      ),
-    );
+    return Scaffold(
+		appBar: AppBar(
+			backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+			title: const Text("SignPain"),
+		),
+		body: Center(
+			child: Column(
+			mainAxisAlignment: MainAxisAlignment.center,
+			children: [
+				const Text('Select your pain level'),
+				Row(
+				mainAxisAlignment: MainAxisAlignment.center, 
+				children: [
+					// IPT image
+					Expanded(
+						flex: 1,
+						child: Image(
+							image: AssetImage('assets/images/ipt.png'),
+							fit: BoxFit.contain, 
+						),
+					),
+					// Options for pain
+					Expanded(
+					child: 
+					  RadioGroup<int>(
+                        groupValue: painLevel,
+                        onChanged: (int? value) {
+                            setState(() {
+                            painLevel = value;
+                            });
+                        },
+                        child:
+                            Column(
+                            children: <Widget>[
+                            for (var i in painScale.reversed.toList())
+                                ListTile(
+                                title: Text(i.toString()),
+                                leading: Radio<int>(value: i))
+                            ],
+                        )
+					)),
+				],
+				),
+			],
+			),
+		),
+		floatingActionButton: FloatingActionButton(
+			onPressed: reset,
+			tooltip: 'reset',
+			child: const Icon(Icons.lock_reset),
+		),
+		);
   }
 }
