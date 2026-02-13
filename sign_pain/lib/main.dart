@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
+import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,7 +30,7 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: .fromSeed(seedColor: const Color.fromARGB(255, 230, 27, 145)),
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -56,72 +58,113 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int? painLevel;
+  	int? painLevel;
+  	late VideoPlayerController _controller;
+  	late Future<void> _initializeVideoPlayerFuture;
 
-  void reset() {
-    setState((){painLevel = null;});
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+	@override
+	void initState() {
+		super.initState();
 
-  final snackBar = SnackBar(
-    content: Text('Reset pain level!'),
-    duration: const Duration(milliseconds: 1500),
-    );
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-		appBar: AppBar(
-			backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-			title: const Text("SignPain"),
-		),
-		body: Center(
-			child: Column(
-			mainAxisAlignment: MainAxisAlignment.center,
-			children: [
-				const Text('Select your pain level'),
-				Row(
-				mainAxisAlignment: MainAxisAlignment.center, 
-				children: [
-					// IPT image
-					Expanded(
-						flex: 1,
-						child: Image(
-							image: AssetImage('assets/images/ipt.png'),
-							fit: BoxFit.contain, 
-						),
-					),
-					// Options for pain
-					Expanded(
-					child: 
-					  RadioGroup<int>(
-                        groupValue: painLevel,
-                        onChanged: (int? value) {
-                            setState(() {
-                            painLevel = value;
-                            });
-                        },
-                        child:
-                            Column(
-                            children: <Widget>[
-                            for (var i in painScale.reversed.toList())
-                                ListTile(
-                                title: Text(i.toString()),
-                                leading: Radio<int>(value: i))
-                            ],
-                        )
-					)),
-				],
-				),
-			],
-			),
-		),
-		floatingActionButton: FloatingActionButton(
-			onPressed: reset,
-			tooltip: 'reset',
-			child: const Icon(Icons.lock_reset),
-		),
+		_controller = VideoPlayerController.asset(
+			'assets/videos/video.mp4', 
 		);
-  }
+
+		_initializeVideoPlayerFuture = _controller.initialize();
+		// ensure the video loops
+		_controller.setLooping(true);
+		_controller.play();
+	}
+
+	@override
+	void dispose() {
+		_controller.dispose();
+
+		super.dispose();
+	}
+
+	void reset() {
+		setState((){painLevel = null;});
+		ScaffoldMessenger.of(context).showSnackBar(snackBar);
+	}
+
+	final snackBar = SnackBar(
+		content: Text('Reset pain level!'),
+		duration: const Duration(milliseconds: 1500),
+		);
+
+	@override
+	Widget build(BuildContext context) {
+		return Scaffold(
+			appBar: AppBar(
+				backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+				title: const Text("SignPain"),
+			),
+			body: SingleChildScrollView(
+				child:Center(
+					child: Column(
+					mainAxisAlignment: MainAxisAlignment.center,
+					children: [
+						FutureBuilder(
+						future: _initializeVideoPlayerFuture,
+						builder: (context, snapshot) {
+							if (snapshot.connectionState == ConnectionState.done) {
+								return AspectRatio(
+									aspectRatio: _controller.value.aspectRatio,
+									child: VideoPlayer(_controller),
+								);
+								} else {
+								return Center(child: CircularProgressIndicator());
+							}
+						},
+						),
+						Row(
+						mainAxisAlignment: MainAxisAlignment.center, 
+						children: [
+							// IPT image
+							Expanded(
+								flex: 1,
+								child: Image(
+									image: AssetImage('assets/images/ipt.png'),
+									fit: BoxFit.contain, 
+								),
+							),
+							// Options for pain
+							Expanded(
+							child: 
+								RadioGroup<int>(
+								groupValue: painLevel,
+								onChanged: (int? value) {
+									setState(() {
+									painLevel = value;
+									});
+								},
+								child:
+									Column(
+									children: <Widget>[
+									for (var i in painScale.reversed.toList())
+										ListTile(
+										title: Text(i.toString()),
+										leading: Radio<int>(value: i))
+									],
+									)
+								)
+							),
+						],
+						),
+					],
+					),
+				)
+			),
+			floatingActionButton: FloatingActionButton(
+				onPressed: reset,
+				tooltip: 'reset',
+				child: Transform(
+					alignment: Alignment.center,
+					transform: Matrix4.rotationY(math.pi),
+					child: Icon(Icons.redo),
+					),
+			),
+		);
+	}
 }
