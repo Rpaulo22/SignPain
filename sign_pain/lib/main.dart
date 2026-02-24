@@ -109,10 +109,45 @@ class _MyHomePageState extends State<MyHomePage> {
 						future: _initializeVideoPlayerFuture,
 						builder: (context, snapshot) {
 							if (snapshot.connectionState == ConnectionState.done) {
-								return AspectRatio(
-									aspectRatio: _controller.value.aspectRatio,
-									child: VideoPlayer(_controller),
-								);
+								return Padding(
+									padding: const EdgeInsets.all(16.0),
+									child: GestureDetector(
+									// wraps the video on a clickable item
+									onTap: () {
+										// dialog = popup
+										showDialog(
+										context: context,
+										// barrierDismissible: true means tapping the darkened background closes the popup
+										barrierDismissible: true, 
+										builder: (BuildContext context) {
+											// return a Dialog widget
+											return Dialog(
+											backgroundColor: Colors.transparent, // hides the default white dialog box
+											insetPadding: const EdgeInsets.all(10), // leaves a gap at the edges
+											child: Stack(
+												alignment: Alignment.topRight,
+												children: [
+												// video
+												GestureDetector(
+													// tap the video itself to close it
+													onTap: () => Navigator.pop(context), 
+													child: AspectRatio(
+													aspectRatio: _controller.value.aspectRatio,
+													child: VideoPlayer(_controller),
+													),
+												),
+												],
+											),
+											);
+										},
+										);
+									},
+									// the video being displayed in the main screen
+									child: AspectRatio(
+										aspectRatio: _controller.value.aspectRatio,
+										child: VideoPlayer(_controller),
+									),
+									));
 								} else {
 								return Center(child: CircularProgressIndicator());
 							}
