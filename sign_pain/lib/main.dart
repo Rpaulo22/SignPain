@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sign_pain/pain_type_screen.dart';
 import 'dart:math' as math;
 import 'package:video_player/video_player.dart';
 
@@ -192,13 +193,16 @@ class _MyHomePageState extends State<MyHomePage> {
 				)
 			),
 			floatingActionButton: FloatingActionButton(
-				onPressed: reset,
-				tooltip: 'reset',
-				child: Transform(
-					alignment: Alignment.center,
-					transform: Matrix4.rotationY(math.pi),
-					child: Icon(Icons.redo),
-					),
+				onPressed: () {
+					Navigator.push(
+						context,
+						MaterialPageRoute(
+						builder: (context) => PainTypeScreen(),
+						),
+					);
+				},
+				tooltip: 'pain type',
+				child: Icon(Icons.redo)
 			),
 		);
 	}
