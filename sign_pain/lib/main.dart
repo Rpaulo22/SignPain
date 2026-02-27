@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sign_pain/view/pain_type_screen.dart';
+import 'package:sign_pain/view/pain_descriptor_screen.dart';
 import 'package:video_player/video_player.dart';
 
 void main() {
@@ -196,12 +196,12 @@ class _MyHomePageState extends State<MyHomePage> {
 					Navigator.push(
 						context,
 						MaterialPageRoute(
-						builder: (context) => PainTypeScreen(),
+						builder: (context) => PainDescriptorScreen(),
 						),
 					);
 				},
 				tooltip: 'pain type',
-				child: Icon(Icons.redo)
+				child: Icon(Icons.arrow_forward)
 			),
 		);
 	}

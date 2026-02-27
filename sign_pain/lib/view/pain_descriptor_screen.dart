@@ -1,19 +1,17 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
-class PainTypeScreen extends StatefulWidget {
+class PainDescriptorScreen extends StatefulWidget {
 
-	const PainTypeScreen({super.key});
+	const PainDescriptorScreen({super.key});
 
 	@override
-  	State<PainTypeScreen> createState() => _PainTypeScreenState();
+  	State<PainDescriptorScreen> createState() => _PainDescriptorScreenState();
 }
 
-class _PainTypeScreenState extends State<PainTypeScreen> {
-	Set<String> painType = {};
+class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
+	Set<String> selectedDescriptors = {};
 
-	final painTypes = ["Latente", "Ardor", "Formigueiro", "Perfurante", "Frio", "Choque"];
+	final painDescriptors = ["Latente", "Ardor", "Formigueiro", "Perfurante", "Frio", "Choque"];
 
 	@override
 	Widget build(BuildContext context) {
@@ -31,16 +29,16 @@ class _PainTypeScreenState extends State<PainTypeScreen> {
 						Padding(padding: EdgeInsetsGeometry.all(20)),
 						Column(
 							children: [
-							for (var i in painTypes)
+							for (var i in painDescriptors)
 								CheckboxListTile(
 									title: Text(i.toString()),
-									value: painType.contains(i),
+									value: selectedDescriptors.contains(i),
 									onChanged: (bool? checked) {
 										setState(() {
 										if (checked == true) {
-											painType.add(i);
+											selectedDescriptors.add(i);
 										} else {
-											painType.remove(i);
+											selectedDescriptors.remove(i);
 										}
 										});
 									},
@@ -54,11 +52,7 @@ class _PainTypeScreenState extends State<PainTypeScreen> {
 						Navigator.pop(context);
 					},
 					tooltip: 'pain type',
-					child: Transform(
-						alignment: Alignment.center,
-						transform: Matrix4.rotationY(math.pi),
-						child: Icon(Icons.redo),
-						),
+					child: Icon(Icons.arrow_back),
 				)
 		);
 	}
