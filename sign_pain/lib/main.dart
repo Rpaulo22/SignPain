@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sign_pain/pain_type_screen.dart';
-import 'dart:math' as math;
+import 'package:sign_pain/view/pain_type_screen.dart';
 import 'package:video_player/video_player.dart';
 
 void main() {
