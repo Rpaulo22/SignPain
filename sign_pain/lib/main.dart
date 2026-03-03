@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sign_pain/view/pain_level_screen.dart';
+import 'package:sign_pain/view/home_page_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: const Color.fromARGB(255, 230, 27, 145)),
       ),
-      home: const PainLevelScreen(),
+      home: const HomePageScreen(),
     );
   }
 }
