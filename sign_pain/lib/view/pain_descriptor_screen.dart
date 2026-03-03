@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:sign_pain/model/pain_form_data.dart';
 
 class PainDescriptorScreen extends StatefulWidget {
 
-	const PainDescriptorScreen({super.key});
+	const PainDescriptorScreen({super.key, required this.formData});
+
+  final PainFormData formData;
 
 	@override
-  	State<PainDescriptorScreen> createState() => _PainDescriptorScreenState();
+  State<PainDescriptorScreen> createState() => _PainDescriptorScreenState();
 }
 
 class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
-	Set<String> selectedDescriptors = {};
-
 	final painDescriptors = ["Latente", "Ardor", "Formigueiro", "Perfurante", "Frio", "Choque"];
 
 	@override
@@ -32,13 +33,13 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
 							for (var i in painDescriptors)
 								CheckboxListTile(
 									title: Text(i.toString()),
-									value: selectedDescriptors.contains(i),
+									value: widget.formData.descriptors.contains(i),
 									onChanged: (bool? checked) {
 										setState(() {
 										if (checked == true) {
-											selectedDescriptors.add(i);
+											widget.formData.descriptors.add(i);
 										} else {
-											selectedDescriptors.remove(i);
+											widget.formData.descriptors.remove(i);
 										}
 										});
 									},

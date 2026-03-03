@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/pain_descriptor_screen.dart';
 import 'package:video_player/video_player.dart';
 
@@ -21,7 +22,7 @@ class PainLevelScreen extends StatefulWidget {
 }
 
 class _PainLevelScreenState extends State<PainLevelScreen> {
-  	int? painLevel;
+  	final PainFormData _formData = PainFormData();
   	late VideoPlayerController _controller;
   	late Future<void> _initializeVideoPlayerFuture;
 
@@ -46,11 +47,6 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 		_controller.dispose();
 
 		super.dispose();
-	}
-
-	void reset() {
-		setState((){painLevel = null;});
-		ScaffoldMessenger.of(context).showSnackBar(snackBar);
 	}
 
 	final snackBar = SnackBar(
@@ -133,10 +129,10 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 							Expanded(
 							child: 
 								RadioGroup<int>(
-								groupValue: painLevel,
+								groupValue: _formData.painLevel,
 								onChanged: (int? value) {
 									setState(() {
-									painLevel = value;
+									_formData.painLevel = value;
 									});
 								},
 								child:
@@ -161,7 +157,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 					Navigator.push(
 						context,
 						MaterialPageRoute(
-						builder: (context) => PainDescriptorScreen(),
+						builder: (context) => PainDescriptorScreen(formData: _formData),
 						),
 					);
 				},
