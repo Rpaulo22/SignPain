@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "149715164888",
+    "project_id": "sign-pain",
+    "storage_bucket": "sign-pain.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:149715164888:android:d3e6ad32f6cb8b304d81ad",
+        "android_client_info": {
+          "package_name": "com.example.sign_pain"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbK-2cl6FigiTJN92oCr3-HDGCrFyfqrc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
