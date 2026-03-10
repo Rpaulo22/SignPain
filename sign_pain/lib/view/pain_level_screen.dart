@@ -6,25 +6,14 @@ import 'package:video_player/video_player.dart';
 class PainLevelScreen extends StatefulWidget {
   const PainLevelScreen({super.key});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  // final String title;
-
   @override
   State<PainLevelScreen> createState() => _PainLevelScreenState();
 }
 
 class _PainLevelScreenState extends State<PainLevelScreen> {
-  	final PainFormData _formData = PainFormData();
-  	late VideoPlayerController _controller;
-  	late Future<void> _initializeVideoPlayerFuture;
+  final PainFormData _formData = PainFormData("user1", {}, null, DateTime.now()); // TODO change to actual userID
+  late VideoPlayerController _controller;
+  late Future<void> _initializeVideoPlayerFuture;
 
 	final painScale = [0,1,2,3,4,5,6,7,8,9,10];
 

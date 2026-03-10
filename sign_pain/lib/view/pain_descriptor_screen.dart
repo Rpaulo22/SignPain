@@ -107,13 +107,15 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                     color: Colors.transparent,
                   ),
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (widget.formData.isComplete) {
-                        if (formViewModel.saveDailyForm(widget.formData)) { // use viewmodel to save pain form
+                        bool successful = await formViewModel.saveDailyForm(widget.formData);
+                        if (successful) { // use viewmodel to save pain form
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar("Registo guardado com sucesso!"));
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(builder: (context) => const HomePageScreen()),
-                            (Route<dynamic> route) => false, // 'false' condition clears the entire stack
+                            (Route<dynamic> route) => false, // false condition clears the entire stack
                           );
                         }
                         else {
@@ -122,7 +124,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                         }
                       }
                       else {
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar("Formulário imcompleto. Por favor indique o seu nível de dor e descreva a sua dor."));
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar("Formulário incompleto. Por favor indique o seu nível de dor e descreva a sua dor."));
                         Navigator.pop(context);
                       }
                     },

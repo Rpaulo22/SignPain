@@ -11,9 +11,19 @@ Future<void> main() async {
   await dotenv.load(fileName: ".env");
   
   // Now initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    // if it's the duplicate app error
+    if (e.toString().contains('duplicate-app')) {
+      print('Firebase was already initialized natively');
+    } else {
+      // if it's a different error
+      rethrow; 
+    }
+  }
   
   runApp(const MyApp());
 }
