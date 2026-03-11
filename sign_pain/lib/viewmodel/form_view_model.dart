@@ -44,10 +44,10 @@ class FormViewModel {
         var _data = docSnapshot.data(); 
         
         var date = (_data['date'] as Timestamp).toDate();
-        var descriptors = _data['descriptors'] as List<String>;
+        var descriptors = Set<String>.from(_data['descriptors'] ?? []);
         var painLevel = _data['painIntensity'] as int;
         
-        PainFormData painForm = PainFormData(userID, descriptors.toSet(), painLevel, date);
+        PainFormData painForm = PainFormData(userID, descriptors, painLevel, date);
         data.add(painForm);
       }
     } catch(e) {

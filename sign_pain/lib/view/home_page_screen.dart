@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sign_pain/view/pain_info_screen.dart';
 import 'package:sign_pain/view/pain_level_screen.dart';
 
 class HomePageScreen extends StatefulWidget {
@@ -29,6 +30,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 textScaler: TextScaler.linear(2),
                 )
             ),
+            // redirects to pain form submission
             TextButton(
               onPressed: () {
                 Navigator.push(
@@ -39,6 +41,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 );
               },
               child: Text('Registe aqui o seu diário da dor')
+            ),
+            // redirects to pain history screen
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PainInfoScreen(),
+                  ),
+                );
+              },
+              child: Text('Veja aqui o seu histórico de dor')
             )
           ],
         )

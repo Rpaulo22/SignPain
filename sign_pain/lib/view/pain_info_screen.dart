@@ -20,7 +20,6 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
     _painDataFuture = formViewModel.getUserPainData(userID);
   }
 
-  }
 	@override
 	Widget build(BuildContext context) {
 		return Scaffold(
@@ -28,16 +27,25 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
 				backgroundColor: Theme.of(context).colorScheme.inversePrimary,
 				title: const Text("SignPain"),
 			),
-			body: SingleChildScrollView(
-        child: Center(
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              for ()
-            ]
-          )
-        )
-      )
-		);
+			body: FutureBuilder<List<PainFormData>>(
+        future: _painDataFuture, 
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) { // pain data has not been loaded yet
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) { // data loading has incurred in some error
+            return Center(child: Text("Erro a carregar página: ${snapshot.error}"));
+          } else if (snapshot.hasData) { // data has been loaded
+            final data = snapshot.data!;
+            return ListView.builder(
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+                return ListTile(title: Text("Nível de dor: ${data[index].painLevel} | Data: ${data[index].date}"));
+              },
+            );
+          }
+          return const Center(child: Text("Não tem quaisquer registos de dor"));
+        },
+		  )
+    );
 	}
 }
