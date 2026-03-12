@@ -16,7 +16,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     return Scaffold(
       appBar: AppBar(
 				backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-				title: const Text("SignPain"),
+				title: const Text("SignPain", textAlign: TextAlign.center),
 			),
 			body: Center(
         child: Column(

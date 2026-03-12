@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/pain_descriptor_screen.dart';
 import 'package:video_player/video_player.dart';
@@ -20,6 +22,8 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 	@override
 	void initState() {
 		super.initState();
+    
+    // start the video playback
 
 		_controller = VideoPlayerController.asset(
 			'assets/videos/video.mp4', 
@@ -45,64 +49,78 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 
 	@override
 	Widget build(BuildContext context) {
+    final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
+
 		return Scaffold(
 			appBar: AppBar(
 				backgroundColor: Theme.of(context).colorScheme.inversePrimary,
 				title: const Text("SignPain"),
+        actions: [
+          Switch(
+          value: isSignMode,
+          onChanged: (value) {
+            // toggle between sign language and text
+            Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
+          },
+        )
+        ],
 			),
 			body: SingleChildScrollView(
 				child:Center(
 					child: Column(
 					mainAxisAlignment: MainAxisAlignment.center,
 					children: [
-						FutureBuilder(
-						future: _initializeVideoPlayerFuture,
-						builder: (context, snapshot) {
-							if (snapshot.connectionState == ConnectionState.done) {
-								return Padding(
-									padding: const EdgeInsets.all(16.0),
-									child: GestureDetector(
-									// wraps the video on a clickable item
-									onTap: () {
-										// dialog = popup
-										showDialog(
-										context: context,
-										// barrierDismissible: true means tapping the darkened background closes the popup
-										barrierDismissible: true, 
-										builder: (BuildContext context) {
-											// return a Dialog widget
-											return Dialog(
-											backgroundColor: Colors.transparent, // hides the default white dialog box
-											insetPadding: const EdgeInsets.all(10), // leaves a gap at the edges
-											child: Stack(
-												alignment: Alignment.topRight,
-												children: [
-												// video
-												GestureDetector(
-													// tap the video itself to close it
-													onTap: () => Navigator.pop(context), 
-													child: AspectRatio(
-													aspectRatio: _controller.value.aspectRatio,
-													child: VideoPlayer(_controller),
-													),
-												),
-												],
-											),
-											);
-										},
-										);
-									},
-									// the video being displayed in the main screen
-									child: AspectRatio(
-										aspectRatio: _controller.value.aspectRatio,
-										child: VideoPlayer(_controller),
-									),
-									));
-								} else {
-								return Center(child: CircularProgressIndicator());
-							}
-						},
-						),
+            if (isSignMode)
+              FutureBuilder(
+              future: _initializeVideoPlayerFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: GestureDetector(
+                    // wraps the video on a clickable item
+                    onTap: () {
+                      // dialog = popup
+                      showDialog(
+                      context: context,
+                      // barrierDismissible: true means tapping the darkened background closes the popup
+                      barrierDismissible: true, 
+                      builder: (BuildContext context) {
+                        // return a Dialog widget
+                        return Dialog(
+                        backgroundColor: Colors.transparent, // hides the default white dialog box
+                        insetPadding: const EdgeInsets.all(10), // leaves a gap at the edges
+                        child: Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                          // video
+                          GestureDetector(
+                            // tap the video itself to close it
+                            onTap: () => Navigator.pop(context), 
+                            child: AspectRatio(
+                            aspectRatio: _controller.value.aspectRatio,
+                            child: VideoPlayer(_controller),
+                            ),
+                          ),
+                          ],
+                        ),
+                        );
+                      },
+                      );
+                    },
+                    // the video being displayed in the main screen
+                    child: AspectRatio(
+                      aspectRatio: _controller.value.aspectRatio,
+                      child: VideoPlayer(_controller),
+                    ),
+                    ));
+                  } else {
+                  return Center(child: CircularProgressIndicator());
+                  }
+                },
+              )
+            else 
+              Text("Indica o teu nível de dor", textScaler: TextScaler.linear(2)),
 						Row(
 						mainAxisAlignment: MainAxisAlignment.center, 
 						children: [
