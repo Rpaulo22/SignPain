@@ -56,13 +56,13 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 				backgroundColor: Theme.of(context).colorScheme.inversePrimary,
 				title: const Text("SignPain"),
         actions: [
-          Switch(
-          value: isSignMode,
-          onChanged: (value) {
-            // toggle between sign language and text
-            Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
-          },
-        )
+          IconButton(
+            onPressed: () {
+              // toggle between sign language and text
+              Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
+            },
+            icon: isSignMode ? Icon(Icons.sign_language) : Icon(Icons.sign_language_outlined)
+          )
         ],
 			),
 			body: SingleChildScrollView(
@@ -70,7 +70,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 					child: Column(
 					mainAxisAlignment: MainAxisAlignment.center,
 					children: [
-            if (isSignMode)
+            if (isSignMode) // sign language content
               FutureBuilder(
               future: _initializeVideoPlayerFuture,
               builder: (context, snapshot) {
@@ -119,7 +119,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                   }
                 },
               )
-            else 
+            else
               Text("Indica o teu nível de dor", textScaler: TextScaler.linear(2)),
 						Row(
 						mainAxisAlignment: MainAxisAlignment.center, 

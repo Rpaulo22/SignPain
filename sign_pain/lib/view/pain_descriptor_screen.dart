@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/home_page_screen.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
@@ -19,10 +21,21 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
 
 	@override
 	Widget build(BuildContext context) {
+    final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
+
 		return Scaffold(
 			appBar: AppBar(
 				backgroundColor: Theme.of(context).colorScheme.inversePrimary,
 				title: const Text("SignPain"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              // toggle between sign language and text
+              Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
+            },
+            icon: isSignMode ? Icon(Icons.sign_language) : Icon(Icons.sign_language_outlined)
+          )
+        ],
 			),
 			body: Center(
 				child: Column(
