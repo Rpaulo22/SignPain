@@ -53,6 +53,7 @@ class FormViewModel {
     } catch(e) {
       rethrow;
     }
+    data.sort((a, b) => a.date!.compareTo(b.date!));
     return data;
   }
 }
