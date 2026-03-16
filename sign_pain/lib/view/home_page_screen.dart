@@ -13,30 +13,42 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
-  late VideoPlayerController _controller;
-  late Future<void> _initializeVideoPlayerFuture;
+  final List<String> videoPaths = [
+    'assets/videos/ola.mp4',
+    'assets/videos/historia.mp4',
+    'assets/videos/dor.mp4',
+  ];
 
+  // 2. The list that will hold our active controllers
+  late List<VideoPlayerController> _controllers;
+
+  // 3. A single Future to tell the UI when everything is ready
+  late Future<void> _initializeAllVideosFuture;
   @override
 	void initState() {
 		super.initState();
     
     // start the video playback
 
-		_controller = VideoPlayerController.asset(
-			'assets/videos/ola.mp4', 
-		);
-    _controller.setVolume(0.0);
-    
-		_initializeVideoPlayerFuture = _controller.initialize();
-		// ensure the video loops
-		_controller.setLooping(true);
-		_controller.play();
+		// a controller for each path
+    _controllers = videoPaths.map((path) => VideoPlayerController.asset(path)).toList();
+
+    _initializeAllVideosFuture = Future.wait(
+      _controllers.map((controller) {
+        return controller.initialize().then((_) {
+          controller.setVolume(0.0); // muted
+          controller.setLooping(true); // always looping
+          controller.play();
+        });
+      }),
+    );
 	}
 
 	@override
 	void dispose() {
-		_controller.dispose();
-
+    for (var controller in _controllers) {
+      controller.dispose();
+    }
 		super.dispose();
 	}
 
@@ -58,68 +70,126 @@ class _HomePageScreenState extends State<HomePageScreen> {
           )
         ],
 			),
-			body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FractionallySizedBox(
-              widthFactor: 0.5,
-              child: Image(
-                image: const AssetImage('assets/images/signpain.png'),
-                fit: BoxFit.contain,
+			body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FractionallySizedBox(
+                widthFactor: 0.5,
+                child: Image(
+                  image: const AssetImage('assets/images/signpain.png'),
+                  fit: BoxFit.contain,
+                ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsetsGeometry.all(12),
-              child: isSignMode ?
+              Padding(
+                padding: EdgeInsetsGeometry.all(12),
+                child: isSignMode ?
+                  FutureBuilder(
+                  future: _initializeAllVideosFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        // the video being displayed in the main screen
+                        child: AspectRatio(
+                          aspectRatio: _controllers[0].value.aspectRatio,
+                          child: VideoPlayer(_controllers[0]),
+                        ),
+                        );
+                      } else {
+                      return Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  )
+                : Text(
+                  'Bem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',
+                  textAlign: TextAlign.center,
+                  textScaler: TextScaler.linear(2),
+                  )
+              ),
+              // redirects to pain form submission
+              if (isSignMode) // sign language content
                 FutureBuilder(
-                future: _initializeVideoPlayerFuture,
+                future: _initializeAllVideosFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     return Padding(
                       padding: const EdgeInsets.all(16.0),
+                      child: GestureDetector(
+                      // wraps the video on a clickable item
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PainLevelScreen(),
+                          ),
+                        );
+                      },
                       // the video being displayed in the main screen
                       child: AspectRatio(
-                        aspectRatio: _controller.value.aspectRatio,
-                        child: VideoPlayer(_controller),
+                        aspectRatio: _controllers[2].value.aspectRatio,
+                        child: VideoPlayer(_controllers[2]), 
                       ),
-                      );
+                      ));
                     } else {
                     return Center(child: CircularProgressIndicator());
                     }
                   },
                 )
-              : Text(
-                'Bem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',
-                textAlign: TextAlign.center,
-                textScaler: TextScaler.linear(2),
+              else TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PainLevelScreen(),
+                    ),
+                  );
+                },
+                child: Text('Registe aqui o seu diário da dor')
+              ),
+              // redirects to pain history screen
+              if (isSignMode) // sign language content
+                FutureBuilder(
+                future: _initializeAllVideosFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: GestureDetector(
+                      // wraps the video on a clickable item
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PainInfoScreen(),
+                          ),
+                        );
+                      },
+                      // the video being displayed in the main screen
+                      child: AspectRatio(
+                        aspectRatio: _controllers[1].value.aspectRatio,
+                        child: VideoPlayer(_controllers[1]),
+                      ),
+                      ));
+                    } else {
+                    return Center(child: CircularProgressIndicator());
+                    }
+                  },
                 )
-            ),
-            // redirects to pain form submission
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PainLevelScreen(),
-                  ),
-                );
-              },
-              child: Text('Registe aqui o seu diário da dor')
-            ),
-            // redirects to pain history screen
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PainInfoScreen(),
-                  ),
-                );
-              },
-              child: Text('Veja aqui o seu histórico de dor')
-            )
-          ],
+              else TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PainInfoScreen(),
+                    ),
+                  );
+                },
+                child: Text('Veja aqui o seu histórico de dor')
+              )
+            ],
+          )
         )
       )
     );
