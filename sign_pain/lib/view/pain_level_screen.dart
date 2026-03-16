@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
-import 'package:sign_pain/view/pain_descriptor_screen.dart';
+import 'package:sign_pain/view/pain_body_screen.dart';
 import 'package:video_player/video_player.dart';
 
 class PainLevelScreen extends StatefulWidget {
@@ -13,7 +13,7 @@ class PainLevelScreen extends StatefulWidget {
 }
 
 class _PainLevelScreenState extends State<PainLevelScreen> {
-  final PainFormData _formData = PainFormData("user1", {}, null, DateTime.now()); // TODO change to actual userID
+  final PainFormData _formData = PainFormData(); // TODO change to actual userID
   late VideoPlayerController _controller;
   late Future<void> _initializeVideoPlayerFuture;
 
@@ -164,7 +164,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 					Navigator.push(
 						context,
 						MaterialPageRoute(
-						builder: (context) => PainDescriptorScreen(formData: _formData),
+						builder: (context) => PainBodyScreen(formData: _formData),
 						),
 					);
 				},

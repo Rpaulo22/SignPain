@@ -1,3 +1,5 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 
@@ -12,7 +14,8 @@ class FormViewModel {
       "userID": formData.userID, 
       "painIntensity": formData.painLevel,
       "descriptors": formData.descriptors.toList(),
-      "date": formData.date
+      "bodyParts": formData.bodyParts.toList(),
+      "date": DateTime.now()
     };
 
     try {
@@ -46,14 +49,15 @@ class FormViewModel {
         var date = (_data['date'] as Timestamp).toDate();
         var descriptors = Set<String>.from(_data['descriptors'] ?? []);
         var painLevel = _data['painIntensity'] as int;
-        
-        PainFormData painForm = PainFormData(userID, descriptors, painLevel, date);
+        var bodyParts = List<String>.from(_data['bodyParts'] ?? []);
+
+        PainFormData painForm = PainFormData.fromForm(userID, descriptors, painLevel, date, BodyPartsMapper.fromList(bodyParts));
         data.add(painForm);
       }
     } catch(e) {
       rethrow;
     }
-    data.sort((a, b) => a.date!.compareTo(b.date!));
+    data.sort((a, b) => a.date!.compareTo(b.date!)); // sort the data based on date, ascending order
     return data;
   }
 }
