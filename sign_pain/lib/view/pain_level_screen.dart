@@ -26,10 +26,10 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
     // start the video playback
 
 		_controller = VideoPlayerController.asset(
-			'assets/videos/video.mp4', 
+			'assets/videos/dor.mp4', 
 		);
-
-		_initializeVideoPlayerFuture = _controller.initialize();
+    _controller.setVolume(0.0);
+		_initializeVideoPlayerFuture = _controller.initialize(); 
 		// ensure the video loops
 		_controller.setLooping(true);
 		_controller.play();

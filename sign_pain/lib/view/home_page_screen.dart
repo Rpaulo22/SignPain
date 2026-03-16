@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/view/pain_info_screen.dart';
 import 'package:sign_pain/view/pain_level_screen.dart';
+import 'package:video_player/video_player.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({super.key});
@@ -12,6 +13,32 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
+  late VideoPlayerController _controller;
+  late Future<void> _initializeVideoPlayerFuture;
+
+  @override
+	void initState() {
+		super.initState();
+    
+    // start the video playback
+
+		_controller = VideoPlayerController.asset(
+			'assets/videos/ola.mp4', 
+		);
+    _controller.setVolume(0.0);
+    
+		_initializeVideoPlayerFuture = _controller.initialize();
+		// ensure the video loops
+		_controller.setLooping(true);
+		_controller.play();
+	}
+
+	@override
+	void dispose() {
+		_controller.dispose();
+
+		super.dispose();
+	}
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +71,25 @@ class _HomePageScreenState extends State<HomePageScreen> {
             ),
             Padding(
               padding: EdgeInsetsGeometry.all(12),
-              child: Text(
+              child: isSignMode ?
+                FutureBuilder(
+                future: _initializeVideoPlayerFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      // the video being displayed in the main screen
+                      child: AspectRatio(
+                        aspectRatio: _controller.value.aspectRatio,
+                        child: VideoPlayer(_controller),
+                      ),
+                      );
+                    } else {
+                    return Center(child: CircularProgressIndicator());
+                    }
+                  },
+                )
+              : Text(
                 'Bem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',
                 textAlign: TextAlign.center,
                 textScaler: TextScaler.linear(2),
