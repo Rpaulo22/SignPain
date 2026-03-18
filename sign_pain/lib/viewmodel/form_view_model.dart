@@ -14,7 +14,7 @@ class FormViewModel {
       "userID": formData.userID, 
       "painIntensity": formData.painLevel,
       "descriptors": formData.descriptors.toList(),
-      "bodyParts": formData.bodyParts.toList(),
+      "bodyParts": formData.bodyParts,
       "date": DateTime.now()
     };
 
@@ -51,7 +51,7 @@ class FormViewModel {
         var painLevel = _data['painIntensity'] as int;
         var bodyParts = List<String>.from(_data['bodyParts'] ?? []);
 
-        PainFormData painForm = PainFormData.fromForm(userID, descriptors, painLevel, date, BodyPartsMapper.fromList(bodyParts));
+        PainFormData painForm = PainFormData.fromForm(userID, descriptors, painLevel, date, bodyParts);
         data.add(painForm);
       }
     } catch(e) {

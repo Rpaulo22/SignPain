@@ -5,7 +5,7 @@ class PainFormData {
   int? painLevel; // self-reported pain level (on a scale of 0-10)
   Set<String> descriptors = {}; // adjectives which describe the felt pain
   DateTime? date; // date of the form's submission
-  BodyParts bodyParts = BodyParts(); // body parts which the pain is inflicted
+  List<String> bodyParts = []; // body parts which the pain is inflicted on
   
   PainFormData.fromForm(this.userID, this.descriptors, this.painLevel, this.date, this.bodyParts);
   PainFormData();

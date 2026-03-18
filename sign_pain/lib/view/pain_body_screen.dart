@@ -16,6 +16,7 @@ class PainBodyScreen extends StatefulWidget {
 }
 
 class _PainBodyScreenState extends State<PainBodyScreen> {
+  BodyParts _selectedParts = BodyParts();
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +33,8 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
       ),
       body: SafeArea(
         child: BodyPartSelectorTurnable(
-          bodyParts: widget.formData.bodyParts,
-          onSelectionUpdated: (p) => setState(() => widget.formData.bodyParts = p),
+          bodyParts: _selectedParts,
+          onSelectionUpdated: (p) => setState(() => _selectedParts = p),
           labelData: const RotationStageLabelData(
             front: 'Frente',
             left: 'Esquerda',
@@ -44,6 +45,8 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
       ),
       floatingActionButton: FloatingActionButton(
 				onPressed: () {
+          List<String> partsList = _selectedParts.toList();
+          widget.formData.bodyParts = partsList; // adds body parts to form data (in list format)
 					Navigator.push(
 						context,
 						MaterialPageRoute(
