@@ -11,10 +11,11 @@ class PainFormData {
   PainFormData();
 
   // helper to check if the form is complete
-  bool get isComplete => painLevel != null && descriptors.isNotEmpty;
+  bool get isComplete => painLevel != null && descriptors.isNotEmpty && bodyParts.isNotEmpty;
 
 }
 
+// functions to extend the functionalities of BodyParts package for SignPain
 extension BodyPartsMapper on BodyParts {
 
   // Transforms a BodyParts object into a List of strings
@@ -39,7 +40,7 @@ extension BodyPartsMapper on BodyParts {
     return BodyParts.fromJson(bodyMap);
   }
 
-  // Transforms a BodyParts object into a List of strings in portuguese, for visualization on UI
+  // Transforms a BodyParts object into a List of strings in portuguese, for visualization in UI
   List<String> toPortugueseList() {
     List<String> parts = [];
 
@@ -68,5 +69,37 @@ extension BodyPartsMapper on BodyParts {
     if (rightFoot) parts.add("Pé Direito");
 
     return parts;
+  }
+  
+  // maps english "code" body parts to corresponding portuguese translation
+  static const Map<String, String> bodyTranslationsPT = {
+    "head" : "Cabeça",
+    "neck" : "Pescoço",
+    "leftShoulder" : "Ombro Esquerdo",
+    "leftUpperArm" : "Braço Esquerdo",
+    "leftElbow" : "Cotovelo Esquerdo",
+    "leftLowerArm" : "Antebraço Esquerdo",
+    "leftHand" : "Mão Esquerda",
+    "rightShoulder" : "Ombro Direito",
+    "rightUpperArm" : "Braço Direito",
+    "rightElbow" : "Cotovelo Direito",
+    "rightLowerArm" : "Antebraço Direito",
+    "rightHand" : "Mão Direita",
+    "upperBody" : "Caixa Torácica",
+    "lowerBody" : "Barriga/Dorsal",
+    "abdomen" : "Anca",
+    "leftUpperLeg" : "Coxa Esquerda",
+    "leftKnee" : "Joelho Esquerdo",
+    "leftLowerLeg" : "Perna Esquerda",
+    "leftFoot" : "Pé Esquerdo",
+    "rightUpperLeg" : "Coxa Direita",
+    "rightKnee" : "Joelho Direito",
+    "rightLowerLeg" : "Perna Direita",
+    "rightFoot" : "Pé Direito"
+  };
+
+  // Given a list of body parts (which are in English), outputs a list with the portuguese translation
+  static List<String> listToPortuguese(List<String> parts) {
+    return parts.map((part) => bodyTranslationsPT[part] ?? part).toList();
   }
 }

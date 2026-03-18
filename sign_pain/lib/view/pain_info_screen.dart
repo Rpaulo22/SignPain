@@ -28,33 +28,35 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
 				backgroundColor: Theme.of(context).colorScheme.inversePrimary,
 				title: const Text("SignPain"),
 			),
-			body: FutureBuilder<List<PainFormData>>(
-        future: _painDataFuture, 
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) { // pain data has not been loaded yet
-            return const Center(child: CircularProgressIndicator());
+			body: SingleChildScrollView(
+        child: FutureBuilder<List<PainFormData>>(
+          future: _painDataFuture, 
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) { // pain data has not been loaded yet
+              return const Center(child: CircularProgressIndicator());
 
-          } else if (snapshot.hasError) { // data loading has incurred in some error
-            return Center(child: Text("Erro a carregar página: ${snapshot.error}"));
+            } else if (snapshot.hasError) { // data loading has incurred in some error
+              return Center(child: Text("Erro a carregar página: ${snapshot.error}"));
 
-          } else if (snapshot.hasData) { // data has been loaded
-            final data = snapshot.data!;
-            return Column(
-              children: <Widget>[
-                for (var entry in data) 
-                  painFormWidget(entry),
-                  const Divider(
-                    thickness: 5,
-                    indent: 25,
-                    endIndent: 25,
-                    color: Colors.transparent,
-                  )
-              ]
-            );
-          }
-          return const Center(child: Text("Não tem quaisquer registos de dor"));
-        },
-		  )
+            } else if (snapshot.hasData) { // data has been loaded
+              final data = snapshot.data!;
+              return Column(
+                children: <Widget>[
+                  for (var entry in data) 
+                    painFormWidget(entry),
+                    const Divider(
+                      thickness: 5,
+                      indent: 25,
+                      endIndent: 25,
+                      color: Colors.transparent,
+                    )
+                ]
+              );
+            }
+            return const Center(child: Text("Não tem quaisquer registos de dor"));
+          },
+        )
+      )
     );
 	}
 
@@ -92,7 +94,8 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                 TextSpan(text: data.descriptors.isNotEmpty ? data.descriptors.join(", ") : "Nenhuma", style: const TextStyle(fontWeight: FontWeight.bold)),
               ],
             )
-          )
+          ),
+          Text(data.bodyParts.isNotEmpty ? BodyPartsMapper.listToPortuguese(data.bodyParts).join(", ") : "Dor não situada", style: const TextStyle(fontWeight: FontWeight.bold), textScaler: TextScaler.linear(1.2))
         ],
       )
     );
