@@ -19,16 +19,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
     'assets/videos/dor.mp4',
   ];
 
-  // 2. The list that will hold our active controllers
   late List<VideoPlayerController> _controllers;
 
-  // 3. A single Future to tell the UI when everything is ready
   late Future<void> _initializeAllVideosFuture;
   @override
 	void initState() {
 		super.initState();
-    
-    // start the video playback
 
 		// a controller for each path
     _controllers = videoPaths.map((path) => VideoPlayerController.asset(path)).toList();
@@ -75,11 +71,14 @@ class _HomePageScreenState extends State<HomePageScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FractionallySizedBox(
-                widthFactor: 0.5,
-                child: Image(
-                  image: const AssetImage('assets/images/signpain.png'),
-                  fit: BoxFit.contain,
+              Padding(
+                padding: EdgeInsetsGeometry.all(16.0),
+                child: FractionallySizedBox(
+                  widthFactor: 0.5,
+                  child: Image(
+                    image: const AssetImage('assets/images/signpain.png'),
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
               Padding(
