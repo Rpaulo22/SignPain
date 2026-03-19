@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
+import 'package:sign_pain/database_seeder.dart';
 import 'package:sign_pain/view/pain_info_screen.dart';
 import 'package:sign_pain/view/pain_level_screen.dart';
 import 'package:video_player/video_player.dart';
@@ -317,7 +318,14 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   );
                 },
                 child: Text('Veja aqui o seu histórico de dor')
-              )
+              ),
+              // button to be used when uploading medical data to firebase
+              //ElevatedButton(
+              //  onPressed: () async {
+              //    await uploadMedicalConditions();
+              //  },
+              //  child: const Text("Carregar Dados"),
+              //)
             ],
           )
         )
