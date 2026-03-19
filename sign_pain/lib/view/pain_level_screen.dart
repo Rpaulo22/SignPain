@@ -30,9 +30,6 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 		);
     _controller.setVolume(0.0);
 		_initializeVideoPlayerFuture = _controller.initialize(); 
-		// ensure the video loops
-		_controller.setLooping(true);
-		_controller.play();
 	}
 
 	@override
@@ -80,6 +77,19 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                     child: GestureDetector(
                     // wraps the video on a clickable item
                     onTap: () {
+                      setState(() {
+                        if (_controller.value.isPlaying) {
+                          _controller.pause();
+                        } else {
+                          _controller.play();
+                        }
+                      });
+                    },
+                    onDoubleTap: () {
+                      // ensure the video loops
+                      _controller.setLooping(true);
+                      _controller.play();
+
                       // dialog = popup
                       showDialog(
                       context: context,
@@ -88,22 +98,26 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                       builder: (BuildContext context) {
                         // return a Dialog widget
                         return Dialog(
-                        backgroundColor: Colors.transparent, // hides the default white dialog box
-                        insetPadding: const EdgeInsets.all(10), // leaves a gap at the edges
-                        child: Stack(
-                          alignment: Alignment.topRight,
-                          children: [
-                          // video
-                          GestureDetector(
-                            // tap the video itself to close it
-                            onTap: () => Navigator.pop(context), 
-                            child: AspectRatio(
-                            aspectRatio: _controller.value.aspectRatio,
-                            child: VideoPlayer(_controller),
-                            ),
+                          backgroundColor: Colors.transparent, // hides the default white dialog box
+                          insetPadding: const EdgeInsets.all(10), // leaves a gap at the edges
+                          child: Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                            // video
+                              GestureDetector(
+                                // tap the video itself to close it
+                                onTap: () {
+                                  _controller.pause();
+                                  _controller.setLooping(false);
+                                  Navigator.pop(context);
+                                }, 
+                                child: AspectRatio(
+                                aspectRatio: _controller.value.aspectRatio,
+                                child: VideoPlayer(_controller),
+                                ),
+                              ),
+                            ],
                           ),
-                          ],
-                        ),
                         );
                       },
                       );
@@ -111,7 +125,28 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                     // the video being displayed in the main screen
                     child: AspectRatio(
                       aspectRatio: _controller.value.aspectRatio,
-                      child: VideoPlayer(_controller),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // bottom Layer: the video
+                          VideoPlayer(_controller),
+
+                          // top Layer: play icon
+                          if (!_controller.value.isPlaying)
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                shape: BoxShape.circle,
+                              ),
+                              padding: const EdgeInsets.all(12.0),
+                              child: const Icon(
+                                Icons.play_arrow,
+                                color: Colors.white,
+                                size: 50.0,
+                              ),
+                            ),
+                        ],
+                      )
                     ),
                     ));
                   } else {

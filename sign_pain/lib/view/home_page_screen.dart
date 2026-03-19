@@ -32,9 +32,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     _initializeAllVideosFuture = Future.wait(
       _controllers.map((controller) {
         return controller.initialize().then((_) {
-          controller.setVolume(0.0); // muted
-          controller.setLooping(true); // always looping
-          controller.play();
+          controller.setVolume(0.0); // muted 
         });
       }),
     );
@@ -88,14 +86,53 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   future: _initializeAllVideosFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
+                      final controller = _controllers[0];
                       return Padding(
                         padding: const EdgeInsets.all(16.0),
                         // the video being displayed in the main screen
-                        child: AspectRatio(
-                          aspectRatio: _controllers[0].value.aspectRatio,
-                          child: VideoPlayer(_controllers[0]),
-                        ),
-                        );
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [ 
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (controller.value.isPlaying) {
+                                    controller.pause();
+                                  } else {
+                                    controller.play();
+                                  }
+                                });
+                              },
+                              child: AspectRatio(
+                                aspectRatio: controller.value.aspectRatio,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    // bottom Layer: the video
+                                    VideoPlayer(controller),
+
+                                    // top Layer: play icon
+                                    if (!controller.value.isPlaying)
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black54,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: const Icon(
+                                          Icons.play_arrow,
+                                          color: Colors.white,
+                                          size: 50.0,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ]
+                        )
+                      );
                       } else {
                       return Center(child: CircularProgressIndicator());
                       }
@@ -113,24 +150,71 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 future: _initializeAllVideosFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
-                    return Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: GestureDetector(
-                      // wraps the video on a clickable item
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PainLevelScreen(),
-                          ),
-                        );
-                      },
-                      // the video being displayed in the main screen
-                      child: AspectRatio(
-                        aspectRatio: _controllers[2].value.aspectRatio,
-                        child: VideoPlayer(_controllers[2]), 
-                      ),
-                      ));
+                      final controller = _controllers[2];
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        // the video being displayed in the main screen
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [ 
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (controller.value.isPlaying) {
+                                    controller.pause();
+                                  } else {
+                                    controller.play();
+                                  }
+                                });
+                              },
+                              child: AspectRatio(
+                                aspectRatio: controller.value.aspectRatio,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    // bottom Layer: the video
+                                    VideoPlayer(controller),
+
+                                    // top Layer: play icon
+                                    if (!controller.value.isPlaying)
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black54,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: const Icon(
+                                          Icons.play_arrow,
+                                          color: Colors.white,
+                                          size: 50.0,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PainLevelScreen(),
+                                  ),
+                                );
+                              },
+                              icon: Icon(Icons.forward),
+                              label: Text('Avançar para página'),
+                            ),
+                          ]
+                        )
+                      );
                     } else {
                     return Center(child: CircularProgressIndicator());
                     }
@@ -153,24 +237,71 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 future: _initializeAllVideosFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
-                    return Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: GestureDetector(
-                      // wraps the video on a clickable item
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PainInfoScreen(),
-                          ),
-                        );
-                      },
-                      // the video being displayed in the main screen
-                      child: AspectRatio(
-                        aspectRatio: _controllers[1].value.aspectRatio,
-                        child: VideoPlayer(_controllers[1]),
-                      ),
-                      ));
+                      final controller = _controllers[1];
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        // the video being displayed in the main screen
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [ 
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (controller.value.isPlaying) {
+                                    controller.pause();
+                                  } else {
+                                    controller.play();
+                                  }
+                                });
+                              },
+                              child: AspectRatio(
+                                aspectRatio: controller.value.aspectRatio,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    // bottom Layer: the video
+                                    VideoPlayer(controller),
+
+                                    // top Layer: play icon
+                                    if (!controller.value.isPlaying)
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black54,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: const Icon(
+                                          Icons.play_arrow,
+                                          color: Colors.white,
+                                          size: 50.0,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PainInfoScreen(),
+                                  ),
+                                );
+                              },
+                              icon: Icon(Icons.forward),
+                              label: Text('Avançar para página'),
+                            ),
+                          ]
+                        )
+                      );
                     } else {
                     return Center(child: CircularProgressIndicator());
                     }
