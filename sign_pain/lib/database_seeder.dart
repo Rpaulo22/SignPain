@@ -24,7 +24,7 @@ final List<Map<String, dynamic>> initialConditions = [
       "text": "O tratamento mais comum baseia-se em fisioterapia, exercícios e aplicação de calor, enquanto opções menos frequentes incluem infiltrações, acupuntura ou cirurgia em casos graves e persistentes",
       "videoURL": "www.example.com"
     },
-    "body_parts_affected": ["neck"]
+    "bodyPartsAffected": ["neck"]
   },
   {
     "id": "lombalgia",
@@ -48,7 +48,7 @@ final List<Map<String, dynamic>> initialConditions = [
       "text": "É aconselhado atividade física, mantendo as atividades do dia-a-dia quanto a dor permita. Caso não seja eficaz, anti-inflamatórios não esteróides. Em último caso, poderá usar opióides ou até ser submitido a cirurgia, dependendo da causa subjacente",
       "videoURL": "www.example.com"
     },
-    "body_parts_affected": ["lowerBack"]
+    "bodyPartsAffected": ["lowerBack"]
   },
 ];
 
