@@ -10,4 +10,6 @@ class MedicalConditionData {
   List<String> uncommonDescriptors;
   String treatment;
   List<String> bodyPartsAffected;
+
+  // missing: videoURLs
 }
