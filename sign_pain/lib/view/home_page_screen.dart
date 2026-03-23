@@ -59,6 +59,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 child: isSignMode ?
                   SignVideoPlayer(
                   videoPath: videoPaths[0],
+                  doubleTap: true
                   )
                 : Text(
                   'Bem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',

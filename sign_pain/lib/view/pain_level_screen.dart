@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/pain_body_screen.dart';
+import 'package:sign_pain/widgets/sign_video_player.dart';
 import 'package:video_player/video_player.dart';
 
 class PainLevelScreen extends StatefulWidget {
@@ -14,30 +15,8 @@ class PainLevelScreen extends StatefulWidget {
 
 class _PainLevelScreenState extends State<PainLevelScreen> {
   final PainFormData _formData = PainFormData(); // TODO change to actual userID
-  late VideoPlayerController _controller;
-  late Future<void> _initializeVideoPlayerFuture;
 
 	final painScale = [0,1,2,3,4,5,6,7,8,9,10];
-
-	@override
-	void initState() {
-		super.initState();
-    
-    // start the video playback
-
-		_controller = VideoPlayerController.asset(
-			'assets/videos/dor.mp4', 
-		);
-    _controller.setVolume(0.0);
-		_initializeVideoPlayerFuture = _controller.initialize(); 
-	}
-
-	@override
-	void dispose() {
-		_controller.dispose();
-
-		super.dispose();
-	}
 
 	final snackBar = SnackBar(
 		content: Text('Reset pain level!'),
@@ -63,96 +42,14 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
         ],
 			),
 			body: SingleChildScrollView(
-				child:Center(
+				child: Center(
 					child: Column(
 					mainAxisAlignment: MainAxisAlignment.center,
 					children: [
             if (isSignMode) // sign language content
-              FutureBuilder(
-              future: _initializeVideoPlayerFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: GestureDetector(
-                    // wraps the video on a clickable item
-                    onTap: () {
-                      setState(() {
-                        if (_controller.value.isPlaying) {
-                          _controller.pause();
-                        } else {
-                          _controller.play();
-                        }
-                      });
-                    },
-                    onDoubleTap: () {
-                      // ensure the video loops
-                      _controller.setLooping(true);
-                      _controller.play();
-
-                      // dialog = popup
-                      showDialog(
-                      context: context,
-                      // barrierDismissible: true means tapping the darkened background closes the popup
-                      barrierDismissible: true, 
-                      builder: (BuildContext context) {
-                        // return a Dialog widget
-                        return Dialog(
-                          backgroundColor: Colors.transparent, // hides the default white dialog box
-                          insetPadding: const EdgeInsets.all(10), // leaves a gap at the edges
-                          child: Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                            // video
-                              GestureDetector(
-                                // tap the video itself to close it
-                                onTap: () {
-                                  _controller.pause();
-                                  _controller.setLooping(false);
-                                  Navigator.pop(context);
-                                }, 
-                                child: AspectRatio(
-                                aspectRatio: _controller.value.aspectRatio,
-                                child: VideoPlayer(_controller),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      );
-                    },
-                    // the video being displayed in the main screen
-                    child: AspectRatio(
-                      aspectRatio: _controller.value.aspectRatio,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // bottom Layer: the video
-                          VideoPlayer(_controller),
-
-                          // top Layer: play icon
-                          if (!_controller.value.isPlaying)
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black54,
-                                shape: BoxShape.circle,
-                              ),
-                              padding: const EdgeInsets.all(12.0),
-                              child: const Icon(
-                                Icons.play_arrow,
-                                color: Colors.white,
-                                size: 50.0,
-                              ),
-                            ),
-                        ],
-                      )
-                    ),
-                    ));
-                  } else {
-                  return Center(child: CircularProgressIndicator());
-                  }
-                },
+              SignVideoPlayer(
+                videoPath: "assets/videos/dor.mp4",
+                doubleTap: true // double tap makes video able to pop up (for better readibility of movements if needed)
               )
             else
               Text("Indica o teu nível de dor", textScaler: TextScaler.linear(2)),

@@ -4,12 +4,14 @@ import 'package:video_player/video_player.dart';
 class SignVideoPlayer extends StatefulWidget {
   final String videoPath;
   
-  final VoidCallback? onTap; 
+  final VoidCallback? onTap; // defines action done by clicking on button next to video
+  final bool doubleTap; // double tap makes video able to pop up (for better readibility of movements if needed)
 
   const SignVideoPlayer({
     super.key, 
     required this.videoPath,
     this.onTap, 
+    this.doubleTap = false
   });
 
   @override
@@ -64,6 +66,45 @@ class _SignVideoPlayerState extends State<SignVideoPlayer> {
                         controller.play();
                       }
                     });
+                  },
+                  onDoubleTap: () {
+                    if (widget.doubleTap) {
+                      // ensure the video loops
+                      _controller.setLooping(true);
+                      _controller.play();
+
+                      // dialog = popup
+                      showDialog(
+                        context: context,
+                        // barrierDismissible: true means tapping the darkened background closes the popup
+                        barrierDismissible: true, 
+                        builder: (BuildContext context) {
+                          // return a Dialog widget
+                          return Dialog(
+                            backgroundColor: Colors.transparent, // hides the default white dialog box
+                            insetPadding: const EdgeInsets.all(10), // leaves a gap at the edges
+                            child: Stack(
+                              alignment: Alignment.topRight,
+                              children: [
+                              // video
+                                GestureDetector(
+                                  // tap the video itself to close it
+                                  onTap: () {
+                                    _controller.pause();
+                                    _controller.setLooping(false);
+                                    Navigator.pop(context);
+                                  }, 
+                                  child: AspectRatio(
+                                  aspectRatio: _controller.value.aspectRatio,
+                                  child: VideoPlayer(_controller),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      );
+                    }
                   },
                   child: AspectRatio(
                     aspectRatio: controller.value.aspectRatio,
