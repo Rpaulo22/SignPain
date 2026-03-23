@@ -5,7 +5,7 @@ import 'package:sign_pain/database_seeder.dart';
 import 'package:sign_pain/view/medical_condition_screen.dart';
 import 'package:sign_pain/view/pain_info_screen.dart';
 import 'package:sign_pain/view/pain_level_screen.dart';
-import 'package:video_player/video_player.dart';
+import 'package:sign_pain/widgets/sign_video_player.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({super.key});
@@ -20,33 +20,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
     'assets/videos/historia.mp4',
     'assets/videos/dor.mp4',
   ];
-
-  late List<VideoPlayerController> _controllers;
-
-  late Future<void> _initializeAllVideosFuture;
-  @override
-	void initState() {
-		super.initState();
-
-		// a controller for each path
-    _controllers = videoPaths.map((path) => VideoPlayerController.asset(path)).toList();
-
-    _initializeAllVideosFuture = Future.wait(
-      _controllers.map((controller) {
-        return controller.initialize().then((_) {
-          controller.setVolume(0.0); // muted 
-        });
-      }),
-    );
-	}
-
-	@override
-	void dispose() {
-    for (var controller in _controllers) {
-      controller.dispose();
-    }
-		super.dispose();
-	}
 
   @override
   Widget build(BuildContext context) {
@@ -84,61 +57,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
               Padding(
                 padding: EdgeInsetsGeometry.all(12),
                 child: isSignMode ?
-                  FutureBuilder(
-                  future: _initializeAllVideosFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      final controller = _controllers[0];
-                      return Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        // the video being displayed in the main screen
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [ 
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (controller.value.isPlaying) {
-                                    controller.pause();
-                                  } else {
-                                    controller.play();
-                                  }
-                                });
-                              },
-                              child: AspectRatio(
-                                aspectRatio: controller.value.aspectRatio,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    // bottom Layer: the video
-                                    VideoPlayer(controller),
-
-                                    // top Layer: play icon
-                                    if (!controller.value.isPlaying)
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.black54,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        padding: const EdgeInsets.all(12.0),
-                                        child: const Icon(
-                                          Icons.play_arrow,
-                                          color: Colors.white,
-                                          size: 50.0,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ]
-                        )
-                      );
-                      } else {
-                      return Center(child: CircularProgressIndicator());
-                      }
-                    },
+                  SignVideoPlayer(
+                  videoPath: videoPaths[0],
                   )
                 : Text(
                   'Bem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',
@@ -148,79 +68,16 @@ class _HomePageScreenState extends State<HomePageScreen> {
               ),
               // redirects to pain form submission
               if (isSignMode) // sign language content
-                FutureBuilder(
-                future: _initializeAllVideosFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                      final controller = _controllers[2];
-                      return Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        // the video being displayed in the main screen
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [ 
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (controller.value.isPlaying) {
-                                    controller.pause();
-                                  } else {
-                                    controller.play();
-                                  }
-                                });
-                              },
-                              child: AspectRatio(
-                                aspectRatio: controller.value.aspectRatio,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    // bottom Layer: the video
-                                    VideoPlayer(controller),
-
-                                    // top Layer: play icon
-                                    if (!controller.value.isPlaying)
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.black54,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        padding: const EdgeInsets.all(12.0),
-                                        child: const Icon(
-                                          Icons.play_arrow,
-                                          color: Colors.white,
-                                          size: 50.0,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
-                                ),
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PainLevelScreen(),
-                                  ),
-                                );
-                              },
-                              icon: Icon(Icons.forward),
-                              label: Text('Avançar para página'),
-                            ),
-                          ]
-                        )
-                      );
-                    } else {
-                    return Center(child: CircularProgressIndicator());
-                    }
-                  },
+                SignVideoPlayer(
+                  videoPath: videoPaths[2],
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PainLevelScreen(),
+                      ),
+                    );
+                 },
                 )
               else TextButton(
                 onPressed: () {
@@ -235,79 +92,16 @@ class _HomePageScreenState extends State<HomePageScreen> {
               ),
               // redirects to pain history screen
               if (isSignMode) // sign language content
-                FutureBuilder(
-                future: _initializeAllVideosFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                      final controller = _controllers[1];
-                      return Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        // the video being displayed in the main screen
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [ 
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (controller.value.isPlaying) {
-                                    controller.pause();
-                                  } else {
-                                    controller.play();
-                                  }
-                                });
-                              },
-                              child: AspectRatio(
-                                aspectRatio: controller.value.aspectRatio,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    // bottom Layer: the video
-                                    VideoPlayer(controller),
-
-                                    // top Layer: play icon
-                                    if (!controller.value.isPlaying)
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.black54,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        padding: const EdgeInsets.all(12.0),
-                                        child: const Icon(
-                                          Icons.play_arrow,
-                                          color: Colors.white,
-                                          size: 50.0,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
-                                ),
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PainInfoScreen(),
-                                  ),
-                                );
-                              },
-                              icon: Icon(Icons.forward),
-                              label: Text('Avançar para página'),
-                            ),
-                          ]
-                        )
-                      );
-                    } else {
-                    return Center(child: CircularProgressIndicator());
-                    }
-                  },
+                SignVideoPlayer(
+                  videoPath: videoPaths[1],
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PainInfoScreen(),
+                      ),
+                    );
+                 },
                 )
               else TextButton(
                 onPressed: () {
