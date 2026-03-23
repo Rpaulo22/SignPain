@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/medical_condition_data.dart';
 import 'package:sign_pain/viewmodel/conditions_view_model.dart';
+import 'package:sign_pain/widgets/medical_condition_widget.dart';
 
 class MedicalConditionScreen extends StatefulWidget {
   const MedicalConditionScreen({super.key});
@@ -55,7 +56,7 @@ class _MedicalConditionScreenState extends State<MedicalConditionScreen> {
                 return Column(
                   children: [
                     for (var medCondition in data)
-                      medicalConditionWidget(medCondition)
+                      MedicalConditionWidget(medData: medCondition)
                   ],
                 );
               }
@@ -63,27 +64,6 @@ class _MedicalConditionScreenState extends State<MedicalConditionScreen> {
             }
           )
         ),
-      )
-    );
-  }
-
-  Widget medicalConditionWidget(MedicalConditionData medData) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).colorScheme.primaryContainer)
-      ),
-      padding: EdgeInsetsDirectional.only(top: 15, bottom: 15, start: 10, end: 10),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(medData.name, textScaler: TextScaler.linear(1.2), style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text("Descrição: ${medData.description}"),
-          Text("Causas: ${medData.causes.join(", ")}"),
-          Text("Dor é: ${medData.commonDescriptors.join(", ")}"),
-          Text("Mais raramente: ${medData.uncommonDescriptors.join(", ")}"),
-          Text("Tratamento: ${medData.treatment}"),
-          Text("Zona do corpo: ${medData.bodyPartsAffected.join(" | ")}")
-        ],
       )
     );
   }
