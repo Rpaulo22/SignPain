@@ -1,6 +1,6 @@
 class MedicalConditionData {
   // constructor
-  MedicalConditionData(this.id, this.name, this.description, this.causes, this.commonDescriptors, this.uncommonDescriptors, this.treatment, this.bodyPartsAffected);
+  MedicalConditionData(this.id, this.name, this.description, this.causes, this.commonDescriptors, this.uncommonDescriptors, this.treatment, this.bodyPartsAffected, this.side);
 
   String id;
   String name;
@@ -10,6 +10,7 @@ class MedicalConditionData {
   List<String> uncommonDescriptors;
   String treatment;
   List<String> bodyPartsAffected;
+  String side;
 
   // missing: videoURLs
 }

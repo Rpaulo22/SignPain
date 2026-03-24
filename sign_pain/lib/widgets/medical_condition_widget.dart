@@ -78,14 +78,24 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
           Text("Tratamento: ${medData.treatment}"),
           SizedBox(
             height: 400,
-            child: BodyPartSelectorTurnable(
+            child: BodyPartSelector(
               bodyParts: parts, 
               onSelectionUpdated: (parts) {},
-              labelData: RotationStageLabelData(front:'Frente', left:'Esquerda', right:'Direita', back:'Trás'),
+              side: defineSide(medData.side)
             ),
           ),
         ],
       )
     );
+  }
+
+  BodySide defineSide(String side) {
+    return switch (side) {
+      'left' => BodySide.left,
+      'right' => BodySide.right,
+      'front' => BodySide.front,
+      'back' => BodySide.back,
+      _ => BodySide.front 
+    };
   }
 }

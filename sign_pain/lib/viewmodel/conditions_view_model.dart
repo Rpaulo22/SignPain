@@ -21,6 +21,7 @@ class ConditionsViewModel {
         var treatmentMap = _data['treatment'] as Map<String, dynamic>;
         var descriptorsMap = _data['painDescriptors'] as Map<String, dynamic>;
         var bodyPartsAffected = List<String>.from(_data['bodyPartsAffected'] ?? []) ;
+        var side = _data['side'] as String;
 
         var name = nameMap['text'] as String;
         var description = descriptionMap['text'] as String;
@@ -29,7 +30,7 @@ class ConditionsViewModel {
         var commonDescriptors = List<String>.from(descriptorsMap['common'] ?? []);
         var uncommonDescriptors = List<String>.from(descriptorsMap['uncommon'] ?? []);
 
-        MedicalConditionData medData = MedicalConditionData(id, name, description, causes, commonDescriptors, uncommonDescriptors, treatment, bodyPartsAffected);
+        MedicalConditionData medData = MedicalConditionData(id, name, description, causes, commonDescriptors, uncommonDescriptors, treatment, bodyPartsAffected, side);
         data.add(medData);
       }
     } catch(e) {
