@@ -95,70 +95,76 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
       insetPadding: const EdgeInsets.all(10),   
       child: SizedBox(
         width: size.width*0.8,
-        height: size.height*0.3,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            const Text('Gravar?', textScaler: TextScaler.linear(2)),
-            Padding(
-              padding: EdgeInsetsGeometry.directional(start:20, end:20),
-              child:Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text(
-                      'Não',
-                      textScaler: TextScaler.linear(1.5),
-                      style: TextStyle(
-                        color: Colors.red
+        height: size.height*0.4,
+        child: Padding(
+          padding: EdgeInsetsGeometry.directional(start:20, end:20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              const Text('Gravar?', textScaler: TextScaler.linear(2)),
+              Text("Nível: ${widget.formData.painLevel}/10"),
+              Text("Descriptores: ${widget.formData.descriptors.join(", ")}"),
+              Text("Parte(s) do corpo: ${BodyPartsMapper.listToPortuguese(widget.formData.bodyParts).join(", ")}"),
+              Padding(
+                padding: EdgeInsetsGeometry.directional(start:20, end:20),
+                child:Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        'Não',
+                        textScaler: TextScaler.linear(1.5),
+                        style: TextStyle(
+                          color: Colors.red
+                        )
                       )
-                    )
-                  ),
-                  const Divider(
-                    thickness: 5,
-                    indent: 25,
-                    endIndent: 25,
-                    color: Colors.transparent,
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      if (widget.formData.isComplete) {
-                        bool successful = await formViewModel.saveDailyForm(widget.formData);
-                        if (successful) { // use viewmodel to save pain form
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar("Registo guardado com sucesso!"));
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => const HomePageScreen()),
-                            (Route<dynamic> route) => false, // false condition clears the entire stack
-                          );
+                    ),
+                    const Divider(
+                      thickness: 5,
+                      indent: 25,
+                      endIndent: 25,
+                      color: Colors.transparent,
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        if (widget.formData.isComplete) {
+                          bool successful = await formViewModel.saveDailyForm(widget.formData);
+                          if (successful) { // use viewmodel to save pain form
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar("Registo guardado com sucesso!"));
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(builder: (context) => const HomePageScreen()),
+                              (Route<dynamic> route) => false, // false condition clears the entire stack
+                            );
+                          }
+                          else {
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar("Erro a gravar. Por favor tente novamente."));
+                            Navigator.pop(context);
+                          }
                         }
                         else {
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar("Erro a gravar. Por favor tente novamente."));
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar("Formulário incompleto. Por favor indique o seu nível de dor e descreva a sua dor."));
                           Navigator.pop(context);
                         }
-                      }
-                      else {
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar("Formulário incompleto. Por favor indique o seu nível de dor e descreva a sua dor."));
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: const Text(
-                      'Sim',
-                      textScaler: TextScaler.linear(1.5),
-                      style: TextStyle(
-                        color: Colors.green
+                      },
+                      child: const Text(
+                        'Sim',
+                        textScaler: TextScaler.linear(1.5),
+                        style: TextStyle(
+                          color: Colors.green
+                        )
                       )
-                    )
-                  ),
-                ]
-              ),
-            )
-          ],
-        ),
+                    ),
+                  ]
+                ),
+              )
+            ],
+          ),
+        )
       )
     );
   }
