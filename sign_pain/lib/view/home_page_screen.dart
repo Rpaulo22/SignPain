@@ -19,6 +19,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     'assets/videos/ola.mp4',
     'assets/videos/historia.mp4',
     'assets/videos/dor.mp4',
+    'assets/videos/doenca.mp4'
   ];
 
   @override
@@ -115,17 +116,30 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 },
                 child: Text('Veja aqui o seu histórico de dor')
               ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MedicalConditionScreen(),
-                    ),
-                  );
-                },
-                child: Text('Informação sobre a sua condição')
-              ),
+              if (isSignMode)
+                SignVideoPlayer(
+                  videoPath: videoPaths[3],
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MedicalConditionScreen(),
+                      ),
+                    );
+                  },
+                )
+              else
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MedicalConditionScreen(),
+                      ),
+                    );
+                  },
+                  child: Text('Informação sobre a sua condição')
+                ),
               // button to be used when uploading medical data to firebase
               //ElevatedButton(
               //  onPressed: () async {
