@@ -1,5 +1,7 @@
+import 'package:body_part_selector/body_part_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_pain/model/medical_condition_data.dart';
+import 'package:sign_pain/model/pain_form_data.dart';
 
 class MedicalConditionWidget extends StatefulWidget{
   const MedicalConditionWidget({super.key, required this.medData});
@@ -15,6 +17,9 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
   @override 
   Widget build(BuildContext context) {
     final medData = widget.medData;
+
+    BodyParts parts = BodyPartsMapper.fromList(medData.bodyPartsAffected); // BodyParts object which holds the body parts affected by the condition for visualization purposes
+
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).colorScheme.primaryContainer)
@@ -71,7 +76,14 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
             ],
           ),
           Text("Tratamento: ${medData.treatment}"),
-          Text("Zona do corpo: ${medData.bodyPartsAffected.join(" | ")}")
+          SizedBox(
+            height: 400,
+            child: BodyPartSelectorTurnable(
+              bodyParts: parts, 
+              onSelectionUpdated: (parts) {},
+              labelData: RotationStageLabelData(front:'Frente', left:'Esquerda', right:'Direita', back:'Trás'),
+            ),
+          ),
         ],
       )
     );
