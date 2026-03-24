@@ -16,7 +16,7 @@ class PainDescriptorScreen extends StatefulWidget {
 }
 
 class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
-	final painDescriptors = ["Latente", "Ardor", "Formigueiro", "Perfurante", "Frio", "Choque"];
+	final painDescriptors = ["Moedeira", "Tensão", "Latejante", "Ardor", "Formigueiro", "Perfurante", "Frio", "Choque", "Localizada", "Mecânica", "Difusa", "Irradiada", "Aguda", "Intermitente", "Cansaço", "Rigidez", "Peso"];
   final FormViewModel formViewModel = FormViewModel();
 
 	@override
@@ -38,31 +38,36 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
         ],
 			),
 			body: Center(
-				child: Column(
-					mainAxisAlignment: MainAxisAlignment.center,
-					children: [
-						Text("Qual destes melhor caracteriza a tua dor?", textScaler: TextScaler.linear(2), textAlign: TextAlign.center,),
-						Padding(padding: EdgeInsetsGeometry.all(20)),
-						Column(
-							children: [
-							for (var i in painDescriptors)
-								CheckboxListTile(
-									title: Text(i.toString()),
-									value: widget.formData.descriptors.contains(i),
-									onChanged: (bool? checked) {
-										setState(() {
-										if (checked == true) {
-											widget.formData.descriptors.add(i);
-										} else {
-											widget.formData.descriptors.remove(i);
-										}
-										});
-									},
-								)
-							],
-						)
-					]),
-				),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsetsGeometry.directional(top:20, bottom:90, start:10, end:10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Qual destas palavras melhor caracteriza a tua dor?", textScaler: TextScaler.linear(2), textAlign: TextAlign.center,),
+                Padding(padding: EdgeInsetsGeometry.all(20)),
+                Column(
+                  children: [
+                  for (var i in painDescriptors)
+                    CheckboxListTile(
+                      title: Text(i.toString()),
+                      value: widget.formData.descriptors.contains(i),
+                      onChanged: (bool? checked) {
+                        setState(() {
+                        if (checked == true) {
+                          widget.formData.descriptors.add(i);
+                        } else {
+                          widget.formData.descriptors.remove(i);
+                        }
+                        });
+                      },
+                    )
+                  ],
+                )
+              ])
+            ),
+          )
+        ),
 				floatingActionButton: FloatingActionButton(
 					onPressed: () {
 						showDialog(
