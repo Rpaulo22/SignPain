@@ -63,7 +63,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   doubleTap: true
                   )
                 : Text(
-                  'Bem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',
+                  '👋\nBem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',
                   textAlign: TextAlign.center,
                   textScaler: TextScaler.linear(2),
                   )
@@ -90,7 +90,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     ),
                   );
                 },
-                child: Text('Registe aqui o seu diário da dor')
+                child: Text('Registe aqui o seu diário da dor 📋')
               ),
               // redirects to pain history screen
               if (isSignMode) // sign language content
@@ -114,7 +114,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     ),
                   );
                 },
-                child: Text('Veja aqui o seu histórico de dor')
+                child: Text('Veja aqui o seu histórico de dor 📈')
               ),
               if (isSignMode)
                 SignVideoPlayer(
@@ -138,7 +138,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                       ),
                     );
                   },
-                  child: Text('Informação sobre a sua condição')
+                  child: Text('Informação sobre a sua condição ℹ️🩺')
                 ),
               // button to be used when uploading medical data to firebase
               //ElevatedButton(

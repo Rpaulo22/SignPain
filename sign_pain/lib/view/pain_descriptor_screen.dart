@@ -50,7 +50,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                   children: [
                   for (var i in painDescriptors)
                     CheckboxListTile(
-                      title: Text(i.toString()),
+                      title: Text("${i.toString()}${descriptorIconMap[i.toString()] ?? ""}"),
                       value: widget.formData.descriptors.contains(i),
                       onChanged: (bool? checked) {
                         setState(() {
@@ -175,4 +175,14 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
       duration: const Duration(milliseconds: 5000),
     );
   }
+
+  static const Map<String, String> descriptorIconMap = {
+    "Ardor": "🔥",
+    "Formigueiro": "🐜",
+    "Tensão": "❄️",
+    "Mecânica": "⚙️",
+    "Peso": "🏋️",
+    "Cansaço": "🥱",
+
+  };
 }

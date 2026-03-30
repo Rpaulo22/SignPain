@@ -27,8 +27,10 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
       padding: EdgeInsetsDirectional.only(top: 15, bottom: 15, start: 10, end: 10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(medData.name, textScaler: TextScaler.linear(1.2), style: const TextStyle(fontWeight: FontWeight.bold)),
+          
           Text("Descrição: ${medData.description}"),
           Text("Causas: ${medData.causes.join(", ")}"),
           Row(
