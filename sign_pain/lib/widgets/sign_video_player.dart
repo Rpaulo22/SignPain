@@ -95,7 +95,7 @@ class _SignVideoPlayerState extends State<SignVideoPlayer> {
                                     Navigator.pop(context);
                                   }, 
                                   child: AspectRatio(
-                                  aspectRatio: _controller.value.aspectRatio,
+                                  aspectRatio: 1.0,
                                   child: VideoPlayer(_controller),
                                   ),
                                 ),
@@ -106,30 +106,33 @@ class _SignVideoPlayerState extends State<SignVideoPlayer> {
                       );
                     }
                   },
-                  child: AspectRatio(
-                    aspectRatio: controller.value.aspectRatio,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // bottom Layer: the video
-                        VideoPlayer(controller),
+                  child: ClipRRect( // forces video to also have rounded corners
+                    borderRadius: BorderRadius.vertical(top: const Radius.circular(12), bottom: (widget.onTap == null) ? const Radius.circular(12) : Radius.zero),
+                    child: AspectRatio(
+                      aspectRatio: 1.0,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // bottom Layer: the video
+                          VideoPlayer(controller),
 
-                        // top Layer: play icon
-                        if (!controller.value.isPlaying)
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black54,
-                              shape: BoxShape.circle,
+                          // top Layer: play icon
+                          if (!controller.value.isPlaying)
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                shape: BoxShape.circle,
+                              ),
+                              padding: const EdgeInsets.all(12.0),
+                              child: const Icon(
+                                Icons.play_arrow,
+                                color: Colors.white,
+                                size: 50.0,
+                              ),
                             ),
-                            padding: const EdgeInsets.all(12.0),
-                            child: const Icon(
-                              Icons.play_arrow,
-                              color: Colors.white,
-                              size: 50.0,
-                            ),
-                          ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    )
                   ),
                 ),
                 if (widget.onTap != null)
