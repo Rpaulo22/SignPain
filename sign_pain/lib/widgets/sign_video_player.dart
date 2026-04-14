@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+/* Widget which displays a sign language video and defines its behaviour (ability to double tap and optional action button below video) */
 class SignVideoPlayer extends StatefulWidget {
   final String videoPath;
   

@@ -81,16 +81,28 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     );
                  },
                 )
-              else TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PainLevelScreen(),
+              else Padding(
+                padding: EdgeInsetsGeometry.directional(top:10, bottom:10),
+                child: SizedBox(
+                  width: double.infinity, // Stretches it to the edges of the screen
+                  height: 50, // Makes it a bit taller and easier to tap
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PainLevelScreen(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.inversePrimary, 
+                      foregroundColor: Colors.white, // Text color
+                      elevation: 4.0, 
                     ),
-                  );
-                },
-                child: Text('Registe aqui o seu diário da dor 📋')
+                    child: Text('Registar dor 📋')
+                  )
+                )
               ),
               // redirects to pain history screen
               if (isSignMode) // sign language content
@@ -105,16 +117,28 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     );
                  },
                 )
-              else TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PainInfoScreen(),
+              else Padding(
+                padding: EdgeInsetsGeometry.directional(top:10, bottom:10),
+                child:SizedBox(
+                  width: double.infinity, // stretches it to the edge
+                  height: 50, // makes it a bit taller and easier to tap
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PainInfoScreen(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green, 
+                      foregroundColor: Colors.white, // Text color
+                      elevation: 4.0, 
                     ),
-                  );
-                },
-                child: Text('Veja aqui o seu histórico de dor 📈')
+                    child: Text('Histórico 📈')
+                  )
+                )
               ),
               if (isSignMode)
                 SignVideoPlayer(
@@ -129,17 +153,29 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   },
                 )
               else
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MedicalConditionScreen(),
+                Padding(
+                  padding: EdgeInsetsGeometry.directional(top:10, bottom:10),
+                  child: SizedBox(
+                    width: double.infinity, // Stretches it to the edges of the screen
+                    height: 50, // Makes it a bit taller and easier to tap
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MedicalConditionScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue, 
+                        foregroundColor: Colors.white, // Text color
+                        elevation: 4.0, 
                       ),
-                    );
-                  },
-                  child: Text('Informação sobre a sua condição ℹ️🩺')
-                ),
+                      child: Text('Informações ℹ️')
+                    )
+                  )
+                )
               // button to be used when uploading medical data to firebase
               //ElevatedButton(
               //  onPressed: () async {
