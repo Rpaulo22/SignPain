@@ -5,6 +5,7 @@ import 'package:sign_pain/view/home_page_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +27,12 @@ Future<void> main() async {
       rethrow; 
     }
   }
+
+  // ensures Flutter bindings are initialized before calling async code
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // load the Portuguese date formatting data (could crash if not awaited for)
+  await initializeDateFormatting('pt_PT', null);
   
   runApp(
     ChangeNotifierProvider(

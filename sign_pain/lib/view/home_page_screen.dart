@@ -42,52 +42,39 @@ class _HomePageScreenState extends State<HomePageScreen> {
 			),
 			body: SingleChildScrollView(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsetsGeometry.all(16.0),
-                child: FractionallySizedBox(
-                  widthFactor: 0.5,
-                  child: Image(
-                    image: const AssetImage('assets/images/signpain.png'),
-                    fit: BoxFit.contain,
+          child: Padding(
+            padding: EdgeInsetsGeometry.directional(start:15, end:15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsetsGeometry.all(16.0),
+                  child: FractionallySizedBox(
+                    widthFactor: 0.5,
+                    child: Image(
+                      image: const AssetImage('assets/images/signpain.png'),
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsetsGeometry.all(12),
-                child: isSignMode ?
+                Padding(
+                  padding: EdgeInsetsGeometry.all(12),
+                  child: isSignMode ?
+                    SignVideoPlayer(
+                    videoPath: videoPaths[0],
+                    doubleTap: true
+                    )
+                  : Text(
+                    '👋\nBem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',
+                    textAlign: TextAlign.center,
+                    textScaler: TextScaler.linear(1.8),
+                    )
+                ),
+                // redirects to pain form submission
+                if (isSignMode) // sign language content
                   SignVideoPlayer(
-                  videoPath: videoPaths[0],
-                  doubleTap: true
-                  )
-                : Text(
-                  '👋\nBem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',
-                  textAlign: TextAlign.center,
-                  textScaler: TextScaler.linear(2),
-                  )
-              ),
-              // redirects to pain form submission
-              if (isSignMode) // sign language content
-                SignVideoPlayer(
-                  videoPath: videoPaths[2],
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PainLevelScreen(),
-                      ),
-                    );
-                 },
-                )
-              else Padding(
-                padding: EdgeInsetsGeometry.directional(top:10, bottom:10),
-                child: SizedBox(
-                  width: double.infinity, // Stretches it to the edges of the screen
-                  height: 50, // Makes it a bit taller and easier to tap
-                  child: ElevatedButton(
-                    onPressed: () {
+                    videoPath: videoPaths[2],
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -95,95 +82,111 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.inversePrimary, 
-                      foregroundColor: Colors.white, // Text color
-                      elevation: 4.0, 
-                    ),
-                    child: Text('Registar dor 📋')
                   )
-                )
-              ),
-              // redirects to pain history screen
-              if (isSignMode) // sign language content
-                SignVideoPlayer(
-                  videoPath: videoPaths[1],
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PainInfoScreen(),
+                else Padding(
+                  padding: EdgeInsetsGeometry.directional(top:10, bottom:20),
+                  child: SizedBox(
+                    width: double.infinity, // Stretches it to the edges of the screen
+                    height: 60, // Makes it a bit taller and easier to tap
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PainLevelScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.inversePrimary, 
+                        foregroundColor: Colors.white, // Text color
+                        elevation: 4.0, 
                       ),
-                    );
-                 },
-                )
-              else Padding(
-                padding: EdgeInsetsGeometry.directional(top:10, bottom:10),
-                child:SizedBox(
-                  width: double.infinity, // stretches it to the edge
-                  height: 50, // makes it a bit taller and easier to tap
-                  child: ElevatedButton(
-                    onPressed: () {
+                      child: Text('Registar dor 📋', textScaler: TextScaler.linear(1.25))
+                    )
+                  )
+                ),
+                // redirects to pain history screen
+                if (isSignMode) // sign language content
+                  SignVideoPlayer(
+                    videoPath: videoPaths[1],
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => PainInfoScreen(),
                         ),
                       );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green, 
-                      foregroundColor: Colors.white, // Text color
-                      elevation: 4.0, 
-                    ),
-                    child: Text('Histórico 📈')
-                  )
-                )
-              ),
-              if (isSignMode)
-                SignVideoPlayer(
-                  videoPath: videoPaths[3],
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MedicalConditionScreen(),
-                      ),
-                    );
                   },
-                )
-              else
-                Padding(
-                  padding: EdgeInsetsGeometry.directional(top:10, bottom:10),
-                  child: SizedBox(
-                    width: double.infinity, // Stretches it to the edges of the screen
-                    height: 50, // Makes it a bit taller and easier to tap
+                  )
+                else Padding(
+                  padding: EdgeInsetsGeometry.directional(top:10, bottom:20),
+                  child:SizedBox(
+                    width: double.infinity, // stretches it to the edge
+                    height: 60, // makes it a bit taller and easier to tap
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MedicalConditionScreen(),
+                            builder: (context) => PainInfoScreen(),
                           ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue, 
+                        backgroundColor: Colors.green, 
                         foregroundColor: Colors.white, // Text color
                         elevation: 4.0, 
                       ),
-                      child: Text('Informações ℹ️')
+                      child: Text('Histórico 📈', textScaler: TextScaler.linear(1.25))
                     )
                   )
-                )
-              // button to be used when uploading medical data to firebase
-              //ElevatedButton(
-              //  onPressed: () async {
-              //    await uploadMedicalConditions();
-              //  },
-              //  child: const Text("Carregar Dados"),
-              //)
-            ],
+                ),
+                if (isSignMode)
+                  SignVideoPlayer(
+                    videoPath: videoPaths[3],
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MedicalConditionScreen(),
+                        ),
+                      );
+                    },
+                  )
+                else
+                  Padding(
+                    padding: EdgeInsetsGeometry.directional(top:10, bottom:20),
+                    child: SizedBox(
+                      width: double.infinity, // Stretches it to the edges of the screen
+                      height: 60, // Makes it a bit taller and easier to tap
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MedicalConditionScreen(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue, 
+                          foregroundColor: Colors.white, // Text color
+                          elevation: 4.0, 
+                        ),
+                        child: Text('Informações ℹ️', textScaler: TextScaler.linear(1.25))
+                      )
+                    )
+                  )
+                // button to be used when uploading medical data to firebase
+                //ElevatedButton(
+                //  onPressed: () async {
+                //    await uploadMedicalConditions();
+                //  },
+                //  child: const Text("Carregar Dados"),
+                //)
+              ],
+            )
           )
         )
       )

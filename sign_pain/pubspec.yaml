@@ -43,6 +43,7 @@ dependencies:
   provider: ^6.1.5+1
   flutter_launcher_icons: ^0.14.4
   body_part_selector: ^0.2.0
+  fl_chart: ^1.2.0
 
 dev_dependencies:
   flutter_test:
