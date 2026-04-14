@@ -83,6 +83,9 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                             lineTouchData: LineTouchData(
                               touchTooltipData: LineTouchTooltipData(
                                 getTooltipColor: (LineBarSpot touchedSpot) => Theme.of(context).colorScheme.inversePrimary,
+
+                                tooltipPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                                tooltipMargin: 30.0, // margin so that finger does not obstruct the information
                                 
                                 getTooltipItems: (List<LineBarSpot> touchedSpots) {
                                   return touchedSpots.map((LineBarSpot spot) {
