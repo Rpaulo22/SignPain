@@ -29,16 +29,6 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
 			appBar: AppBar(
 				backgroundColor: Theme.of(context).colorScheme.inversePrimary,
 				title: const Text("SignPain"),
-        actions: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                showGraph = !showGraph;
-              });
-            }, 
-            icon: showGraph ? Icon(Icons.show_chart) : Icon(Icons.show_chart_outlined)
-          )
-        ],
 			),
 			body: SingleChildScrollView(
         child: FutureBuilder<List<PainFormData>>(
@@ -57,6 +47,17 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                 int interval = (dataX.last / 4).toInt();
                 return Column(
                   children: [
+                    Padding(
+                      padding: EdgeInsetsGeometry.all(20),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            showGraph = !showGraph;
+                          });
+                        },
+                        child: Text("Lista 📋")
+                      )
+                    ),
                     Text("Progressão da dor", textScaler: TextScaler.linear(1.8), style: TextStyle(fontWeight: FontWeight.bold)),
                     Padding(
                       padding: EdgeInsetsGeometry.directional(start: 5, end: 25, top: 40),
@@ -155,6 +156,17 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
               else {
                 return Column(
                   children: <Widget>[
+                    Padding(
+                      padding: EdgeInsetsGeometry.all(20),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            showGraph = !showGraph;
+                          });
+                        },
+                        child: Text("Gráfico 📈")
+                      )
+                    ),
                     for (var entry in data) 
                       painFormWidget(entry),
                       const Divider(
