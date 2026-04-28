@@ -53,41 +53,45 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
               )
             else
               Text("Indica o teu nível de dor", textScaler: TextScaler.linear(2)),
-						Row(
-						mainAxisAlignment: MainAxisAlignment.center, 
-						children: [
-							// IPT image
-							Expanded(
-								flex: 1,
-								child: Image(
-									image: AssetImage('assets/images/ipt.png'),
-									fit: BoxFit.contain, 
-								),
-							),
-							// Options for pain
-							Expanded(
-							child: 
-								RadioGroup<int>(
-								groupValue: _formData.painLevel,
-								onChanged: (int? value) {
-									setState(() {
-									_formData.painLevel = value;
-									});
-								},
-								child:
-									Column(
-									children: <Widget>[
-									for (var i in painScale.reversed.toList())
-										ListTile(
-										title: Text(i.toString()),
-										leading: Radio<int>(value: i))
-									],
-									)
-								)
-							),
-						],
-						),
-					],
+						Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image(
+                  image: AssetImage('assets/images/ipt.png'),
+                  fit: BoxFit.contain, 
+                ),
+
+                // Options for pain
+                RadioGroup<int>(
+                  groupValue: _formData.painLevel,
+                  onChanged: (int? value) {
+                    setState(() {
+                    _formData.painLevel = value;
+                    });
+                  },
+                  child: Wrap(
+                    spacing: 8.0,
+                    runSpacing: 8.0,
+                    
+                    children: <Widget>[
+                      for (var i in painScale)
+                        Row(
+                          mainAxisSize: MainAxisSize.min, 
+                          children: [
+                            Radio<int>(value: i),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text(i.toString(), style: const TextStyle(fontSize: 16)),
+                            ),
+                          ],
+                        )
+                    ],
+                  )
+                )
+              ],
+              ),
+            ],
 					),
 				)
 			),
