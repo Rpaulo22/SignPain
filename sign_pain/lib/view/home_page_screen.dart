@@ -1,10 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
-import 'package:sign_pain/database_seeder.dart';
 import 'package:sign_pain/view/medical_condition_screen.dart';
 import 'package:sign_pain/view/pain_info_screen.dart';
 import 'package:sign_pain/view/pain_level_screen.dart';
+import 'package:sign_pain/viewmodel/account_view_model.dart';
 import 'package:sign_pain/widgets/sign_video_player.dart';
 
 class HomePageScreen extends StatefulWidget {
@@ -22,9 +23,21 @@ class _HomePageScreenState extends State<HomePageScreen> {
     'assets/videos/doenca.mp4'
   ];
 
+  final accountViewModel = AccountViewModel();
+
   @override
   Widget build(BuildContext context) {
     final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
+    User? currentUser = FirebaseAuth.instance.currentUser;
+
+    // safely handle the split-second where it might be null
+    if (currentUser == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    Future<String> userNameFuture = accountViewModel.getUserName(currentUser.uid);
 
     return Scaffold(
       appBar: AppBar(
@@ -64,11 +77,20 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     videoPath: videoPaths[0],
                     doubleTap: true
                     )
-                  : Text(
-                    '👋\nBem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',
-                    textAlign: TextAlign.center,
-                    textScaler: TextScaler.linear(1.8),
-                    )
+                  : FutureBuilder(
+                    future: userNameFuture, 
+                    builder: (context, snapshot) { // waiting for user's name
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      else {
+                        return Text('👋Olá ${snapshot.data}\nBem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',
+                          textAlign: TextAlign.center,
+                          textScaler: TextScaler.linear(1.8)
+                        );
+                      }
+                    }
+                  )
                 ),
                 // redirects to pain form submission
                 if (isSignMode) // sign language content

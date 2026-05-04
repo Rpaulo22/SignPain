@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
@@ -13,7 +14,7 @@ class PainInfoScreen extends StatefulWidget {
 
 class _PainInfoScreenState extends State<PainInfoScreen> {
   final FormViewModel formViewModel = FormViewModel();
-  String userID = "user1"; // TODO use actual user ID
+  String userID = FirebaseAuth.instance.currentUser!.uid; // TODO use actual user ID
   late Future<List<PainFormData>> _painDataFuture;
   bool showGraph = false;
 

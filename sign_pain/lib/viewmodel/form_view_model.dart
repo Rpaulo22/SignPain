@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 
 
@@ -6,6 +7,7 @@ class FormViewModel {
   
   // function which saves pain form date in firebase (firestore)
   Future<bool> saveDailyForm(PainFormData formData) async {
+
     var db = FirebaseFirestore.instance;
     // TODO check if userValid()
     final formEntry = <String, dynamic>{
@@ -16,12 +18,15 @@ class FormViewModel {
       "date": DateTime.now()
     };
 
+    final userEntries = FirebaseFirestore.instance
+      .collection('Users')
+      .doc(formData.userID)
+      .collection('userEntries'); // form entries subcollection
+
     try {
       // attempt to upload
-      await db.collection("FormEntry").add(formEntry);
-      
-      // successful
-      print("Form submitted successfully!");
+      await userEntries.add(formEntry);
+
       return true;
       
     } catch (e) {
@@ -36,13 +41,16 @@ class FormViewModel {
     List<PainFormData> data = [];
 
     try {
-      final querySnapshot = await db
-          .collection("FormEntry")
-          .where("userID", isEqualTo: userID)
+      final userEntries = await db
+          .collection("Users")
+          .doc(userID)
+          .collection('userEntries')
+          .orderBy('date', descending: true)
           .get();
+
       // loop through results
-      for (var docSnapshot in querySnapshot.docs) {
-        var _data = docSnapshot.data(); 
+      for (var entry in userEntries.docs) {
+        var _data = entry.data(); 
         
         var date = (_data['date'] as Timestamp).toDate();
         var descriptors = Set<String>.from(_data['descriptors'] ?? []);
@@ -55,7 +63,7 @@ class FormViewModel {
     } catch(e) {
       rethrow;
     }
-    data.sort((a, b) => a.date!.compareTo(b.date!)); // sort the data based on date, ascending order
+    
     return data;
   }
 }
