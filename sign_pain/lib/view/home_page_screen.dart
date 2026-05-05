@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
+import 'package:sign_pain/view/login_screen.dart';
 import 'package:sign_pain/view/medical_condition_screen.dart';
 import 'package:sign_pain/view/pain_info_screen.dart';
 import 'package:sign_pain/view/pain_level_screen.dart';
@@ -199,6 +200,28 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         child: Text('Informações ℹ️', textScaler: TextScaler.linear(1.25))
                       )
                     )
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      try {
+                        await accountViewModel.signOutUser();
+
+                        if (!context.mounted) return;
+
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen()
+                          ),
+                        );
+                      }
+                      catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(e.toString()))
+                        );
+                      }
+                    },
+                    child: Text("Terminar sessão", textScaler: TextScaler.linear(1.25))
                   )
                 // button to be used when uploading medical data to firebase
                 //ElevatedButton(

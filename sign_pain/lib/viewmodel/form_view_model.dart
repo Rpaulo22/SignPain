@@ -5,11 +5,10 @@ import 'package:sign_pain/model/pain_form_data.dart';
 
 class FormViewModel {
   
-  // function which saves pain form date in firebase (firestore)
+  // Given a pain form entry (and the user currently logged in), saves it to firebase
   Future<bool> saveDailyForm(PainFormData formData) async {
 
     var db = FirebaseFirestore.instance;
-    // TODO check if userValid()
     final formEntry = <String, dynamic>{
       "userID": formData.userID, 
       "painIntensity": formData.painLevel,
@@ -18,7 +17,7 @@ class FormViewModel {
       "date": DateTime.now()
     };
 
-    final userEntries = FirebaseFirestore.instance
+    final userEntries = db
       .collection('Users')
       .doc(formData.userID)
       .collection('userEntries'); // form entries subcollection
@@ -30,7 +29,6 @@ class FormViewModel {
       return true;
       
     } catch (e) {
-      // goes wrong 
       print("Error adding document: $e");
       return false;
     }
@@ -63,7 +61,7 @@ class FormViewModel {
     } catch(e) {
       rethrow;
     }
-    
+
     return data;
   }
 }

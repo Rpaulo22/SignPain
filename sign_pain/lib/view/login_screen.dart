@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sign_pain/view/create_account_screen.dart';
 import 'package:sign_pain/view/home_page_screen.dart';
-import 'package:sign_pain/viewmodel/login_view_model.dart';
+import 'package:sign_pain/viewmodel/account_view_model.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,7 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   late TextEditingController userStringController;
   late TextEditingController passwordController;
 
-  final loginViewModel = LoginViewModel();
+  final accountViewModel = AccountViewModel();
 
   @override
   void initState() {
@@ -36,79 +36,82 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       body: Center(
-        child: Padding( 
-          padding: EdgeInsetsGeometry.directional(start: 20.0, end: 20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsetsGeometry.directional(bottom: 50.0),
-                child: FractionallySizedBox(
-                  widthFactor: 0.5,
-                  child: Image(
-                    image: const AssetImage('assets/images/signpain.png'),
-                    fit: BoxFit.contain,
+        child: SingleChildScrollView(
+          child: Padding( 
+            padding: EdgeInsetsGeometry.directional(start: 20.0, end: 20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsetsGeometry.directional(bottom: 50.0),
+                  child: FractionallySizedBox(
+                    widthFactor: 0.5,
+                    child: Image(
+                      image: const AssetImage('assets/images/signpain.png'),
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsetsGeometry.all(16.0),
-                child: Text("Entrar na conta", textScaler: TextScaler.linear(2.0),)
-              ),
-              TextField(
-                controller: userStringController,
-                obscureText: false,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'E-mail',
+                Padding(
+                  padding: EdgeInsetsGeometry.all(16.0),
+                  child: Text("Entrar na conta", textScaler: TextScaler.linear(2.0),)
                 ),
-              ),
-              Divider(height: 10.0, color: Colors.transparent,),
-              TextField(
-                controller: userStringController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Palavra-passe',
+                TextField(
+                  controller: userStringController,
+                  obscureText: false,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'E-mail',
+                  ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsetsGeometry.all(16.0),
-                child: ElevatedButton(
+                Divider(height: 10.0, color: Colors.transparent,),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Palavra-passe',
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsetsGeometry.all(16.0),
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      try {
+                        await accountViewModel.loginUser(userStringController.text, passwordController.text);
+
+                        if (!context.mounted) return;
+
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomePageScreen(),
+                          ),
+                        );
+                      }
+                      catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(e.toString()))
+                        );
+                      }
+                    }, 
+                    child: Text("Entrar")
+                  ),
+                ),
+                TextButton(
                   onPressed: () {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => HomePageScreen(),
+                        builder: (context) => CreateAccountScreen(),
                       ),
                     );
                   }, 
-                  child: Text("Entrar")
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  try {
-                    await loginViewModel.loginUser(userStringController.text, passwordController.text);
-
-                    if (!context.mounted) return;
-
-                    Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CreateAccountScreen(),
-                    ),
-                  );
-                  }
-                  catch (e) {
-                    print(e);
-                  }
-                  
-                }, 
-                child: Text("Criar conta")
-              )
-            ],
-          ),
+                  child: Text("Criar conta")
+                )
+              ],
+            ),
+          )
         )
       )
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sign_pain/view/home_page_screen.dart';
-import 'package:sign_pain/viewmodel/login_view_model.dart';
+import 'package:sign_pain/viewmodel/account_view_model.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -10,7 +10,7 @@ class CreateAccountScreen extends StatefulWidget {
 }
 
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
-  final loginViewModel = LoginViewModel();
+  final accountViewModel = AccountViewModel();
 
   late TextEditingController userStringController;
   late TextEditingController passwordController;
@@ -101,7 +101,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   child: ElevatedButton(
                     onPressed: () async {
                       try {
-                        await loginViewModel.createUser(
+                        await accountViewModel.createUser(
                           userStringController.text, 
                           numberController.text, 
                           passwordController.text, 
