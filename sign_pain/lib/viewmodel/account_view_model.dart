@@ -27,8 +27,16 @@ class AccountViewModel {
 
   // Given a userString (email or phone number) and a password, attempts to login the user into the app (through Firebase)
   Future<void> loginUser(String userString, String password) async {
+    // sanitize arguments
+    if (userString.isEmpty) { // email or phone number must be given
+      throw AppException("Por favor indique e-mail ou nº de telemóvel");
+    }
+    if (password.isEmpty) { // password must be given
+      throw AppException("Por favor indique palavra-passe");
+    }
+
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: userString,
         password: password
       );
@@ -60,6 +68,23 @@ class AccountViewModel {
 
   // Given a new user's information (email, phone number, password and name), attempts to create a new account and login the user (through Firebase)
   Future<void> createUser(String emailAddress, String phoneNumber, String password, String name) async {
+    // sanitize arguments
+    if (emailAddress.isEmpty) { // email must be given
+      throw AppException("Por favor indique e-mail");
+    }
+    if (password.isEmpty) { // password must be given
+      throw AppException("Por favor indique palavra-passe");
+    }
+    if (phoneNumber.isEmpty) { // phone number must be given
+      throw AppException("Por favor indique nº de telemóvel");
+    }
+    if (name.isEmpty) { // name must be given
+      throw AppException("Por favor indique o seu nome");
+    }
+    if (phoneNumber.length != 9 || phoneNumber[0] != '9') { // phone number must be a valid potential portuguese phone number
+      throw AppException("Por favor indique um nº de telemóvel português válido");
+    }
+
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailAddress,
