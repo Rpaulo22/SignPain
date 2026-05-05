@@ -17,6 +17,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   late TextEditingController numberController;
   late TextEditingController nameController;
 
+  var obscurePassword = true;
+
   @override
   void initState() {
     super.initState();
@@ -90,10 +92,18 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 const Divider(height: 10.0, color: Colors.transparent),
                 TextField(
                   controller: passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                  obscureText: obscurePassword,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
                     labelText: 'Palavra-passe',
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscurePassword ? Icons.visibility_off : Icons.visibility
+                      ),
+                      onPressed: () => setState(() {
+                        obscurePassword = !obscurePassword;
+                      })
+                    )
                   ),
                 ),
                 Padding(

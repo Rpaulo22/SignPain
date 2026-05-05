@@ -17,6 +17,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final accountViewModel = AccountViewModel();
 
+  var obscurePassword = true;
+
   @override
   void initState() {
     super.initState();
@@ -67,11 +69,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 Divider(height: 10.0, color: Colors.transparent,),
                 TextField(
                   controller: passwordController,
-                  obscureText: true,
+                  obscureText: obscurePassword,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Palavra-passe',
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscurePassword ? Icons.visibility_off : Icons.visibility
+                      ),
+                      onPressed: () => setState(() {
+                        obscurePassword = !obscurePassword;
+                      })
+                    )
                   ),
+
                 ),
                 Padding(
                   padding: EdgeInsetsGeometry.all(16.0),
