@@ -201,27 +201,58 @@ class _HomePageScreenState extends State<HomePageScreen> {
                       )
                     )
                   ),
-                  TextButton(
-                    onPressed: () async {
-                      try {
-                        await accountViewModel.signOutUser();
+                  ListTile(
+                    trailing: const Icon(Icons.logout, color: Colors.red),
+                    title: const Text(
+                      "Terminar Sessão", 
+                      style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.end,
+                    ),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text("Terminar Sessão"),
+                            content: const Text("Tem a certeza que deseja sair da sua conta?"),
+                            actions: [
+                              // Cancel Button
+                              TextButton(
+                                onPressed: () => Navigator.pop(context), 
+                                child: const Text("Cancelar"),
+                              ),
+                              // Confirm Button
+                              TextButton(
+                                onPressed: () async {
+                                  // Close the dialog first
+                                  Navigator.pop(context); 
 
-                        if (!context.mounted) return;
+                                  try {
+                                    await accountViewModel.signOutUser();
 
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen()
-                          ),
-                        );
-                      }
-                      catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(e.toString()))
-                        );
-                      }
-                    },
-                    child: Text("Terminar sessão", textScaler: TextScaler.linear(1.25))
+                                    if (!context.mounted) return;
+
+                                    // Send user back to Login
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                                    );
+                                  } catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')))
+                                    );
+                                  }
+                                },
+                                child: const Text(
+                                  "Sair", 
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
                   )
                 // button to be used when uploading medical data to firebase
                 //ElevatedButton(
