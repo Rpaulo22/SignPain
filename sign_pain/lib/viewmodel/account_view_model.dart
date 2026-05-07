@@ -1,8 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:sign_pain/app_exception.dart';
 
-class AccountViewModel {
+class AccountViewModel extends ChangeNotifier{
+  
+  var isSmsCodeSent = false; // switch for the ui to react to the sms verification
+  String? verificationID; // verification code for the sms verification
+  String? errorMessage;
+
   // Given a user ID, obtains the corresponding user's name in Firebase
   Future<String> getUserName(String userID) async {
     var db = FirebaseFirestore.instance;
@@ -25,11 +31,11 @@ class AccountViewModel {
     }
   }
 
-  // Given a userString (email or phone number) and a password, attempts to login the user into the app (through Firebase)
-  Future<void> loginUser(String userString, String password) async {
+  // Given an email and a password, attempts to login the user into the app (through Firebase)
+  Future<void> loginUser(String emailAdress, String password) async {
     // sanitize arguments
-    if (userString.isEmpty) { // email or phone number must be given
-      throw AppException("Por favor indique e-mail ou nº de telemóvel");
+    if (emailAdress.isEmpty) { // email must be given
+      throw AppException("Por favor indique e-mail");
     }
     if (password.isEmpty) { // password must be given
       throw AppException("Por favor indique palavra-passe");
@@ -37,7 +43,7 @@ class AccountViewModel {
 
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: userString,
+        email: emailAdress,
         password: password
       );
     } on FirebaseAuthException catch (e) {
@@ -58,6 +64,8 @@ class AccountViewModel {
           throw AppException('O formato do nº de telemóvel é inválido.');
         case 'invalid-credential':
           throw AppException('Nenhum utilizador encontrado ou palavra-passe incorreta.');
+        case 'network-request-failed':
+          throw AppException('Erro de rede. Verifique o seu acesso à internet.');
         default: 
           throw AppException('Erro no login (Erro do Firebase): ${e.code} - ${e.message}');
       }
@@ -66,23 +74,23 @@ class AccountViewModel {
     }
   }
 
-  // Given a new user's information (email, phone number, password and name), attempts to create a new account and login the user (through Firebase)
+  // Given a new user's information (email, phone number, password and name), attempts to create a new account
+  // and asks for verification of phone number. If it is verified, it then logs in user
   Future<void> createUser(String emailAddress, String phoneNumber, String password, String name) async {
+    var hasNumber = true;
+
     // sanitize arguments
     if (emailAddress.isEmpty) { // email must be given
       throw AppException("Por favor indique e-mail");
     }
-    if (password.isEmpty) { // password must be given
-      throw AppException("Por favor indique palavra-passe");
-    }
-    if (phoneNumber.isEmpty) { // phone number must be given
-      throw AppException("Por favor indique nº de telemóvel");
-    }
     if (name.isEmpty) { // name must be given
       throw AppException("Por favor indique o seu nome");
     }
-    if (phoneNumber.length != 9 || phoneNumber[0] != '9') { // phone number must be a valid potential portuguese phone number
+    if (phoneNumber.isNotEmpty && (phoneNumber.length != 9 || phoneNumber[0] != '9')) { // phone number must be a valid potential portuguese phone number
       throw AppException("Por favor indique um nº de telemóvel português válido");
+    }
+    if (phoneNumber.isEmpty) { // phone number is optional
+      hasNumber = false;
     }
 
     try {
@@ -90,20 +98,50 @@ class AccountViewModel {
         email: emailAddress,
         password: password,
       );
+
       User? newUser = credential.user;
+
+      Map<String,dynamic> userMap = {
+        'name': name,
+        'email': emailAddress,
+        'createdAt': DateTime.now(),
+        'phoneVerified': false
+      };
+
+      if (hasNumber) userMap['phoneNumber'] = phoneNumber; 
+
       if (newUser != null) {
         // saving the data from auth to firestore database
         await FirebaseFirestore.instance
             .collection('Users')
             .doc(newUser.uid) // uses pre-established UID to bridge between auth and firestore
-            .set({
-          'phoneNumber': phoneNumber,
-          'name': name,
-          'email': emailAddress,
-          'createdAt': DateTime.now()
-          }
+            .set(userMap);
+      }
+
+      if (hasNumber) { // if the user inserted their phone number, verify it and link it to account
+        String fullNumber = "+351$phoneNumber";
+
+        await FirebaseAuth.instance.verifyPhoneNumber(
+          phoneNumber: fullNumber,
+          verificationCompleted: (PhoneAuthCredential cred) async {
+            // Auto-resolution (Android only)
+            await credential.user!.linkWithCredential(cred);
+          },
+          verificationFailed: (e) {
+            errorMessage = 'Erro no SMS: ${e.message}';
+            notifyListeners();
+          },
+          codeSent: (String verificationId, int? resendToken) {
+            verificationID = verificationId; 
+            
+            isSmsCodeSent = true;
+
+            notifyListeners();
+          },
+          codeAutoRetrievalTimeout: (id) => verificationID = id,
         );
       }
+
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'user-disabled':
@@ -118,6 +156,8 @@ class AccountViewModel {
           throw AppException("O formato do e-mail é inválido.");
         case 'invalid-argument':
           throw AppException('E-mail ou nº de telemóvel ou palavra-passe inválidas.');
+        case 'network-request-failed':
+          throw AppException('Erro de rede. Verifique o seu acesso à internet.');
         default: 
           throw AppException("Erro do Firebase: ${e.code} - ${e.message}");
       }
@@ -134,4 +174,78 @@ class AccountViewModel {
       throw AppException('Erro a terminar sessão. Por favor tente mais tarde - $e');
     }
   }
+
+  // Given an SMS transmitted 6-digit code, verifies if phone number is valid
+  Future<void> verifySMSCode(String smsCode) async {
+    if (verificationID == null) throw AppException('ID nulo.');
+
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) throw AppException('Erro crítico: Utilizador não criado.');
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationID!,
+        smsCode: smsCode,
+      );
+
+      // link the account with the previously given number
+      await currentUser.linkWithCredential(credential);
+
+      // update firebase to let it know that phone has been verified
+      await FirebaseFirestore.instance.collection('Users').doc(currentUser.uid).update({
+        'phoneVerified': true,
+      });
+      
+      isSmsCodeSent = false;
+    } catch (e) {
+      throw AppException('Código incorreto ou expirado, ${e.toString()}');
+    }
+  }
+
+  // Given a phone number, attemps to login through SMS authentication
+  Future<void> loginUserWithPhoneAuth(String phoneNumber) async {
+    String fullNumber = "+351$phoneNumber";
+
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: fullNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        // Auto-login (Android only)
+        await FirebaseAuth.instance.signInWithCredential(credential);
+      },
+      verificationFailed: (e) {
+        errorMessage = 'Erro no SMS: ${e.message}';
+        notifyListeners();
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        verificationID = verificationId;
+        isSmsCodeSent = true;
+        notifyListeners(); 
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {
+        verificationID = verificationId;
+      },
+    );
+  }
+
+  // Given an SMS 6-digit verification code, verifies user and attempts to login
+  Future<void> verifySMSAndLogin(String smsCode) async {
+  if (verificationID == null) throw AppException('ID de verificação nulo.');
+
+  try {
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      verificationId: verificationID!,
+      smsCode: smsCode.trim(),
+    );
+
+    await FirebaseAuth.instance.signInWithCredential(credential);
+
+    isSmsCodeSent = false;
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'invalid-verification-code') {
+      throw AppException('Código inserido está incorreto.');
+    } else if (e.code == 'user-not-found' || e.code == 'user-disabled') {
+       throw AppException('Conta não existe ou foi desativada.');
+    }
+    throw AppException('Erro no login: ${e.message}');
+  }
+}
 }
