@@ -47,6 +47,7 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
 
       child: Scaffold(
         appBar: AppBar(
+				  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text("SignPain"),
           actions: [
             IconButton(
@@ -55,17 +56,34 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
             )
           ],
         ),
-        body: SafeArea(
-          child: BodyPartSelectorTurnable(
-            bodyParts: _selectedParts,
-            onSelectionUpdated: (p) => setState(() => _selectedParts = p),
-            labelData: const RotationStageLabelData(
-              front: 'Frente',
-              left: 'Esquerda',
-              right: 'Direita',
-              back: 'Trás',
+        body: Column(
+          children: [
+            Expanded(
+              flex: 10,
+              child: Center(
+                child: Text(
+                  "Onde sente a dor? 🧍", 
+                  textScaler: TextScaler.linear(1.8),
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                )
+              ),
             ),
-          ),
+            Expanded(
+              flex: 90,
+              child:SafeArea(
+                child: BodyPartSelectorTurnable(
+                  bodyParts: _selectedParts,
+                  onSelectionUpdated: (p) => setState(() => _selectedParts = p),
+                  labelData: const RotationStageLabelData(
+                    front: 'Frente',
+                    left: 'Esquerda',
+                    right: 'Direita',
+                    back: 'Trás',
+                  ),
+                ),
+              )
+            )
+          ]
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {

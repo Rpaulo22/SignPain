@@ -43,50 +43,54 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
           )
         ],
 			),
-			body: SingleChildScrollView(
-				child: Center(
-					child: Column(
-					mainAxisAlignment: MainAxisAlignment.center,
-					children: [
-            if (isSignMode) // sign language content
-              SignVideoPlayer(
-                videoPath: "assets/videos/dor.mp4",
-                doubleTap: true // double tap makes video able to pop up (for better readibility of movements if needed)
-              )
-            else
-              Padding(
-                padding: EdgeInsetsGeometry.directional(top:20.0, bottom: 30.0),
-                child: Text("Indica o teu nível de dor", textScaler: TextScaler.linear(2))
+			body: Center(
+        child: Column(
+          children: [
+            Expanded(
+              flex: 40,
+              child: Center( 
+                child: isSignMode 
+                  ? SignVideoPlayer(
+                      videoPath: "assets/videos/dor.mp4",
+                      doubleTap: true 
+                    )
+                  : const Text(
+                      "Indica o teu nível de dor 0️⃣-🔟", 
+                      textScaler: TextScaler.linear(1.8), 
+                      style: TextStyle(fontWeight: FontWeight.bold)
+                    ),
               ),
-						Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image(
-                  image: AssetImage('assets/images/ipt.png'),
-                  fit: BoxFit.contain, 
-                ),
+            ),
+            Expanded(
+              flex: 60,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Image(
+                    image: AssetImage('assets/images/ipt.png'),
+                    fit: BoxFit.contain, 
+                  ),
 
-                Slider(
-                  value: currentSliderValue,
-                  max: 10,
-                  divisions: 10,
-                  label: currentSliderValue.round().toString(),
-                  showValueIndicator: ShowValueIndicator.alwaysVisible,
-                  padding: EdgeInsetsGeometry.directional(top: 30.0, start: paddingSlider, end: paddingSlider),
-                  onChanged: (double value) {
-                    setState(() {
-                      currentSliderValue = value;
-                      _formData.painLevel = currentSliderValue.toInt();
-                    });
-                  }
-                )
-              ],
-              ),
-            ],
-					),
-				)
-			),
+                  Slider(
+                    value: currentSliderValue,
+                    max: 10,
+                    divisions: 10,
+                    label: currentSliderValue.round().toString(),
+                    showValueIndicator: ShowValueIndicator.alwaysVisible,
+                    padding: EdgeInsetsGeometry.directional(top: 30.0, start: paddingSlider, end: paddingSlider),
+                    onChanged: (double value) {
+                      setState(() {
+                        currentSliderValue = value;
+                        _formData.painLevel = currentSliderValue.toInt();
+                      });
+                    }
+                  )
+                ],
+              )
+            )
+          ],
+        ),
+      ),
 			floatingActionButton: FloatingActionButton(
 				onPressed: () {
 					Navigator.push(

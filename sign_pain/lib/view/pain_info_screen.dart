@@ -33,168 +33,180 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
 				backgroundColor: Theme.of(context).colorScheme.inversePrimary,
 				title: const Text("SignPain"),
 			),
-			body: SingleChildScrollView(
-        child: FutureBuilder<List<PainFormData>>(
-          future: _painDataFuture, 
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) { // pain data has not been loaded yet
-              return const Center(child: CircularProgressIndicator());
-
-            } else if (snapshot.hasError) { // data loading has incurred in some error
-              return Center(child: Text("Erro a carregar página: ${snapshot.error}"));
-
-            } else if (snapshot.hasData) { // data has been loaded
-              final data = snapshot.data!;
-               
-              if (data.isEmpty) {
-                return SizedBox(
-                  height: MediaQuery.of(context).size.height, 
-                  child: Center(
-                    child: Text(
-                      "❌📋\nAinda não tem quaisquer registos de dor",
-                      textAlign: TextAlign.center,
-                      textScaler: const TextScaler.linear(1.6),
-                    ),
-                  )
+			body: FutureBuilder<List<PainFormData>>(
+        future: _painDataFuture, 
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) { 
+            return const Center(child: CircularProgressIndicator());
+          } 
+          else if (snapshot.hasError) { 
+            return Center(child: Text("Erro a carregar página: ${snapshot.error}"));
+          } 
+          else if (snapshot.hasData) { 
+            final data = snapshot.data!;
+              
+            if (data.isEmpty) {
+              return const Center(
+                child: Text(
+                  "❌📋\nAinda não tem quaisquer registos de dor",
+                  textAlign: TextAlign.center,
+                  textScaler: TextScaler.linear(1.6),
+                ),
+              );
+            }
+            else if (showGraph) {
+              if (data.length < 2) {
+                return const Center(
+                  child: Text(
+                    "É preciso 2 registos para ver gráfico",
+                    textAlign: TextAlign.center,
+                    textScaler: TextScaler.linear(1.6),
+                  ),
                 );
               }
-              else if (showGraph) {
-                if (data.length < 2) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height, 
-                    child: Center(
-                      child: Text(
-                        "É preciso 2 registos para ver gráfico",
-                        textAlign: TextAlign.center,
-                        textScaler: const TextScaler.linear(1.6),
-                      ),
-                    )
-                  );
-                }
-                else {
-                  final dataX = getDataX(data);
-                  double rawInterval = dataX.last / 4;
+              else {
+                final dataX = getDataX(data);
+                double rawInterval = dataX.last / 4;
+                double safeInterval = rawInterval < 1 ? 1.0 : rawInterval.floorToDouble();
+                
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            showGraph = !showGraph;
+                          });
+                        },
+                        child: const Text("Lista 📋")
+                      )
+                    ),
+                    const Text(
+                      "Progressão da dor", 
+                      textScaler: TextScaler.linear(1.8), 
+                      style: TextStyle(fontWeight: FontWeight.bold)
+                    ),
+                    Expanded(
+                      // Wrapped in a Center and Padding to make it look perfect in the middle
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: AspectRatio(
+                            aspectRatio: 1.5,
+                            child: LineChart(
+                              LineChartData(
+                                minY: 0,
+                                maxY: 10,
+                                
+                                // the data being ilustrated
+                                lineBarsData: [
+                                  LineChartBarData(
+                                    spots: [
+                                      for (var i = 0; i < data.length; i++)
+                                        FlSpot(
+                                          dataX[i].toDouble(),
+                                          data[i].painLevel!.toDouble(),
+                                        )
+                                    ],
+                                    color: Theme.of(context).colorScheme.inversePrimary,
+                                    barWidth: 4,
+                                    isStrokeCapRound: true,
+                                  ),
+                                ],
+                                
+                                // When user taps a point
+                                lineTouchData: LineTouchData( 
+                                  touchTooltipData: LineTouchTooltipData(
+                                    getTooltipColor: (LineBarSpot touchedSpot) => Theme.of(context).colorScheme.inversePrimary,
+                                    tooltipPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                                    tooltipMargin: 30.0, // margin so that finger does not obstruct the information
+                                    getTooltipItems: (List<LineBarSpot> touchedSpots) {
+                                      return touchedSpots.map((LineBarSpot spot) {
+                                        
+                                        DateTime dayOne = data.first.date!;
+                                        DateTime d = dayOne.add(Duration(days: spot.x.toInt()));
+                                        String dateString = DateFormat('d MMM', 'pt_PT').format(d);
 
-                  // ensure it is never less than 1
-                  double safeInterval = rawInterval < 1 ? 1.0 : rawInterval.floorToDouble();
-                  return Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsetsGeometry.all(20),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              showGraph = !showGraph;
-                            });
-                          },
-                          child: Text("Lista 📋")
-                        )
-                      ),
-                      Text("Progressão da dor", textScaler: TextScaler.linear(1.8), style: TextStyle(fontWeight: FontWeight.bold)),
-                      Padding(
-                        padding: EdgeInsetsGeometry.directional(start: 5, end: 25, top: 40),
-                        child: AspectRatio(
-                          aspectRatio: 1.5, // Keeps the graph rectangular and responsive
-                          child: LineChart(
-                            LineChartData(
-                              minY: 0,
-                              maxY: 10,
-                              lineBarsData: [
-                                LineChartBarData(
-                                  spots:  [
-                                    for (var i = 0; i < data.length; i++) 
-                                      FlSpot(
-                                        dataX[i].toDouble(), 
-                                        data[i].painLevel!.toDouble())
-                                  ],
-                                  color: Theme.of(context).colorScheme.inversePrimary,
-                                  barWidth: 4,
-                                  isStrokeCapRound: true
-                                ),
-                              ],
-                              lineTouchData: LineTouchData( // data shown when selecting graph point
-                                touchTooltipData: LineTouchTooltipData(
-                                  getTooltipColor: (LineBarSpot touchedSpot) => Theme.of(context).colorScheme.inversePrimary,
-
-                                  tooltipPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                                  tooltipMargin: 30.0, // margin so that finger does not obstruct the information
-                                  
-                                  getTooltipItems: (List<LineBarSpot> touchedSpots) {
-                                    return touchedSpots.map((LineBarSpot spot) {
-                                      
-                                      DateTime dayOne = data.first.date!;
-                                      DateTime d = dayOne.add(Duration(days: spot.x.toInt()));
-                                      String dateString = DateFormat('d MMM', 'pt_PT').format(d);
-
-                                      return LineTooltipItem(
-                                        'Dor: ${spot.y.toInt()}\n', 
-                                        TextStyle(
-                                          color: Theme.of(context).colorScheme.secondary,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                        children: [
-                                          TextSpan(
-                                            text: dateString,
-                                            style: TextStyle(
-                                              color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 12,
-                                            ),
+                                        return LineTooltipItem(
+                                          'Dor: ${spot.y.toInt()}\n',
+                                          TextStyle(
+                                            color: Theme.of(context).colorScheme.secondary,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14,
                                           ),
-                                        ],
-                                      );
-                                    }).toList();
-                                  },
-                                ),
-                              ),
-                              titlesData: FlTitlesData(
-                                // Bottom X-Axis: Show the dates
-                                bottomTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    interval: safeInterval,
-                                    reservedSize: 30,
-                                    getTitlesWidget: (value, meta) {
-                                      DateTime dayOne = data.first.date!;
-                                      DateTime d = dayOne.add(Duration(days: value.toInt()));
-                                      return Padding(
-                                        padding: const EdgeInsets.only(top: 8.0),
-                                        child: Text(DateFormat('dd/MM').format(d))
-                                      );
+                                          children: [
+                                            TextSpan(
+                                              text: dateString,
+                                              style: TextStyle(
+                                                color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }).toList();
                                     },
                                   ),
                                 ),
-                                leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    interval: 2, // Show a label every 2 levels (2, 4, 6...)
-                                    reservedSize: 30, // Give the text enough room
+                                
+                                titlesData: FlTitlesData(
+                                  
+                                  // Bottom X-Axis: Show the dates
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      interval: safeInterval,
+                                      reservedSize: 30,
+                                      getTitlesWidget: (value, meta) {
+                                        DateTime dayOne = data.first.date!;
+                                        DateTime d = dayOne.add(Duration(days: value.toInt()));
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top: 8.0),
+                                          child: Text(DateFormat('dd/MM').format(d)),
+                                        );
+                                      },
+                                    ),
                                   ),
+                                  
+                                  // Left Y-Axis: Pain levels
+                                  leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      interval: 2, // Show a label every 2 levels (2, 4, 6...)
+                                      reservedSize: 30, // Give the text enough room
+                                    ),
+                                  ),
+                                  
+                                  // Hide the top and right titles for a cleaner look
+                                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                                 ),
-                                // Hide the top and right titles for a cleaner look
-                                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                
+                                gridData: const FlGridData(show: false),
+                                
                               ),
-                              gridData: const FlGridData(show: false)
                             ),
                           ),
-                        )
-                      )
-                    ]
-                  );
-                }
+                        ),
+                      ),
+                    )
+                  ]
+                );
               }
-              else {
-                return Column(
+            } else {
+              // list may be big, so scrollable
+              return SingleChildScrollView(
+                child: Column(
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsetsGeometry.all(20),
+                      padding: const EdgeInsets.all(20),
                       child: ElevatedButton(
                         onPressed: () {
                           if (data.length < 2) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("É preciso 2 registos para ver gráfico"))
+                              const SnackBar(content: Text("É preciso 2 registos para ver gráfico"))
                             );
                           }
                           else {
@@ -203,24 +215,24 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                             });
                           }
                         },
-                        child: Text("Gráfico 📈")
+                        child: const Text("Gráfico 📈")
                       )
                     ),
                     for (var entry in data) 
                       painFormWidget(entry),
-                      const Divider(
-                        thickness: 5,
-                        indent: 25,
-                        endIndent: 25,
-                        color: Colors.transparent,
-                      )
+                    const Divider(
+                      thickness: 5,
+                      indent: 25,
+                      endIndent: 25,
+                      color: Colors.transparent,
+                    )
                   ]
-                );
-              }
+                ),
+              );
             }
-            return const Center(child: Text("Não tem quaisquer registos de dor"));
-          },
-        )
+          }
+          return const Center(child: Text("Não tem quaisquer registos de dor"));
+        },
       )
     );
 	}

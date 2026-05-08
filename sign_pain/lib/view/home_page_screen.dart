@@ -85,9 +85,24 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         return Center(child: CircularProgressIndicator());
                       }
                       else {
-                        return Text('👋Olá ${snapshot.data}\nBem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',
+                        return RichText(
                           textAlign: TextAlign.center,
-                          textScaler: TextScaler.linear(1.8)
+                          text: TextSpan(
+                            style: const TextStyle(
+                              color: Colors.black,
+                            ),
+                            children: <TextSpan>[
+                              TextSpan(text:'👋\nOlá ',
+                                style: TextStyle(fontSize: 32)
+                              ),
+                              TextSpan(text: '${snapshot.data}',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 32)
+                              ),
+                              TextSpan(text:'\n\nBem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',
+                                style: TextStyle(fontSize: 24)
+                              )
+                            ]
+                          )
                         );
                       }
                     }

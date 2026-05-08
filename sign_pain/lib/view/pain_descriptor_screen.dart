@@ -44,8 +44,13 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Qual destas palavras melhor caracteriza a tua dor?", textScaler: TextScaler.linear(2), textAlign: TextAlign.center,),
-                Padding(padding: EdgeInsetsGeometry.all(20)),
+                Text(
+                  "Qual destas palavras melhor caracteriza a tua dor?", 
+                  textScaler: TextScaler.linear(1.8), 
+                  textAlign: TextAlign.center, 
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+
+                Divider(height: 40, color: Colors.transparent),
                 Column(
                   children: [
                   for (var i in painDescriptors)
