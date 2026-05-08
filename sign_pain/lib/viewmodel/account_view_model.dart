@@ -8,6 +8,7 @@ class AccountViewModel extends ChangeNotifier{
   var isSmsCodeSent = false; // switch for the ui to react to the sms verification
   String? verificationID; // verification code for the sms verification
   String? errorMessage;
+  bool isLoading = false;
 
   // Given a user ID, obtains the corresponding user's name in Firebase
   Future<String> getUserName(String userID) async {
@@ -33,6 +34,10 @@ class AccountViewModel extends ChangeNotifier{
 
   // Given an email and a password, attempts to login the user into the app (through Firebase)
   Future<void> loginUser(String emailAdress, String password) async {
+    // allows the app to display loading circle
+    isLoading = true;
+    notifyListeners();
+
     // sanitize arguments
     if (emailAdress.isEmpty) { // email must be given
       throw AppException("Por favor indique e-mail");
@@ -46,6 +51,11 @@ class AccountViewModel extends ChangeNotifier{
         email: emailAdress,
         password: password
       );
+
+      // lets screen know that loading is done
+      isLoading = false;
+      notifyListeners();
+
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'user-not-found':
@@ -79,17 +89,29 @@ class AccountViewModel extends ChangeNotifier{
   Future<void> createUser(String emailAddress, String phoneNumber, String password, String name) async {
     var hasNumber = true;
 
+    // allows the app to display loading circle
+    isLoading = true;
+    notifyListeners();
+
     // sanitize arguments
     if (emailAddress.isEmpty) { // email must be given
+      isLoading = false;
+      notifyListeners();
       throw AppException("Por favor indique e-mail");
     }
     if (name.isEmpty) { // name must be given
+      isLoading = false;
+      notifyListeners();
       throw AppException("Por favor indique o seu nome");
     }
     if (phoneNumber.isNotEmpty && (phoneNumber.length != 9 || phoneNumber[0] != '9')) { // phone number must be a valid potential portuguese phone number
+      isLoading = false;
+      notifyListeners();
       throw AppException("Por favor indique um nº de telemóvel português válido");
     }
     if (phoneNumber.isEmpty) { // phone number is optional
+      isLoading = false;
+      notifyListeners();
       hasNumber = false;
     }
 
@@ -126,9 +148,12 @@ class AccountViewModel extends ChangeNotifier{
           verificationCompleted: (PhoneAuthCredential cred) async {
             // Auto-resolution (Android only)
             await credential.user!.linkWithCredential(cred);
+            isLoading = false;
+            notifyListeners();
           },
           verificationFailed: (e) {
             errorMessage = 'Erro no SMS: ${e.message}';
+            isLoading = false;
             notifyListeners();
           },
           codeSent: (String verificationId, int? resendToken) {
@@ -136,13 +161,19 @@ class AccountViewModel extends ChangeNotifier{
             
             isSmsCodeSent = true;
 
+            isLoading = false;
             notifyListeners();
           },
           codeAutoRetrievalTimeout: (id) => verificationID = id,
         );
       }
-
+      else {
+        isLoading = false;
+        notifyListeners();
+      }
     } on FirebaseAuthException catch (e) {
+      isLoading = false;
+      notifyListeners();
       switch (e.code) {
         case 'user-disabled':
           throw AppException('Utilizador foi invalidado.');
@@ -162,6 +193,8 @@ class AccountViewModel extends ChangeNotifier{
           throw AppException("Erro do Firebase: ${e.code} - ${e.message}");
       }
     } catch (e) {
+      isLoading = false;
+      notifyListeners();
       throw AppException("Erro a criar conta. Tente novamente mais tarde - $e");
     }
   }
@@ -177,10 +210,21 @@ class AccountViewModel extends ChangeNotifier{
 
   // Given an SMS transmitted 6-digit code, verifies if phone number is valid
   Future<void> verifySMSCode(String smsCode) async {
-    if (verificationID == null) throw AppException('ID nulo.');
+    isLoading = true;
+    notifyListeners();
+
+    if (verificationID == null) {
+      isLoading = false;
+      notifyListeners();
+      throw AppException('ID nulo.');
+    }
 
     final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) throw AppException('Erro crítico: Utilizador não criado.');
+    if (currentUser == null) {
+      isLoading = false;
+      notifyListeners();
+      throw AppException('Erro crítico: Utilizador não criado.');
+    }
     try {
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: verificationID!,
@@ -194,15 +238,22 @@ class AccountViewModel extends ChangeNotifier{
       await FirebaseFirestore.instance.collection('Users').doc(currentUser.uid).update({
         'phoneVerified': true,
       });
-      
+
+      isLoading = false;
       isSmsCodeSent = false;
+      notifyListeners();
     } catch (e) {
+      isLoading = false;
+      notifyListeners();
       throw AppException('Código incorreto ou expirado, ${e.toString()}');
     }
   }
 
   // Given a phone number, attemps to login through SMS authentication
   Future<void> loginUserWithPhoneAuth(String phoneNumber) async {
+    isLoading = true;
+    notifyListeners();
+
     String fullNumber = "+351$phoneNumber";
 
     await FirebaseAuth.instance.verifyPhoneNumber(
@@ -210,14 +261,19 @@ class AccountViewModel extends ChangeNotifier{
       verificationCompleted: (PhoneAuthCredential credential) async {
         // Auto-login (Android only)
         await FirebaseAuth.instance.signInWithCredential(credential);
+
+        isLoading = false;
+        notifyListeners();
       },
       verificationFailed: (e) {
         errorMessage = 'Erro no SMS: ${e.message}';
+        isLoading = false;
         notifyListeners();
       },
       codeSent: (String verificationId, int? resendToken) {
         verificationID = verificationId;
         isSmsCodeSent = true;
+        isLoading = false;
         notifyListeners(); 
       },
       codeAutoRetrievalTimeout: (String verificationId) {
@@ -228,7 +284,14 @@ class AccountViewModel extends ChangeNotifier{
 
   // Given an SMS 6-digit verification code, verifies user and attempts to login
   Future<void> verifySMSAndLogin(String smsCode) async {
-  if (verificationID == null) throw AppException('ID de verificação nulo.');
+    isLoading = true;
+    notifyListeners();
+
+  if (verificationID == null) { 
+    isLoading = false;
+    notifyListeners();
+    throw AppException('ID de verificação nulo.');
+  }
 
   try {
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
@@ -239,12 +302,20 @@ class AccountViewModel extends ChangeNotifier{
     await FirebaseAuth.instance.signInWithCredential(credential);
 
     isSmsCodeSent = false;
+    isLoading = false;
+    notifyListeners();
   } on FirebaseAuthException catch (e) {
     if (e.code == 'invalid-verification-code') {
+      isLoading = false;
+      notifyListeners();
       throw AppException('Código inserido está incorreto.');
     } else if (e.code == 'user-not-found' || e.code == 'user-disabled') {
-       throw AppException('Conta não existe ou foi desativada.');
+      isLoading = false;
+      notifyListeners();
+      throw AppException('Conta não existe ou foi desativada.');
     }
+    isLoading = false;
+    notifyListeners();
     throw AppException('Erro no login: ${e.message}');
   }
 }

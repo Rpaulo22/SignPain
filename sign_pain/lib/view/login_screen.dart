@@ -43,12 +43,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
 	Widget build(BuildContext context) {
+    bool isLoading = accountViewModel.isLoading;
 
     return Scaffold(
       body: ListenableBuilder(
         listenable: accountViewModel, 
         builder: (BuildContext context, Widget? child) {
-
 
           if (accountViewModel.errorMessage != null) {
             // tells flutter to wait to render the snackbar after the rest of elements (to avoid error)
@@ -62,197 +62,228 @@ class _LoginScreenState extends State<LoginScreen> {
               accountViewModel.errorMessage = null; 
             });
           }
+          final padding = MediaQuery.widthOf(context)/4;
 
-          if (!accountViewModel.isSmsCodeSent) {
-            return Center(
-              child: SingleChildScrollView(
-                child: Padding( 
-                  padding: EdgeInsetsGeometry.directional(start: 20.0, end: 20.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsetsGeometry.directional(bottom: 50.0),
-                        child: FractionallySizedBox(
-                          widthFactor: 0.5,
-                          child: Image(
-                            image: const AssetImage('assets/images/signpain.png'),
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsetsGeometry.all(16.0),
-                        child: Text("Entrar na conta", textScaler: TextScaler.linear(2.0),)
-                      ),
-                      if (!loginWithPhone) ... [
-                        TextField(
-                          controller: emailController,
-                          obscureText: false,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'E-mail',
-                          ),
-                        ),
-                        Divider(height: 10.0, color: Colors.transparent,),
-                        TextField(
-                          controller: passwordController,
-                          obscureText: obscurePassword,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Palavra-passe',
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                obscurePassword ? Icons.visibility_off : Icons.visibility
+          return Stack(
+            children: [
+              IgnorePointer(
+                ignoring: isLoading,
+                child: !accountViewModel.isSmsCodeSent ?
+                  Center(
+                    child: SingleChildScrollView(
+                      child: Padding( 
+                        padding: EdgeInsetsGeometry.directional(start: 20.0, end: 20.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsetsGeometry.directional(bottom: 50.0),
+                              child: FractionallySizedBox(
+                                widthFactor: 0.5,
+                                child: Image(
+                                  image: const AssetImage('assets/images/signpain.png'),
+                                  fit: BoxFit.contain,
+                                ),
                               ),
-                              onPressed: () => setState(() {
-                                obscurePassword = !obscurePassword;
-                              })
-                            )
-                          ),
-                        ),
-                      ]
-                      else 
-                        TextFormField(
-                          controller: phoneNumberController,
+                            ),
+                            Padding(
+                              padding: EdgeInsetsGeometry.all(16.0),
+                              child: Text("Entrar na conta", textScaler: TextScaler.linear(2.0),)
+                            ),
+                            if (!loginWithPhone) ... [
+                              TextField(
+                                controller: emailController,
+                                obscureText: false,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'E-mail',
+                                ),
+                              ),
+                              Divider(height: 10.0, color: Colors.transparent,),
+                              TextField(
+                                controller: passwordController,
+                                obscureText: obscurePassword,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Palavra-passe',
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      obscurePassword ? Icons.visibility_off : Icons.visibility
+                                    ),
+                                    onPressed: () => setState(() {
+                                      obscurePassword = !obscurePassword;
+                                    })
+                                  )
+                                ),
+                              ),
+                            ]
+                            else 
+                              TextFormField(
+                                controller: phoneNumberController,
 
-                          keyboardType: TextInputType.number, 
-                          
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          
-                          // validate the string before using it
-                          validator: (value) {
-                            if (value == null || value.isEmpty) return "Insira um nº de telemóvel";
-                            if (value.isNotEmpty && value.length != 9 && value[0] != '9') return "Insira um nº de telemóvel válido";
+                                keyboardType: TextInputType.number, 
+                                
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                
+                                // validate the string before using it
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) return "Insira um nº de telemóvel";
+                                  if (value.isNotEmpty && value.length != 9 && value[0] != '9') return "Insira um nº de telemóvel válido";
 
-                            return null;
-                          },
-                          
-                          decoration: const InputDecoration(
-                            labelText: "Nº telemóvel",
-                            prefixText: "+351 ", // Keeps the country code visible but uneditable
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      TextButton(
-                        onPressed: () => setState(() {loginWithPhone = !loginWithPhone;}),
-                        child: !loginWithPhone ? Text("Entrar com nº telemóvel") : Text("Entrar com e-mail")
-                      ),
-                      Padding(
-                        padding: EdgeInsetsGeometry.all(16.0),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            try {
-                              if (loginWithPhone) { // if phone number is given, login through phone number authentication
-                                await accountViewModel.loginUserWithPhoneAuth(phoneNumberController.text);
-                                if (!context.mounted) return;
-                              }
-                              else { // else, attempt to login with email + password
-                                await accountViewModel.loginUser(emailController.text, passwordController.text);
+                                  return null;
+                                },
+                                
+                                decoration: const InputDecoration(
+                                  labelText: "Nº telemóvel",
+                                  prefixText: "+351 ", // Keeps the country code visible but uneditable
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            TextButton(
+                              onPressed: () => setState(() {loginWithPhone = !loginWithPhone;}),
+                              child: !loginWithPhone ? Text("Entrar com nº telemóvel") : Text("Entrar com e-mail")
+                            ),
+                            Padding(
+                              padding: EdgeInsetsGeometry.all(16.0),
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  try {
+                                    if (loginWithPhone) { // if phone number is given, login through phone number authentication
+                                      await accountViewModel.loginUserWithPhoneAuth(phoneNumberController.text);
+                                      if (!context.mounted) return;
+                                    }
+                                    else { // else, attempt to login with email + password
+                                      await accountViewModel.loginUser(emailController.text, passwordController.text);
 
-                                if (!context.mounted) return;
+                                      if (!context.mounted) return;
 
-                                Navigator.pushReplacement(
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => HomePageScreen(),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                  catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(e.toString()))
+                                    );
+                                  }
+                                }, 
+                                child: Text("Entrar")
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => HomePageScreen(),
+                                    builder: (context) => CreateAccountScreen(),
                                   ),
                                 );
-                              }
-                            }
-                            catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(e.toString()))
-                              );
-                            }
-                          }, 
-                          child: Text("Entrar")
+                              }, 
+                              child: Text("Criar conta")
+                            )
+                          ],
                         ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CreateAccountScreen(),
-                            ),
-                          );
-                        }, 
-                        child: Text("Criar conta")
                       )
-                    ],
-                  ),
-                )
-              )
-            );
-          }
-          else {
-            final padding = MediaQuery.widthOf(context)/4;
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("📲 Verificação SMS", textScaler: TextScaler.linear(1.8), style: TextStyle(fontWeight: FontWeight.bold)),
-                  Divider(height: padding, color: Colors.transparent),
-                  Padding(
-                    padding: EdgeInsetsGeometry.directional(start:padding, end: padding),
-                    child: TextFormField(
-                      controller: verificationCodeController,
-
-                      keyboardType: TextInputType.number, 
-                      
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                      
-                      // validate the string before using it
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, insira um número';
-                        }
-                        if (value.length != 6) {
-                          return 'Número tem 6 dígitos';
-                        }
-                        return null; // Input is valid
-                      },
-                      
-                      decoration: const InputDecoration(
-                        labelText: "Código SMS",
-                        border: UnderlineInputBorder(),
-
-                      ),
-                    )
-                  ),
-                  Padding(
-                    padding: EdgeInsetsGeometry.all(30.0),
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          await accountViewModel.verifySMSAndLogin(verificationCodeController.text);
-
-                          if (!context.mounted) return;
-
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomePageScreen(),
-                            ),
-                          );
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(e.toString()))
-                          );
-                        }
-                      },
-                      child: Text('Entrar')
                     )
                   )
-                ]
+                :
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          flex: 45,
+                          child: FractionallySizedBox(
+                            widthFactor: 0.5,
+                            child: Image(
+                              image: const AssetImage('assets/images/signpain.png'),
+                              fit: BoxFit.contain,
+                            ),
+                          )
+                        ),
+                        Expanded(
+                          flex: 55,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text("📲 Verificação SMS", textScaler: TextScaler.linear(1.8), style: TextStyle(fontWeight: FontWeight.bold)),
+                              Padding(
+                                padding: EdgeInsetsGeometry.directional(start:padding, end: padding),
+                                child: TextFormField(
+                                  controller: verificationCodeController,
+
+                                  keyboardType: TextInputType.number, 
+                                  
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  
+                                  // validate the string before using it
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Por favor, insira um número';
+                                    }
+                                    if (value.length != 6) {
+                                      return 'Número tem 6 dígitos';
+                                    }
+                                    return null; // Input is valid
+                                  },
+                                  
+                                  decoration: const InputDecoration(
+                                    labelText: "Código SMS",
+                                    border: UnderlineInputBorder(),
+
+                                  ),
+                                )
+                              ),
+                              Padding(
+                                padding: EdgeInsetsGeometry.all(30.0),
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    try {
+                                      await accountViewModel.verifySMSAndLogin(verificationCodeController.text);
+
+                                      if (!context.mounted) return;
+
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => HomePageScreen(),
+                                        ),
+                                      );
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(e.toString()))
+                                      );
+                                    }
+                                  },
+                                  child: Text('Entrar')
+                                )
+                              )
+                            ]
+                          )
+                        )
+                      ]
+                    )
+                  )
+              ),
+              if (accountViewModel.isLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5), 
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  )
+                )
               )
-            );
-          }
+            ]
+          );
         }
       )
     );
