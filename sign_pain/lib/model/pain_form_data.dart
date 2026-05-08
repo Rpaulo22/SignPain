@@ -2,7 +2,7 @@ import 'package:body_part_selector/body_part_selector.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class PainFormData {
-  String userID = FirebaseAuth.instance.currentUser!.uid; 
+  String userID = FirebaseAuth.instance.currentUser!.uid; // registers as being the current user
   int? painLevel; // self-reported pain level (on a scale of 0-10)
   Set<String> descriptors = {}; // adjectives which describe the felt pain
   DateTime? date; // date of the form's submission

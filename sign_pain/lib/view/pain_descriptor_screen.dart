@@ -104,7 +104,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
             children: <Widget>[
               const Text('Gravar?', textScaler: TextScaler.linear(2)),
               Text("Nível: ${widget.formData.painLevel}/10"),
-              Text("Descriptores: ${widget.formData.descriptors.join(", ")}"),
+              Text("Descrição: ${widget.formData.descriptors.join(", ")}"),
               Text("Parte(s) do corpo: ${BodyPartsMapper.listToPortuguese(widget.formData.bodyParts).join(", ")}"),
               Padding(
                 padding: EdgeInsetsGeometry.directional(start:20, end:20),
@@ -133,6 +133,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                       onPressed: () async {
                         if (widget.formData.isComplete) {
                           bool successful = await formViewModel.saveDailyForm(widget.formData);
+                          if (!mounted) return;
                           if (successful) { // use viewmodel to save pain form
                             ScaffoldMessenger.of(context).showSnackBar(snackBar("Registo guardado com sucesso!"));
                             Navigator.pushAndRemoveUntil(

@@ -4,7 +4,6 @@ import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/pain_body_screen.dart';
 import 'package:sign_pain/widgets/sign_video_player.dart';
-import 'package:video_player/video_player.dart';
 
 class PainLevelScreen extends StatefulWidget {
   const PainLevelScreen({super.key});
@@ -14,9 +13,11 @@ class PainLevelScreen extends StatefulWidget {
 }
 
 class _PainLevelScreenState extends State<PainLevelScreen> {
-  final PainFormData _formData = PainFormData(); // TODO change to actual userID
+  final PainFormData _formData = PainFormData();
 
 	final painScale = [0,1,2,3,4,5,6,7,8,9,10];
+
+  double currentSliderValue = 0;
 
 	final snackBar = SnackBar(
 		content: Text('Reset pain level!'),
@@ -26,6 +27,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 	@override
 	Widget build(BuildContext context) {
     final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
+    final paddingSlider = MediaQuery.widthOf(context)/10;
 
 		return Scaffold(
 			appBar: AppBar(
@@ -52,7 +54,10 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                 doubleTap: true // double tap makes video able to pop up (for better readibility of movements if needed)
               )
             else
-              Text("Indica o teu nível de dor", textScaler: TextScaler.linear(2)),
+              Padding(
+                padding: EdgeInsetsGeometry.directional(top:20.0, bottom: 30.0),
+                child: Text("Indica o teu nível de dor", textScaler: TextScaler.linear(2))
+              ),
 						Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -62,32 +67,19 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                   fit: BoxFit.contain, 
                 ),
 
-                // Options for pain
-                RadioGroup<int>(
-                  groupValue: _formData.painLevel,
-                  onChanged: (int? value) {
+                Slider(
+                  value: currentSliderValue,
+                  max: 10,
+                  divisions: 10,
+                  label: currentSliderValue.round().toString(),
+                  showValueIndicator: ShowValueIndicator.alwaysVisible,
+                  padding: EdgeInsetsGeometry.directional(top: 30.0, start: paddingSlider, end: paddingSlider),
+                  onChanged: (double value) {
                     setState(() {
-                    _formData.painLevel = value;
+                      currentSliderValue = value;
+                      _formData.painLevel = currentSliderValue.toInt();
                     });
-                  },
-                  child: Wrap(
-                    spacing: 8.0,
-                    runSpacing: 8.0,
-                    
-                    children: <Widget>[
-                      for (var i in painScale)
-                        Row(
-                          mainAxisSize: MainAxisSize.min, 
-                          children: [
-                            Radio<int>(value: i),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Text(i.toString(), style: const TextStyle(fontSize: 16)),
-                            ),
-                          ],
-                        )
-                    ],
-                  )
+                  }
                 )
               ],
               ),
