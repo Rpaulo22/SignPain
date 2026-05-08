@@ -70,16 +70,20 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
         ),
 				floatingActionButton: FloatingActionButton(
 					onPressed: () {
-						showDialog(
-              context: context,
-              barrierDismissible: false, 
-              builder: (BuildContext context) {
-                // return the confirm dialog widget
-                return confirmDialog();
-              }
-            );
+            if (widget.formData.isComplete) {
+              showDialog(
+                context: context,
+                barrierDismissible: false, 
+                builder: (BuildContext context) {
+                  // return the confirm dialog widget
+                  return confirmDialog();
+                }
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Por favor complete o formulário!")));
+            }
 					},
-					tooltip: 'pain type',
+					tooltip: 'Save form',
 					child: Icon(Icons.save),
 				)
 		);
