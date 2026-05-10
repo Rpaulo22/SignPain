@@ -274,14 +274,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   )
               ),
               if (accountViewModel.isLoading)
-              Container(
-                color: Colors.black.withOpacity(0.5), 
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
+                Container(
+                  color: Colors.black.withOpacity(0.5), 
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    )
                   )
                 )
-              )
             ]
           );
         }
