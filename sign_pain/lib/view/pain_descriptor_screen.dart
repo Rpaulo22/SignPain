@@ -25,7 +25,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
 
 		return Scaffold(
 			appBar: AppBar(
-				backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        centerTitle: true,
 				title: const Text("SignPain"),
         actions: [
           IconButton(

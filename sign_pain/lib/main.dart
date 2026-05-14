@@ -53,7 +53,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'SignPain',
       theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: const Color.fromARGB(255, 230, 27, 145)),
+        colorScheme: .fromSeed(seedColor: const Color.fromARGB(255, 233, 129, 64)),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color.fromARGB(255, 233, 129, 64),
+          foregroundColor: Colors.white,
+        ),
       ),
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),

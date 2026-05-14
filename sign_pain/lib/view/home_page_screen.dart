@@ -42,7 +42,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
     return Scaffold(
       appBar: AppBar(
-				backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         centerTitle: true,
 				title: const Text("SignPain"),
         actions: [
@@ -137,7 +136,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.inversePrimary, 
+                        backgroundColor: const Color.fromARGB(255, 233, 129, 64),
                         foregroundColor: Colors.white, // Text color
                         elevation: 4.0, 
                       ),
@@ -173,7 +172,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green, 
+                        backgroundColor: Colors.cyan, 
                         foregroundColor: Colors.white, // Text color
                         elevation: 4.0, 
                       ),
@@ -213,24 +212,25 @@ class _HomePageScreenState extends State<HomePageScreen> {
                           foregroundColor: Colors.white, // Text color
                           elevation: 4.0, 
                         ),
+                        
                         child: Text('Informações ℹ️', textScaler: TextScaler.linear(1.25))
                       )
                     )
                   ),
-                  ListTile(
-                    trailing: const Icon(Icons.logout, color: Colors.red),
-                    title: const Text(
+                  TextButton(
+                    child: const Text(
                       "Terminar Sessão", 
                       style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.end,
+                      textAlign: TextAlign.center,
                     ),
-                    onTap: () {
+                    onPressed: () {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: const Text("Terminar Sessão"),
-                            content: const Text("Tem a certeza que deseja sair da sua conta?"),
+                            actionsAlignment: MainAxisAlignment.spaceBetween,
+                            title: const Text("Terminar Sessão", textAlign: TextAlign.center),
+                            content: const Text("Tem a certeza que deseja sair da sua conta?", textAlign: TextAlign.center),
                             actions: [
                               // Cancel Button
                               TextButton(

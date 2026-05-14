@@ -47,7 +47,7 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
 
       child: Scaffold(
         appBar: AppBar(
-				  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        centerTitle: true,
           title: Text("SignPain"),
           actions: [
             IconButton(

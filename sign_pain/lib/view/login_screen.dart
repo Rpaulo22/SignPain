@@ -168,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Padding(
                               padding: EdgeInsetsGeometry.all(16.0),
                               child: ElevatedButton(
-                                onPressed: () => _login,
+                                onPressed: () => _login(),
                                 child: Text("Entrar")
                               ),
                             ),

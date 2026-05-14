@@ -28,7 +28,7 @@ class _MedicalConditionScreenState extends State<MedicalConditionScreen> {
 
     return Scaffold(
       appBar: AppBar(
-				backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        centerTitle: true,
 				title: const Text("SignPain"),
         actions: [
           IconButton(
