@@ -91,54 +91,74 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: Text("Entrar na conta", textScaler: TextScaler.linear(2.0),)
                             ),
                             if (!loginWithPhone) ... [
-                              TextField(
-                                controller: emailController,
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: 'E-mail',
-                                ),
-                              ),
-                              Divider(height: 10.0, color: Colors.transparent,),
-                              TextField(
-                                controller: passwordController,
-                                obscureText: obscurePassword,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: 'Palavra-passe',
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      obscurePassword ? Icons.visibility_off : Icons.visibility
+                              AutofillGroup(
+                                child: Column(
+                                  children: [
+                                    TextField(
+                                      controller: emailController,
+                                      obscureText: false,
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: 'E-mail',
+                                      ),
+                                      keyboardType: TextInputType.emailAddress,
+                                      autofillHints: [AutofillHints.email],
+                                      textInputAction: TextInputAction.next,
                                     ),
-                                    onPressed: () => setState(() {
-                                      obscurePassword = !obscurePassword;
-                                    })
-                                  )
-                                ),
-                              ),
+                                    Divider(height: 10.0, color: Colors.transparent,),
+                                    TextField(
+                                      controller: passwordController,
+                                      obscureText: obscurePassword,
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: 'Palavra-passe',
+                                        suffixIcon: IconButton(
+                                          icon: Icon(
+                                            obscurePassword ? Icons.visibility_off : Icons.visibility
+                                          ),
+                                          onPressed: () => setState(() {
+                                            obscurePassword = !obscurePassword;
+                                          })
+                                        )
+                                      ),
+                                      keyboardType: TextInputType.visiblePassword,
+                                      autofillHints: [AutofillHints.password],
+
+                                      textInputAction: TextInputAction.done,
+                                      onSubmitted: (_) => _login(),
+                                    ),
+                                  ]
+                                )
+                              )
                             ]
                             else 
-                              TextFormField(
-                                controller: phoneNumberController,
+                              AutofillGroup(
+                                child: TextFormField(
+                                  controller: phoneNumberController,
 
-                                keyboardType: TextInputType.number, 
-                                
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                
-                                // validate the string before using it
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) return "Insira um nº de telemóvel";
-                                  if (value.isNotEmpty && value.length != 9 && value[0] != '9') return "Insira um nº de telemóvel válido";
+                                  keyboardType: TextInputType.phone,
+                                  autofillHints: [AutofillHints.telephoneNumber],
+                                  
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  
+                                  // validate the string before using it
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) return "Insira um nº de telemóvel";
+                                    if (value.isNotEmpty && value.length != 9 && value[0] != '9') return "Insira um nº de telemóvel válido";
 
-                                  return null;
-                                },
-                                
-                                decoration: const InputDecoration(
-                                  labelText: "Nº telemóvel",
-                                  prefixText: "+351 ", // Keeps the country code visible but uneditable
-                                  border: OutlineInputBorder(),
+                                    return null;
+                                  },
+                                  
+                                  decoration: const InputDecoration(
+                                    labelText: "Nº telemóvel",
+                                    prefixText: "+351 ", // Keeps the country code visible but uneditable
+                                    border: OutlineInputBorder(),
+                                  ),
+
+                                  textInputAction: TextInputAction.done,
+                                  onFieldSubmitted: (_) => _login(),
                                 ),
                               ),
                             TextButton(
@@ -148,31 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Padding(
                               padding: EdgeInsetsGeometry.all(16.0),
                               child: ElevatedButton(
-                                onPressed: () async {
-                                  try {
-                                    if (loginWithPhone) { // if phone number is given, login through phone number authentication
-                                      await accountViewModel.loginUserWithPhoneAuth(phoneNumberController.text);
-                                      if (!context.mounted) return;
-                                    }
-                                    else { // else, attempt to login with email + password
-                                      await accountViewModel.loginUser(emailController.text, passwordController.text);
-
-                                      if (!context.mounted) return;
-
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => HomePageScreen(),
-                                        ),
-                                      );
-                                    }
-                                  }
-                                  catch (e) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(e.toString()))
-                                    );
-                                  }
-                                }, 
+                                onPressed: () => _login,
                                 child: Text("Entrar")
                               ),
                             ),
@@ -223,6 +219,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly,
                                   ],
+
+                                  autofillHints: [AutofillHints.oneTimeCode],
+                                  textInputAction: TextInputAction.done,
                                   
                                   // validate the string before using it
                                   validator: (value) {
@@ -238,31 +237,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                   decoration: const InputDecoration(
                                     labelText: "Código SMS",
                                     border: UnderlineInputBorder(),
-
                                   ),
+
+                                  onFieldSubmitted: (_) => _loginSMS(),
                                 )
                               ),
                               Padding(
                                 padding: EdgeInsetsGeometry.all(30.0),
                                 child: ElevatedButton(
-                                  onPressed: () async {
-                                    try {
-                                      await accountViewModel.verifySMSAndLogin(verificationCodeController.text);
-
-                                      if (!context.mounted) return;
-
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => HomePageScreen(),
-                                        ),
-                                      );
-                                    } catch (e) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(e.toString()))
-                                      );
-                                    }
-                                  },
+                                  onPressed: () => _loginSMS(),
                                   child: Text('Entrar')
                                 )
                               )
@@ -287,5 +270,51 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       )
     );
+  }
+
+  Future<void> _login() async {
+    try {
+      if (loginWithPhone) { // if phone number is given, login through phone number authentication
+        await accountViewModel.loginUserWithPhoneAuth(phoneNumberController.text);
+        TextInput.finishAutofillContext();
+        if (!mounted) return;
+      }
+      else { // else, attempt to login with email + password
+        await accountViewModel.loginUser(emailController.text, passwordController.text);
+        TextInput.finishAutofillContext();
+        if (!mounted) return;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePageScreen(),
+          ),
+        );
+      }
+    }
+    catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()))
+      );
+    }
+  }
+
+  Future<void> _loginSMS() async {
+    try {
+      await accountViewModel.verifySMSAndLogin(verificationCodeController.text);
+
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePageScreen(),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString()))
+      );
+    }
   }
 }

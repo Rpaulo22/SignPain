@@ -40,9 +40,13 @@ class AccountViewModel extends ChangeNotifier{
 
     // sanitize arguments
     if (emailAdress.isEmpty) { // email must be given
+      isLoading = false;
+      notifyListeners();
       throw AppException("Por favor indique e-mail");
     }
     if (password.isEmpty) { // password must be given
+      isLoading = false;
+      notifyListeners();
       throw AppException("Por favor indique palavra-passe");
     }
 
@@ -57,6 +61,8 @@ class AccountViewModel extends ChangeNotifier{
       notifyListeners();
 
     } on FirebaseAuthException catch (e) {
+      isLoading = false;
+      notifyListeners();
       switch (e.code) {
         case 'user-not-found':
           throw AppException('Nenhum utilizador registado com e-mail fornecido.');
@@ -80,6 +86,8 @@ class AccountViewModel extends ChangeNotifier{
           throw AppException('Erro no login (Erro do Firebase): ${e.code} - ${e.message}');
       }
     } catch (e) {
+      isLoading = false;
+      notifyListeners();
       throw AppException('Erro no login. Tente novamente mais tarde.\n(${e.toString()})');
     }
   }
@@ -135,9 +143,9 @@ class AccountViewModel extends ChangeNotifier{
       if (newUser != null) {
         // saving the data from auth to firestore database
         await FirebaseFirestore.instance
-            .collection('Users')
-            .doc(newUser.uid) // uses pre-established UID to bridge between auth and firestore
-            .set(userMap);
+          .collection('Users')
+          .doc(newUser.uid) // uses pre-established UID to bridge between auth and firestore
+          .set(userMap);
       }
 
       if (hasNumber) { // if the user inserted their phone number, verify it and link it to account
@@ -287,36 +295,36 @@ class AccountViewModel extends ChangeNotifier{
     isLoading = true;
     notifyListeners();
 
-  if (verificationID == null) { 
-    isLoading = false;
-    notifyListeners();
-    throw AppException('ID de verificação nulo.');
-  }
-
-  try {
-    PhoneAuthCredential credential = PhoneAuthProvider.credential(
-      verificationId: verificationID!,
-      smsCode: smsCode.trim(),
-    );
-
-    await FirebaseAuth.instance.signInWithCredential(credential);
-
-    isSmsCodeSent = false;
-    isLoading = false;
-    notifyListeners();
-  } on FirebaseAuthException catch (e) {
-    if (e.code == 'invalid-verification-code') {
+    if (verificationID == null) { 
       isLoading = false;
       notifyListeners();
-      throw AppException('Código inserido está incorreto.');
-    } else if (e.code == 'user-not-found' || e.code == 'user-disabled') {
-      isLoading = false;
-      notifyListeners();
-      throw AppException('Conta não existe ou foi desativada.');
+      throw AppException('ID de verificação nulo.');
     }
-    isLoading = false;
-    notifyListeners();
-    throw AppException('Erro no login: ${e.message}');
+
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationID!,
+        smsCode: smsCode.trim(),
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      isSmsCodeSent = false;
+      isLoading = false;
+      notifyListeners();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-verification-code') {
+        isLoading = false;
+        notifyListeners();
+        throw AppException('Código inserido está incorreto.');
+      } else if (e.code == 'user-not-found' || e.code == 'user-disabled') {
+        isLoading = false;
+        notifyListeners();
+        throw AppException('Conta não existe ou foi desativada.');
+      }
+      isLoading = false;
+      notifyListeners();
+      throw AppException('Erro no login: ${e.message}');
+    }
   }
-}
 }
