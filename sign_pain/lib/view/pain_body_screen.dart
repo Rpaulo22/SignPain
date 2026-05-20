@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/pain_descriptor_screen.dart';
+import 'package:sign_pain/widgets/step_indicator.dart';
 
 class PainBodyScreen extends StatefulWidget {
   const PainBodyScreen({super.key, required this.formData});
@@ -56,34 +57,47 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
             )
           ],
         ),
-        body: Column(
-          children: [
-            Expanded(
-              flex: 10,
-              child: Center(
-                child: Text(
-                  "Onde sente a dor? 🧍", 
-                  textScaler: TextScaler.linear(1.8),
-                  style: TextStyle(fontWeight: FontWeight.bold),
+        body: Padding(
+          padding: EdgeInsetsGeometry.directional(start: 20, end: 20, top: 10, bottom: 50),
+          child: Column(
+            children: [
+              Expanded(
+                flex: 10,
+                child: Center(
+                  child: Text(
+                    "Onde sente a dor? 🧍", 
+                    textScaler: TextScaler.linear(1.8),
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )
+                ),
+              ),
+              Expanded(
+                flex: 75,
+                child:SafeArea(
+                  child: BodyPartSelectorTurnable(
+                    bodyParts: _selectedParts,
+                    onSelectionUpdated: (p) => setState(() => _selectedParts = p),
+                    labelData: const RotationStageLabelData(
+                      front: 'Frente',
+                      left: 'Esquerda',
+                      right: 'Direita',
+                      back: 'Trás',
+                    ),
+                  ),
                 )
               ),
-            ),
-            Expanded(
-              flex: 90,
-              child:SafeArea(
-                child: BodyPartSelectorTurnable(
-                  bodyParts: _selectedParts,
-                  onSelectionUpdated: (p) => setState(() => _selectedParts = p),
-                  labelData: const RotationStageLabelData(
-                    front: 'Frente',
-                    left: 'Esquerda',
-                    right: 'Direita',
-                    back: 'Trás',
+              Expanded(
+                flex: 15,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 64.0),
+                  child: StepIndicator(
+                    currentStep: 2, // user is on page 2
+                    totalSteps: 3,  // of 3 pages total
                   ),
                 ),
               )
-            )
-          ]
+            ]
+          )
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {

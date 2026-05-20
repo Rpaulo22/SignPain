@@ -4,6 +4,7 @@ import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/pain_body_screen.dart';
 import 'package:sign_pain/widgets/sign_video_player.dart';
+import 'package:sign_pain/widgets/step_indicator.dart';
 
 class PainLevelScreen extends StatefulWidget {
   const PainLevelScreen({super.key});
@@ -43,52 +44,65 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
           )
         ],
 			),
-			body: Center(
-        child: Column(
-          children: [
-            Expanded(
-              flex: 40,
-              child: Center( 
-                child: isSignMode 
-                  ? SignVideoPlayer(
-                      videoPath: "assets/videos/dor.mp4",
-                      doubleTap: true 
-                    )
-                  : const Text(
-                      "Indica o teu nível de dor 0️⃣-🔟", 
-                      textScaler: TextScaler.linear(1.8), 
-                      style: TextStyle(fontWeight: FontWeight.bold)
-                    ),
+			body: Padding(
+        padding: EdgeInsetsGeometry.directional(start: 20, end: 20, top: 10, bottom: 50),
+        child: Center(
+          child: Column(
+            children: [
+              Expanded(
+                flex: 30,
+                child: Center( 
+                  child: isSignMode 
+                    ? SignVideoPlayer(
+                        videoPath: "assets/videos/dor.mp4",
+                        doubleTap: true 
+                      )
+                    : const Text(
+                        "Indica o teu nível de dor 0️⃣-🔟", 
+                        textScaler: TextScaler.linear(1.8), 
+                        style: TextStyle(fontWeight: FontWeight.bold)
+                      ),
+                ),
               ),
-            ),
-            Expanded(
-              flex: 60,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Image(
-                    image: AssetImage('assets/images/ipt.png'),
-                    fit: BoxFit.contain, 
-                  ),
+              Expanded(
+                flex: 55,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Image(
+                      image: AssetImage('assets/images/ipt.png'),
+                      fit: BoxFit.contain, 
+                    ),
 
-                  Slider(
-                    value: currentSliderValue,
-                    max: 10,
-                    divisions: 10,
-                    label: currentSliderValue.round().toString(),
-                    showValueIndicator: ShowValueIndicator.alwaysVisible,
-                    padding: EdgeInsetsGeometry.directional(top: 30.0, start: paddingSlider, end: paddingSlider),
-                    onChanged: (double value) {
-                      setState(() {
-                        currentSliderValue = value;
-                        _formData.painLevel = currentSliderValue.toInt();
-                      });
-                    }
-                  )
-                ],
+                    Slider(
+                      value: currentSliderValue,
+                      max: 10,
+                      divisions: 10,
+                      label: currentSliderValue.round().toString(),
+                      showValueIndicator: ShowValueIndicator.alwaysVisible,
+                      padding: EdgeInsetsGeometry.directional(top: 30.0, start: paddingSlider, end: paddingSlider),
+                      onChanged: (double value) {
+                        setState(() {
+                          currentSliderValue = value;
+                          _formData.painLevel = currentSliderValue.toInt();
+                        });
+                      }
+                    )
+                  ],
+                )
+              ),
+              Expanded(
+                flex: 15,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 64.0),
+                  child: StepIndicator(
+                    currentStep: 1, // user is on page 1
+                    totalSteps: 3,  // of 3 pages total
+                  ),
+                ),
               )
-            )
-          ],
+            ],
+          ),
         ),
       ),
 			floatingActionButton: FloatingActionButton(

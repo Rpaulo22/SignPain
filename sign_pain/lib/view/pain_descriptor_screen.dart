@@ -4,6 +4,7 @@ import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/home_page_screen.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
+import 'package:sign_pain/widgets/step_indicator.dart';
 
 class PainDescriptorScreen extends StatefulWidget {
 
@@ -38,40 +39,56 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
         ],
 			),
 			body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsetsGeometry.directional(top:20, bottom:90, start:10, end:10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Qual destas palavras melhor caracteriza a tua dor?", 
-                  textScaler: TextScaler.linear(1.8), 
-                  textAlign: TextAlign.center, 
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+        child: Padding(
+          padding: EdgeInsetsGeometry.directional(start: 20, end: 20, top: 10, bottom: 50),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 10,
+                child: Text(
+                "Qual destas palavras melhor caracteriza a tua dor?", 
+                textScaler: TextScaler.linear(1.8), 
+                textAlign: TextAlign.center, 
+                style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+              SizedBox(height:20),
 
-                Divider(height: 40, color: Colors.transparent),
-                Column(
-                  children: [
-                  for (var i in painDescriptors)
-                    CheckboxListTile(
-                      title: Text("${i.toString()} ${descriptorIconMap[i.toString()] ?? "🩺"}"),
-                      value: widget.formData.descriptors.contains(i),
-                      onChanged: (bool? checked) {
-                        setState(() {
-                        if (checked == true) {
-                          widget.formData.descriptors.add(i);
-                        } else {
-                          widget.formData.descriptors.remove(i);
-                        }
-                        });
-                      },
-                    )
-                  ],
+              Expanded(
+                flex: 75,
+                child:SingleChildScrollView(
+                  child: Column(
+                    children: [
+                    for (var i in painDescriptors)
+                      CheckboxListTile(
+                        title: Text("${i.toString()} ${descriptorIconMap[i.toString()] ?? "🩺"}"),
+                        value: widget.formData.descriptors.contains(i),
+                        onChanged: (bool? checked) {
+                          setState(() {
+                          if (checked == true) {
+                            widget.formData.descriptors.add(i);
+                          } else {
+                            widget.formData.descriptors.remove(i);
+                          }
+                          });
+                        },
+                      )
+                    ],
+                  )
                 )
-              ])
-            ),
-          )
+              ),
+              Expanded(
+                flex: 15,
+                child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 64.0),
+                child: StepIndicator(
+                  currentStep: 3, // user is on page 3
+                  totalSteps: 3,  // of 3 pages total
+                ),
+              ),
+              )
+            ])
+          ),
         ),
 				floatingActionButton: FloatingActionButton(
 					onPressed: () {
