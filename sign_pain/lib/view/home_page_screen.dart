@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/view/login_screen.dart';
-import 'package:sign_pain/view/medical_condition_screen.dart';
 import 'package:sign_pain/view/pain_info_screen.dart';
 import 'package:sign_pain/view/pain_level_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
@@ -42,6 +41,55 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        // logout option on top
+        leading: IconButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  actionsAlignment: MainAxisAlignment.spaceBetween,
+                  title: const Text("Terminar Sessão", textAlign: TextAlign.center),
+                  content: const Text("Tem a certeza que deseja sair da sua conta?", textAlign: TextAlign.center),
+                  actions: [
+                    // Cancel Button
+                    TextButton(
+                      onPressed: () => Navigator.pop(context), 
+                      child: const Text("Cancelar"),
+                    ),
+                    // Confirm Button
+                    TextButton(
+                      onPressed: () async {
+                        // Close the dialog first
+                        Navigator.pop(context); 
+
+                        try {
+                          await accountViewModel.signOutUser();
+
+                          if (!context.mounted) return;
+
+                          // Send user back to Login
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const LoginScreen()),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')))
+                          );
+                        }
+                      },
+                      child: const Text(
+                        "Sair", 
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          }, 
+          icon: Icon(Icons.logout)),
         centerTitle: true,
 				title: const Text("SignPain"),
         actions: [
@@ -98,7 +146,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                               TextSpan(text: '${snapshot.data}',
                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 32)
                               ),
-                              TextSpan(text:'\n\nBem vindo ao SignPain, a aplicação de comunicação de dor para a Comunidade Surda.',
+                              TextSpan(text:'\n\nBem vindo ao SignPain!',
                                 style: TextStyle(fontSize: 24)
                               )
                             ]
@@ -138,7 +186,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromARGB(255, 233, 129, 64),
                         foregroundColor: Colors.white, // Text color
-                        elevation: 4.0, 
+                        elevation: 4.0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12))
                       ),
                       child: Text('Registar dor 📋', textScaler: TextScaler.linear(1.25))
                     )
@@ -175,101 +224,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         backgroundColor: Colors.cyan, 
                         foregroundColor: Colors.white, // Text color
                         elevation: 4.0, 
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12))
                       ),
                       child: Text('Histórico 📈', textScaler: TextScaler.linear(1.25))
                     )
                   )
                 ),
-                if (isSignMode)
-                  SignVideoPlayer(
-                    videoPath: videoPaths[3],
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MedicalConditionScreen(),
-                        ),
-                      );
-                    },
-                  )
-                else
-                  Padding(
-                    padding: EdgeInsetsGeometry.directional(top:10, bottom:20),
-                    child: SizedBox(
-                      width: double.infinity, // Stretches it to the edges of the screen
-                      height: 60, // Makes it a bit taller and easier to tap
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MedicalConditionScreen(),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, 
-                          foregroundColor: Colors.white, // Text color
-                          elevation: 4.0, 
-                        ),
-                        
-                        child: Text('Informações ℹ️', textScaler: TextScaler.linear(1.25))
-                      )
-                    )
-                  ),
-                  TextButton(
-                    child: const Text(
-                      "Terminar Sessão", 
-                      style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            actionsAlignment: MainAxisAlignment.spaceBetween,
-                            title: const Text("Terminar Sessão", textAlign: TextAlign.center),
-                            content: const Text("Tem a certeza que deseja sair da sua conta?", textAlign: TextAlign.center),
-                            actions: [
-                              // Cancel Button
-                              TextButton(
-                                onPressed: () => Navigator.pop(context), 
-                                child: const Text("Cancelar"),
-                              ),
-                              // Confirm Button
-                              TextButton(
-                                onPressed: () async {
-                                  // Close the dialog first
-                                  Navigator.pop(context); 
-
-                                  try {
-                                    await accountViewModel.signOutUser();
-
-                                    if (!context.mounted) return;
-
-                                    // Send user back to Login
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const LoginScreen()),
-                                    );
-                                  } catch (e) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')))
-                                    );
-                                  }
-                                },
-                                child: const Text(
-                                  "Sair", 
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    }
-                  )
                 // button to be used when uploading medical data to firebase
                 //ElevatedButton(
                 //  onPressed: () async {

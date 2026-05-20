@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sign_pain/view/home_page_screen.dart';
+import 'package:sign_pain/view/main_navigation_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
 
 class CreateAccountScreen extends StatefulWidget {
@@ -265,7 +266,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const HomePageScreen(),
+            builder: (context) => const MainNavigationScreen(),
           )
         );
       }
@@ -285,7 +286,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const HomePageScreen(),
+          builder: (context) => const MainNavigationScreen(),
         ),
       );
     } catch (e) {

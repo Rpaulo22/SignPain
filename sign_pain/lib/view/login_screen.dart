@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sign_pain/view/create_account_screen.dart';
 import 'package:sign_pain/view/home_page_screen.dart';
+import 'package:sign_pain/view/main_navigation_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -287,7 +288,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePageScreen(),
+            builder: (context) => MainNavigationScreen(),
           ),
         );
       }
@@ -308,7 +309,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => HomePageScreen(),
+          builder: (context) => MainNavigationScreen(),
         ),
       );
     } catch (e) {
