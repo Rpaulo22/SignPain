@@ -63,9 +63,13 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                 );
               }
               else {
-                final dataX = getDataX(data);
-                double rawInterval = dataX.last / 4;
-                double safeInterval = rawInterval < 1 ? 1.0 : rawInterval.floorToDouble();
+                final ascendingData = List<PainFormData>.from(data);
+                ascendingData.sort((a,b) => a.date!.compareTo(b.date!));
+                final dataX = getDataX(ascendingData);
+
+                double totalDaysSpan = dataX.last.toDouble();
+                double strictInterval = totalDaysSpan / 5; 
+                if (strictInterval < 1) strictInterval = 1.0; 
                 
                 return Column(
                   children: [
@@ -101,10 +105,10 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                                 lineBarsData: [
                                   LineChartBarData(
                                     spots: [
-                                      for (var i = 0; i < data.length; i++)
+                                      for (var i = 0; i < ascendingData.length; i++)
                                         FlSpot(
                                           dataX[i].toDouble(),
-                                          data[i].painLevel!.toDouble(),
+                                          ascendingData[i].painLevel!.toDouble(),
                                         )
                                     ],
                                     color: Theme.of(context).colorScheme.inversePrimary,
@@ -122,7 +126,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                                     getTooltipItems: (List<LineBarSpot> touchedSpots) {
                                       return touchedSpots.map((LineBarSpot spot) {
                                         
-                                        DateTime dayOne = data.first.date!;
+                                        DateTime dayOne = ascendingData.first.date!;
                                         DateTime d = dayOne.add(Duration(days: spot.x.toInt()));
                                         String dateString = DateFormat('d MMM', 'pt_PT').format(d);
 
@@ -155,19 +159,32 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                                   bottomTitles: AxisTitles(
                                     sideTitles: SideTitles(
                                       showTitles: true,
-                                      interval: safeInterval,
+                                      interval: strictInterval,
                                       reservedSize: 30,
                                       getTitlesWidget: (value, meta) {
-                                        DateTime dayOne = data.first.date!;
+                                        if (value > meta.max - (strictInterval / 2) && value < meta.max) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        // Convert offset back to a Date
+                                        DateTime dayOne = ascendingData.first.date!;
                                         DateTime d = dayOne.add(Duration(days: value.toInt()));
-                                        return Padding(
-                                          padding: const EdgeInsets.only(top: 8.0),
-                                          child: Text(DateFormat('dd/MM').format(d)),
+                                        
+                                        return SideTitleWidget(
+                                          meta: meta,
+                                          space: 8.0, // Proper spacing from the X-axis line
+                                          child: Text(
+                                            DateFormat('dd/MM').format(d), 
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
                                         );
                                       },
                                     ),
                                   ),
-                                  
+                                                                    
                                   // Left Y-Axis: Pain levels
                                   leftTitles: AxisTitles(
                                     sideTitles: SideTitles(
