@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/home_page_screen.dart';
+import 'package:sign_pain/view/main_navigation_screen.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'package:sign_pain/widgets/step_indicator.dart';
 
@@ -117,7 +118,6 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
     final size = MediaQuery.of(context).size;
 
     return Dialog(
-      backgroundColor: Colors.white,
       insetPadding: const EdgeInsets.all(10),   
       child: SizedBox(
         width: size.width*0.8,
@@ -164,7 +164,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(snackBar("Registo guardado com sucesso!"));
                             Navigator.pushAndRemoveUntil(
                               context,
-                              MaterialPageRoute(builder: (context) => const HomePageScreen()),
+                              MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
                               (Route<dynamic> route) => false, // false condition clears the entire stack
                             );
                           }

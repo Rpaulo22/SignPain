@@ -136,8 +136,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         return RichText(
                           textAlign: TextAlign.center,
                           text: TextSpan(
-                            style: const TextStyle(
-                              color: Colors.black,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface
                             ),
                             children: <TextSpan>[
                               TextSpan(text:'👋\nOlá ',
