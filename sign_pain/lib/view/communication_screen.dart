@@ -16,19 +16,6 @@ class _CommunicationScreen extends State<CommunicationScreen> {
     bool isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-				title: const Text("SignPain"),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // toggle between sign language and text
-              Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
-            },
-            icon: isSignMode ? Icon(Icons.sign_language) : Icon(Icons.sign_language_outlined)
-          )
-        ],
-      ),
       body: Center(child: Text("Communicação por LGP em breve...", style: TextStyle(fontSize: 28, fontWeight: .bold), textAlign: .center,))
     );
   }

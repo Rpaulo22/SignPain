@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
-import 'package:sign_pain/view/login_screen.dart';
 import 'package:sign_pain/view/pain_info_screen.dart';
 import 'package:sign_pain/view/pain_level_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
@@ -40,68 +39,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
     Future<String> userNameFuture = accountViewModel.getUserName(currentUser.uid);
 
     return Scaffold(
-      appBar: AppBar(
-        // logout option on top
-        leading: IconButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  actionsAlignment: MainAxisAlignment.spaceBetween,
-                  title: const Text("Terminar Sessão", textAlign: TextAlign.center),
-                  content: const Text("Tem a certeza que deseja sair da sua conta?", textAlign: TextAlign.center),
-                  actions: [
-                    // Cancel Button
-                    TextButton(
-                      onPressed: () => Navigator.pop(context), 
-                      child: const Text("Cancelar"),
-                    ),
-                    // Confirm Button
-                    TextButton(
-                      onPressed: () async {
-                        // Close the dialog first
-                        Navigator.pop(context); 
-
-                        try {
-                          await accountViewModel.signOutUser();
-
-                          if (!context.mounted) return;
-
-                          // Send user back to Login
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const LoginScreen()),
-                          );
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')))
-                          );
-                        }
-                      },
-                      child: const Text(
-                        "Sair", 
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          }, 
-          icon: Icon(Icons.logout)),
-        centerTitle: true,
-				title: const Text("SignPain"),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // toggle between sign language and text
-              Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
-            },
-            icon: isSignMode ? Icon(Icons.sign_language) : Icon(Icons.sign_language_outlined)
-          )
-        ],
-			),
 			body: SingleChildScrollView(
         child: Center(
           child: Padding(

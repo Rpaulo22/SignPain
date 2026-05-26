@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
-import 'package:sign_pain/view/home_page_screen.dart';
 import 'package:sign_pain/view/main_navigation_screen.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'package:sign_pain/widgets/step_indicator.dart';
