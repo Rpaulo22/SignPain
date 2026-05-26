@@ -121,8 +121,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 233, 129, 64),
-                        foregroundColor: Colors.white, // Text color
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         elevation: 4.0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12))
                       ),
@@ -158,8 +158,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.cyan, 
-                        foregroundColor: Colors.white, // Text color
+                        backgroundColor: Theme.of(context).colorScheme.tertiary,
+                        foregroundColor: Theme.of(context).colorScheme.onTertiary,
                         elevation: 4.0, 
                         shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12))
                       ),

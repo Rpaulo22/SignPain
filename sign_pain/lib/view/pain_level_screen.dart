@@ -34,14 +34,25 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 		return Scaffold(
 			appBar: AppBar(
         centerTitle: true,
-				title: const Text("SignPain"),
+				title: Text("SignPain", style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
+
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          }, 
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onPrimary)
+        ),
+
         actions: [
           IconButton(
             onPressed: () {
               // toggle between sign language and text
               Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
             },
-            icon: isSignMode ? Icon(Icons.sign_language) : Icon(Icons.sign_language_outlined)
+            icon: 
+              isSignMode 
+              ? Icon(Icons.sign_language, color: Theme.of(context).colorScheme.onPrimary) 
+              : Icon(Icons.sign_language_outlined, color: Theme.of(context).colorScheme.onPrimary)
           )
         ],
 			),
@@ -79,20 +90,53 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                       ),
                       fit: BoxFit.contain, 
                     ),
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        trackHeight: 30.0, 
+                        activeTrackColor: Colors.white,   // Must be white so the gradient shader can paint over it
+                        inactiveTrackColor: Colors.white.withAlpha(100), // Gives a dimmed background gradient
+                        thumbColor: Colors.white,          
+                        
+                        // This removes the default overlay halo when tapping so it doesn't look messy
+                        overlayColor: Colors.transparent, 
 
-                    Slider(
-                      value: currentSliderValue,
-                      max: 10,
-                      divisions: 10,
-                      label: currentSliderValue.round().toString(),
-                      showValueIndicator: ShowValueIndicator.alwaysVisible,
-                      padding: EdgeInsetsGeometry.directional(top: 30.0, start: paddingSlider, end: paddingSlider),
-                      onChanged: (double value) {
-                        setState(() {
-                          currentSliderValue = value;
-                          _formData.painLevel = currentSliderValue.toInt();
-                        });
-                      }
+                        valueIndicatorShape: const PaddleSliderValueIndicatorShape(), 
+
+                        valueIndicatorColor: getGradientColor(currentSliderValue),
+    
+                        valueIndicatorTextStyle: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      child: ShaderMask(
+                        blendMode: BlendMode.srcIn, 
+                        
+                        
+                        shaderCallback: (Rect bounds) {
+                          return LinearGradient(
+                            colors: [
+                              Colors.white70,
+                              Colors.red,
+                            ],
+                          ).createShader(bounds);
+                        },
+                        
+                        child: Slider(
+                          value: currentSliderValue,
+                          max: 10,
+                          divisions: 10,
+                          label: currentSliderValue.round().toString(),
+                          showValueIndicator: ShowValueIndicator.alwaysVisible,
+                          padding: EdgeInsetsDirectional.only(top: 30.0, start: paddingSlider, end: paddingSlider),
+                          onChanged: (double value) {
+                            setState(() {
+                              currentSliderValue = value;
+                              _formData.painLevel = currentSliderValue.toInt();
+                            });
+                          },
+                        ),
+                      ),
                     )
                   ],
                 )
@@ -125,4 +169,10 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 			),
 		);
 	}
+  
+   Color? getGradientColor(double value) {
+    double normalized = value / 10.0;
+
+    return Color.lerp(Colors.white70, Colors.red, normalized)!;
+  }
 }

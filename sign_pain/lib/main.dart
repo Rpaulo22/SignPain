@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         colorScheme: .fromSeed(seedColor: const Color.fromARGB(255, 233, 129, 64), brightness: .dark),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color.fromARGB(255, 233, 129, 64)
+          backgroundColor: Color.fromARGB(255, 233, 129, 64),
         ),
       ),
       themeMode: ThemeMode.system,

@@ -86,16 +86,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               },
             );
           }, 
-          icon: Icon(Icons.logout)),
+          icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.onPrimary)),
         centerTitle: true,
-				title: const Text("SignPain"),
+				title: Text("SignPain", style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
         actions: [
           IconButton(
             onPressed: () {
               // toggle between sign language and text
               Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
             },
-            icon: isSignMode ? Icon(Icons.sign_language) : Icon(Icons.sign_language_outlined)
+            icon: 
+            isSignMode 
+            ? Icon(Icons.sign_language, color: Theme.of(context).colorScheme.onPrimary) 
+            : Icon(Icons.sign_language_outlined, color: Theme.of(context).colorScheme.onPrimary)
           )
         ],
 			),
@@ -108,12 +111,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white.withAlpha(100),
+        selectedItemColor: Theme.of(context).colorScheme.onPrimary,
+        unselectedItemColor: Theme.of(context).colorScheme.onPrimary.withAlpha(60),
         backgroundColor: const Color.fromARGB(255, 233, 129, 64),
         showUnselectedLabels: true,
         elevation: 4,
-        type: BottomNavigationBarType.shifting,
+        type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),

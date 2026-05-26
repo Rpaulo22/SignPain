@@ -48,12 +48,26 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
 
       child: Scaffold(
         appBar: AppBar(
-        centerTitle: true,
-          title: Text("SignPain"),
+          centerTitle: true,
+          title: Text("SignPain", style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
+
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            }, 
+            icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onPrimary)
+          ),
+
           actions: [
             IconButton(
-              onPressed: () {Provider.of<SignLanguageProvider>(context).toggleMode();}, 
-              icon: isSignMode ? Icon(Icons.sign_language) : Icon(Icons.sign_language_outlined)
+              onPressed: () {
+                // toggle between sign language and text
+                Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
+              },
+              icon: 
+                isSignMode 
+                ? Icon(Icons.sign_language, color: Theme.of(context).colorScheme.onPrimary) 
+                : Icon(Icons.sign_language_outlined, color: Theme.of(context).colorScheme.onPrimary)
             )
           ],
         ),
