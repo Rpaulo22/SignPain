@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'package:intl/intl.dart';
@@ -26,11 +28,33 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
 
 	@override
 	Widget build(BuildContext context) {
+    final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
+
 		return Scaffold(
 			appBar: AppBar(
         centerTitle: true,
-				title: const Text("SignPain"),
-			),
+        title: Text("SignPain", style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
+
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          }, 
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onPrimary)
+        ),
+
+        actions: [
+          IconButton(
+            onPressed: () {
+              // toggle between sign language and text
+              Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
+            },
+            icon: 
+              isSignMode 
+              ? Icon(Icons.sign_language, color: Theme.of(context).colorScheme.onPrimary) 
+              : Icon(Icons.sign_language_outlined, color: Theme.of(context).colorScheme.onPrimary)
+          )
+        ],
+      ),
 			body: FutureBuilder<List<PainFormData>>(
         future: _painDataFuture, 
         builder: (context, snapshot) {
@@ -76,12 +100,20 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.secondary,
+                          foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                          elevation: 4.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                         onPressed: () {
                           setState(() {
                             showGraph = !showGraph;
                           });
                         },
-                        child: const Text("Lista 📋")
+                        child: const Text("Gráfico 📈")
                       )
                     ),
                     const Text(
@@ -200,7 +232,22 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                                 ),
                                 
                                 gridData: const FlGridData(show: false),
-                                
+
+                                borderData: FlBorderData(
+                                  show: true,
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: Theme.of(context).colorScheme.onSurface.withAlpha(100), 
+                                      width: 1.5,
+                                    ),
+                                    left: BorderSide(
+                                      color: Theme.of(context).colorScheme.onSurface.withAlpha(100), 
+                                      width: 1.5,
+                                    ),
+                                    top: const BorderSide(color: Colors.transparent),
+                                    right: const BorderSide(color: Colors.transparent),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -212,37 +259,44 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
               }
             } else {
               // list may be big, so scrollable
-              return SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (data.length < 2) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("É preciso 2 registos para ver gráfico"))
-                            );
-                          }
-                          else {
-                            setState(() {
-                              showGraph = !showGraph;
-                            });
-                          }
-                        },
-                        child: const Text("Gráfico 📈")
-                      )
-                    ),
-                    for (var entry in data) 
-                      painFormWidget(entry),
-                    const Divider(
-                      thickness: 5,
-                      indent: 25,
-                      endIndent: 25,
-                      color: Colors.transparent,
-                    )
-                  ]
-                ),
+              return Padding(
+                padding: EdgeInsetsGeometry.symmetric(horizontal: 15, vertical:10),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.secondary,
+                            foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                            elevation: 4.0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: () {
+                            if (data.length < 2) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("É preciso 2 registos para ver gráfico"))
+                              );
+                            }
+                            else {
+                              setState(() {
+                                showGraph = !showGraph;
+                              });
+                            }
+                          },
+                          child: const Text("Gráfico 📈")
+                        )
+                      ),
+                      for (var entry in data) ... [
+                        painFormWidget(entry),
+                        SizedBox(height: 10)
+                      ]
+                    ]
+                  ),
+                )
               );
             }
           }
@@ -254,9 +308,12 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
 
   // individual pain form entry
   Widget painFormWidget(PainFormData data) {
+
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).colorScheme.primaryContainer)
+        border: Border.all(color: Theme.of(context).colorScheme.primaryContainer),
+        color: Theme.of(context).colorScheme.primary,
+        borderRadius: BorderRadius.circular(12)
       ),
       padding: EdgeInsetsDirectional.only(top: 15, bottom: 15, start: 10, end: 10),
       child: Column(
@@ -265,21 +322,28 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Dor registada: ${data.painLevel}/10", textScaler: TextScaler.linear(1.2)),
-              Text("Data: ${DateFormat('dd-MM-yyy | kk:mm').format(data.date!)}", textScaler: TextScaler.linear(1.2), style: TextStyle(fontWeight: FontWeight.bold))
+              Text(
+                "Dor registada: ${data.painLevel}/10", 
+                style: TextStyle(
+                  fontSize: 14, 
+                  color: Theme.of(context).colorScheme.onPrimary
+                )
+              ),
+              Text(
+                "Data: ${DateFormat('dd-MM-yyy | kk:mm').format(data.date!)}", 
+                style: TextStyle(
+                  fontWeight: FontWeight.bold, 
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.onPrimary
+                )
+              )
             ]
-          ),
-          const Divider(
-            thickness: 5,
-            indent: 10,
-            endIndent: 10,
-            color: Colors.transparent,
           ),
           RichText(
             textAlign: TextAlign.start,
             text: TextSpan(
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
               children: <TextSpan>[
                 TextSpan(text: "Descrição da dor: "),
@@ -287,7 +351,16 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
               ],
             )
           ),
-          Text(data.bodyParts.isNotEmpty ? BodyPartsMapper.listToPortuguese(data.bodyParts).join(", ") : "Dor não situada", style: const TextStyle(fontWeight: FontWeight.bold), textScaler: TextScaler.linear(1.2))
+          Text(
+            data.bodyParts.isNotEmpty 
+              ? BodyPartsMapper.listToPortuguese(data.bodyParts).join(", ") 
+              : "Dor não situada", 
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: Theme.of(context).colorScheme.onPrimary
+            )
+          )
         ],
       )
     );
