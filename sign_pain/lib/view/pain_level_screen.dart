@@ -28,6 +28,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 	@override
 	Widget build(BuildContext context) {
     final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
+    final bool isDarkMode = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
     final paddingSlider = MediaQuery.widthOf(context)/10;
 
 		return Scaffold(
@@ -59,8 +60,9 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                       )
                     : const Text(
                         "Indica o teu nível de dor 0️⃣-🔟", 
-                        textScaler: TextScaler.linear(1.8), 
-                        style: TextStyle(fontWeight: FontWeight.bold)
+                        textScaler: TextScaler.linear(1.6), 
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        textAlign: .center,
                       ),
                 ),
               ),
@@ -70,7 +72,11 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Image(
-                      image: AssetImage('assets/images/ipt.png'),
+                      image: AssetImage(
+                        isDarkMode 
+                        ? 'assets/images/ipt_dark.png'
+                        : 'assets/images/ipt.png'
+                      ),
                       fit: BoxFit.contain, 
                     ),
 

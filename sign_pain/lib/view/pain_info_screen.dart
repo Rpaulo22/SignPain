@@ -278,8 +278,8 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
           RichText(
             textAlign: TextAlign.start,
             text: TextSpan(
-              style: const TextStyle(
-                color: Colors.black,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               children: <TextSpan>[
                 TextSpan(text: "Descrição da dor: "),
