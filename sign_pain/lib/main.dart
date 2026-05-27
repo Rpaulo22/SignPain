@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:sign_pain/utils/theme_controller.dart';
 import 'package:sign_pain/view/login_screen.dart';
 import 'package:sign_pain/view/main_navigation_screen.dart';
-import 'firebase_options.dart';
+import 'utils/firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
+
+final themeController = ThemeController();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +53,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    
     return MaterialApp(
       title: 'SignPain',
       theme: ThemeData(
@@ -67,7 +71,7 @@ class MyApp extends StatelessWidget {
           foregroundColor: Color.fromARGB(255, 233, 129, 64)
         ),
       ),
-      themeMode: ThemeMode.system,
+
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -95,7 +99,49 @@ class MyApp extends StatelessWidget {
           return const LoginScreen(); 
         },
       ),
+
+      // permits changing theme withot redrawing the whole app
+      builder: (context, child) {
+        return ListenableBuilder(
+          listenable: themeController,
+          builder: (context, _) {
+            
+            // what mode it is on
+            final bool isDark = themeController.themeMode == ThemeMode.dark;
+
+            return Theme(
+              data: isDark
+                  ? ThemeData(
+                      colorScheme: ColorScheme.fromSeed(
+                        seedColor: const Color.fromARGB(255, 233, 129, 64), 
+                        brightness: Brightness.dark,
+                      ),
+                      appBarTheme: const AppBarTheme(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Color.fromARGB(255, 233, 129, 64),
+                      ),
+                      brightness: Brightness.dark,
+                    )
+                  : ThemeData(
+                      colorScheme: ColorScheme.fromSeed(
+                        seedColor: const Color.fromARGB(255, 233, 129, 64), 
+                        brightness: Brightness.light,
+                      ),
+                      appBarTheme: const AppBarTheme(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Color.fromARGB(255, 233, 129, 64),
+                      ),
+                      brightness: Brightness.light,
+                    ),
+              child: child!, // Holds the currently active screen state safely
+            );
+          },
+        );
+      },
+
     );
+    
+    
   }
 }
 

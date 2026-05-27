@@ -5,6 +5,7 @@ import 'package:sign_pain/view/home_page_screen.dart';
 import 'package:sign_pain/view/communication_screen.dart';
 import 'package:sign_pain/view/login_screen.dart';
 import 'package:sign_pain/view/medical_condition_screen.dart';
+import 'package:sign_pain/view/settings_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -22,6 +23,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     HomePageScreen(),
     CommunicationScreen(),
     MedicalConditionScreen(),
+    SettingsScreen()
   ];
 
   void _onItemTapped(int index) {
@@ -108,33 +110,45 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         children: _pages
       ),
       
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Theme.of(context).appBarTheme.foregroundColor,
-        unselectedItemColor: Theme.of(context).appBarTheme.foregroundColor!.withAlpha(60),
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        showUnselectedLabels: true,
-        elevation: 4,
-        type: BottomNavigationBarType.fixed,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Início',
-            backgroundColor: Color.fromARGB(255, 233, 129, 64),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.interpreter_mode),
-            label: 'Comunicar',
-            backgroundColor: Color.fromARGB(255, 233, 129, 64),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.medical_information),
-            label: 'Info. Médica',
-            backgroundColor: Color.fromARGB(255, 233, 129, 64),
-          ),
-        ],
-      ),
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          // removes tap feedback visuals
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+        ),
+        child: BottomNavigationBar(
+          currentIndex: selectedIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: Theme.of(context).appBarTheme.foregroundColor,
+          unselectedItemColor: Theme.of(context).appBarTheme.foregroundColor!.withAlpha(90),
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+          showUnselectedLabels: true,
+          elevation: 4,
+          type: BottomNavigationBarType.fixed,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Início',
+              backgroundColor: Color.fromARGB(255, 233, 129, 64),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.interpreter_mode),
+              label: 'Comunicar',
+              backgroundColor: Color.fromARGB(255, 233, 129, 64),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.medical_information),
+              label: 'Info. Médica',
+              backgroundColor: Color.fromARGB(255, 233, 129, 64),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Definições',
+              backgroundColor: Color.fromARGB(255, 233, 129, 64),
+            ),
+          ],
+        ),
+      )
     );
   }
 }

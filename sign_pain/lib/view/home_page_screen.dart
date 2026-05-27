@@ -80,6 +80,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold, 
                                               fontSize: 32,
+                                              color: Color.fromARGB(255, 233, 129, 64)
                                             ),
                                           ),
                                           const TextSpan(
