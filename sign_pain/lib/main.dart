@@ -55,15 +55,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: const Color.fromARGB(255, 233, 129, 64), brightness: .light),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color.fromARGB(255, 233, 129, 64),
-          foregroundColor: Colors.white,
+          backgroundColor: Colors.white,
+          foregroundColor: Color.fromARGB(255, 233, 129, 64),
         ),
         brightness: .light
       ),
       darkTheme: ThemeData(
         colorScheme: .fromSeed(seedColor: const Color.fromARGB(255, 233, 129, 64), brightness: .dark),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color.fromARGB(255, 233, 129, 64),
+          backgroundColor: Colors.black,
+          foregroundColor: Color.fromARGB(255, 233, 129, 64)
         ),
       ),
       themeMode: ThemeMode.system,

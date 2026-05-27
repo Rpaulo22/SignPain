@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sign_pain/view/home_page_screen.dart';
 import 'package:sign_pain/view/main_navigation_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
 
@@ -171,6 +170,14 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                                elevation: 4.0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
                               onPressed: () => _createUser(), 
                               child: const Text("Criar conta")
                             ),
@@ -225,6 +232,14 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       Padding(
                         padding: EdgeInsetsGeometry.all(30.0),
                         child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                            elevation: 4.0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                           onPressed: () => _verifySMS(),
                           child: Text('Verificar')
                         )

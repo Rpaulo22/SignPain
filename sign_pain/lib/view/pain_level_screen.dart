@@ -34,15 +34,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 		return Scaffold(
 			appBar: AppBar(
         centerTitle: true,
-				title: Text("SignPain", style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
-
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          }, 
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onPrimary)
-        ),
-
+				title: Text("SignPain"),
         actions: [
           IconButton(
             onPressed: () {
@@ -51,8 +43,8 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
             },
             icon: 
               isSignMode 
-              ? Icon(Icons.sign_language, color: Theme.of(context).colorScheme.onPrimary) 
-              : Icon(Icons.sign_language_outlined, color: Theme.of(context).colorScheme.onPrimary)
+              ? Icon(Icons.sign_language) 
+              : Icon(Icons.sign_language_outlined)
           )
         ],
 			),
