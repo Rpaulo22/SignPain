@@ -32,7 +32,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
     
 
 		return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: .startFloat,
       
 			body: FutureBuilder<List<PainFormData>>(
         future: _painDataFuture, 
@@ -272,7 +272,8 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                       for (var entry in data) ... [
                         painFormWidget(entry),
                         SizedBox(height: 10)
-                      ]
+                      ],
+                      SizedBox(height: 60)
                     ]
                   ),
                 )
@@ -281,7 +282,14 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
           }
           return const Center(child: Text("Não tem quaisquer registos de dor"));
         },
-      )
+      ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'btn_back',
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: const Icon(Icons.arrow_back),
+      ),
     );
 	}
 
