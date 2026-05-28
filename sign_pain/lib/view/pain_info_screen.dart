@@ -6,6 +6,7 @@ import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class PainInfoScreen extends StatefulWidget {
   const PainInfoScreen({super.key});
@@ -18,7 +19,12 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
   final FormViewModel formViewModel = FormViewModel();
   String userID = FirebaseAuth.instance.currentUser!.uid;
   late Future<List<PainFormData>> _painDataFuture;
-  bool showGraph = false;
+  
+  int mode = 0; // 0 -> list | 1 -> graph | 2 -> calendar
+
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
 
   @override
   void initState() {
@@ -55,230 +61,117 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                 ),
               );
             }
-            else if (showGraph) {
-              if (data.length < 2) {
-                return const Center(
-                  child: Text(
-                    "É preciso 2 registos para ver gráfico",
-                    textAlign: TextAlign.center,
-                    textScaler: TextScaler.linear(1.6),
-                  ),
-                );
-              }
-              else {
-                final ascendingData = List<PainFormData>.from(data);
-                ascendingData.sort((a,b) => a.date!.compareTo(b.date!));
-                final dataX = getDataX(ascendingData);
 
-                double totalDaysSpan = dataX.last.toDouble();
-                double strictInterval = totalDaysSpan / 5; 
-                if (strictInterval < 1) strictInterval = 1.0; 
-                
-                return Column(
+            return Column(
+              children: [
+                // buttons to change mode
+                Row(
+                  mainAxisAlignment: .spaceBetween,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.secondary,
-                          foregroundColor: Theme.of(context).colorScheme.onSecondary,
-                          elevation: 4.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: mode == 0 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.primary.withAlpha(80),
+                        foregroundColor: mode == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onPrimary.withAlpha(80),
+                        elevation: 4.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        onPressed: () {
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          mode = 0;
+                        });
+                      },
+                      child: const Text("Lista 📋")
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: mode == 1 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.primary.withAlpha(80),
+                        foregroundColor: mode == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onPrimary.withAlpha(80),
+                        elevation: 4.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
+                        if (data.length < 2) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("É preciso 2 registos para ver gráfico"))
+                          );
+                        }
+                        else {
                           setState(() {
-                            showGraph = !showGraph;
+                            mode = 1;
                           });
-                        },
-                        child: const Text("Gráfico 📈")
-                      )
+                        }
+                      },
+                      child: const Text("Gráfico 📈")
                     ),
-                    const Text(
-                      "Progressão da dor", 
-                      textScaler: TextScaler.linear(1.8), 
-                      style: TextStyle(fontWeight: FontWeight.bold)
-                    ),
-                    Expanded(
-                      // Wrapped in a Center and Padding to make it look perfect in the middle
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: AspectRatio(
-                            aspectRatio: 1.5,
-                            child: LineChart(
-                              LineChartData(
-                                minY: 0,
-                                maxY: 10,
-                                
-                                // the data being ilustrated
-                                lineBarsData: [
-                                  LineChartBarData(
-                                    spots: [
-                                      for (var i = 0; i < ascendingData.length; i++)
-                                        FlSpot(
-                                          dataX[i].toDouble(),
-                                          ascendingData[i].painLevel!.toDouble(),
-                                        )
-                                    ],
-                                    color: Theme.of(context).colorScheme.inversePrimary,
-                                    barWidth: 4,
-                                    isStrokeCapRound: true,
-                                  ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: mode == 2 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.primary.withAlpha(80),
+                        foregroundColor: mode == 2 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onPrimary.withAlpha(80),
+                        elevation: 4.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          mode = 2;
+                        });
+                      },
+                      child: const Text("Calendário 📅")
+                    )
+                  ],
+                ),
+                Expanded(
+                  child: Builder(
+                    builder: (context) {
+                      if (mode == 0) {
+                        // LIST VIEW
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                for (var entry in data) ...[
+                                  painFormWidget(entry),
+                                  const SizedBox(height: 10),
                                 ],
-                                
-                                // When user taps a point
-                                lineTouchData: LineTouchData( 
-                                  touchTooltipData: LineTouchTooltipData(
-                                    getTooltipColor: (LineBarSpot touchedSpot) => Theme.of(context).colorScheme.inversePrimary,
-                                    tooltipPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                                    tooltipMargin: 30.0, // margin so that finger does not obstruct the information
-                                    getTooltipItems: (List<LineBarSpot> touchedSpots) {
-                                      return touchedSpots.map((LineBarSpot spot) {
-                                        
-                                        DateTime dayOne = ascendingData.first.date!;
-                                        DateTime d = dayOne.add(Duration(days: spot.x.toInt()));
-                                        String dateString = DateFormat('d MMM', 'pt_PT').format(d);
-
-                                        return LineTooltipItem(
-                                          'Dor: ${spot.y.toInt()}\n',
-                                          TextStyle(
-                                            color: Theme.of(context).colorScheme.secondary,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14,
-                                          ),
-                                          children: [
-                                            TextSpan(
-                                              text: dateString,
-                                              style: TextStyle(
-                                                color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      }).toList();
-                                    },
-                                  ),
-                                ),
-                                
-                                titlesData: FlTitlesData(
-                                  
-                                  // Bottom X-Axis: Show the dates
-                                  bottomTitles: AxisTitles(
-                                    sideTitles: SideTitles(
-                                      showTitles: true,
-                                      interval: strictInterval,
-                                      reservedSize: 30,
-                                      getTitlesWidget: (value, meta) {
-                                        if (value > meta.max - (strictInterval / 2) && value < meta.max) {
-                                          return const SizedBox.shrink();
-                                        }
-                                        // Convert offset back to a Date
-                                        DateTime dayOne = ascendingData.first.date!;
-                                        DateTime d = dayOne.add(Duration(days: value.toInt()));
-                                        
-                                        return SideTitleWidget(
-                                          meta: meta,
-                                          space: 8.0, // Proper spacing from the X-axis line
-                                          child: Text(
-                                            DateFormat('dd/MM').format(d), 
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                                                    
-                                  // Left Y-Axis: Pain levels
-                                  leftTitles: AxisTitles(
-                                    sideTitles: SideTitles(
-                                      showTitles: true,
-                                      interval: 2, // Show a label every 2 levels (2, 4, 6...)
-                                      reservedSize: 30, // Give the text enough room
-                                    ),
-                                  ),
-                                  
-                                  // Hide the top and right titles for a cleaner look
-                                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                ),
-                                
-                                gridData: const FlGridData(show: false),
-
-                                borderData: FlBorderData(
-                                  show: true,
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Theme.of(context).colorScheme.onSurface.withAlpha(100), 
-                                      width: 1.5,
-                                    ),
-                                    left: BorderSide(
-                                      color: Theme.of(context).colorScheme.onSurface.withAlpha(100), 
-                                      width: 1.5,
-                                    ),
-                                    top: const BorderSide(color: Colors.transparent),
-                                    right: const BorderSide(color: Colors.transparent),
-                                  ),
+                                const SizedBox(height: 60) // Bottom padding for FAB
+                              ],
+                            ),
+                          ),
+                        );
+                      } else if (mode == 1) {
+                        // GRAPH VIEW
+                        return Column(
+                          children: [
+                            const Text(
+                              "Progressão da dor",
+                              textScaler: TextScaler.linear(1.8),
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Expanded(
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                  child: painChart(data),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                    )
-                  ]
-                );
-              }
-            } else {
-              // list may be big, so scrollable
-              return Padding(
-                padding: EdgeInsetsGeometry.symmetric(horizontal: 15, vertical:10),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.secondary,
-                            foregroundColor: Theme.of(context).colorScheme.onSecondary,
-                            elevation: 4.0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          onPressed: () {
-                            if (data.length < 2) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("É preciso 2 registos para ver gráfico"))
-                              );
-                            }
-                            else {
-                              setState(() {
-                                showGraph = !showGraph;
-                              });
-                            }
-                          },
-                          child: const Text("Gráfico 📈")
-                        )
-                      ),
-                      for (var entry in data) ... [
-                        painFormWidget(entry),
-                        SizedBox(height: 10)
-                      ],
-                      SizedBox(height: 60)
-                    ]
+                          ],
+                        );
+                      } else {
+                        // CALENDAR VIEW
+                        return painCalendar(data);
+                      }
+                    },
                   ),
                 )
-              );
-            }
+              ]
+            );
           }
           return const Center(child: Text("Não tem quaisquer registos de dor"));
         },
@@ -368,5 +261,263 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
       days.add(dateAux.difference(dayOneAux).inDays); // days elapsed between first registered form and this one
     }
     return days;
+  }
+  
+  // chart representing the evolution of 
+  Widget painChart(List<PainFormData> data) {
+
+    final ascendingData = List<PainFormData>.from(data);
+    ascendingData.sort((a,b) => a.date!.compareTo(b.date!));
+    final dataX = getDataX(ascendingData);
+
+    double totalDaysSpan = dataX.last.toDouble();
+    double strictInterval = totalDaysSpan / 5; 
+    if (strictInterval < 1) strictInterval = 1.0; 
+
+    return AspectRatio(
+      aspectRatio: 1.5,
+      child: LineChart(
+        LineChartData(
+          minY: 0,
+          maxY: 10,
+          
+          // the data being ilustrated
+          lineBarsData: [
+            LineChartBarData(
+              spots: [
+                for (var i = 0; i < ascendingData.length; i++)
+                  FlSpot(
+                    dataX[i].toDouble(),
+                    ascendingData[i].painLevel!.toDouble(),
+                  )
+              ],
+              color: Theme.of(context).colorScheme.inversePrimary,
+              barWidth: 4,
+              isStrokeCapRound: true,
+            ),
+          ],
+          
+          // When user taps a point
+          lineTouchData: LineTouchData( 
+            touchTooltipData: LineTouchTooltipData(
+              getTooltipColor: (LineBarSpot touchedSpot) => Theme.of(context).colorScheme.inversePrimary,
+              tooltipPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              tooltipMargin: 30.0, // margin so that finger does not obstruct the information
+              getTooltipItems: (List<LineBarSpot> touchedSpots) {
+                return touchedSpots.map((LineBarSpot spot) {
+                  
+                  DateTime dayOne = ascendingData.first.date!;
+                  DateTime d = dayOne.add(Duration(days: spot.x.toInt()));
+                  String dateString = DateFormat('d MMM', 'pt_PT').format(d);
+
+                  return LineTooltipItem(
+                    'Dor: ${spot.y.toInt()}\n',
+                    TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: dateString,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
+                          fontWeight: FontWeight.normal,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList();
+              },
+            ),
+          ),
+          
+          titlesData: FlTitlesData(
+            
+            // Bottom X-Axis: Show the dates
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: strictInterval,
+                reservedSize: 30,
+                getTitlesWidget: (value, meta) {
+                  if (value > meta.max - (strictInterval / 2) && value < meta.max) {
+                    return const SizedBox.shrink();
+                  }
+                  // Convert offset back to a Date
+                  DateTime dayOne = ascendingData.first.date!;
+                  DateTime d = dayOne.add(Duration(days: value.toInt()));
+                  
+                  return SideTitleWidget(
+                    meta: meta,
+                    space: 8.0, // Proper spacing from the X-axis line
+                    child: Text(
+                      DateFormat('dd/MM').format(d), 
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+                                              
+            // Left Y-Axis: Pain levels
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: 2, // Show a label every 2 levels (2, 4, 6...)
+                reservedSize: 30, // Give the text enough room
+              ),
+            ),
+            
+            // Hide the top and right titles for a cleaner look
+            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          ),
+          
+          gridData: const FlGridData(show: false),
+
+          borderData: FlBorderData(
+            show: true,
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(100), 
+                width: 1.5,
+              ),
+              left: BorderSide(
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(100), 
+                width: 1.5,
+              ),
+              top: const BorderSide(color: Colors.transparent),
+              right: const BorderSide(color: Colors.transparent),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // visualization of pain history through calendar
+  Widget painCalendar(List<PainFormData> data) {
+    CalendarFormat calendarFormat = CalendarFormat.month;
+    DateTime focusedDay = DateTime.now();
+    DateTime? selectedDay;
+
+    final firstDay = data.reduce((curr, next) => curr.date!.compareTo(next.date!) < 0 ? curr : next).date!;
+    
+    // format the list to a map to more easily access data pertaining to a specific day
+    Map<DateTime, List<PainFormData>> historyMap = data.fold({}, (map, record) {
+      final date = record.date!;
+      final normalizedKey = DateTime.utc(date.year, date.month, date.day);
+      map.putIfAbsent(normalizedKey, () => []).add(record);
+      return map;
+    });
+
+    // helper function to match exact days ignoring timestamps
+    List<PainFormData>? getPainRecordsForDay(DateTime day) {
+      return historyMap[day]; 
+    }
+
+    Color getMarkerColor(int painLevel) {
+      if (painLevel < 3) return Colors.green;
+      if (painLevel < 6) return Colors.orange;
+      if (painLevel < 9) return Colors.redAccent;
+      return Colors.red;
+    }
+
+    return Column(
+      children: [
+        TableCalendar(
+          locale: 'pt_PT', 
+          firstDay: firstDay,
+          lastDay: focusedDay,
+          focusedDay: focusedDay,
+          calendarFormat: calendarFormat,
+          selectedDayPredicate: (day) => isSameDay(selectedDay, day),
+          // ignore: no_leading_underscores_for_local_identifiers
+          onDaySelected: (_selectedDay, _focusedDay) {
+            setState(() {
+              selectedDay = _selectedDay;
+              focusedDay = _focusedDay;
+            });
+            // TODO: Fetch and show specific records for this day below the calendar!
+          },
+          onFormatChanged: (format) {
+            setState(() {
+              calendarFormat = format;
+            });
+          },
+          onPageChanged: (focusedDay) {
+            focusedDay = focusedDay;
+          },
+
+          daysOfWeekHeight: 24,
+
+          calendarBuilders: CalendarBuilders(
+            markerBuilder: (context, date, events) {
+              final dayEntries = getPainRecordsForDay(date);
+              if (dayEntries == null) return const SizedBox.shrink();
+
+              // average pain level reported in that day
+              final painLevel = (dayEntries.map((entry) => entry.painLevel!).reduce((a, b) => a + b) / dayEntries.length).round();
+
+              // Build a beautiful colored badge under the date matching your pain scale
+              return Positioned(
+                bottom: 4,
+                child: Container(
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: getMarkerColor(painLevel),
+                  ),
+                  child: Text(
+                    painLevel.toString(),
+                    style: TextStyle(fontSize: 10),
+                    textAlign: .center,
+                  ),
+                ),
+              );
+            },
+
+            dowBuilder: (context, day) {
+              // format the day to a 3-letter abbreviation
+              final text = DateFormat.E('pt_PT').format(day);
+              
+              final cleanText = text.substring(0, 1).toUpperCase() + text.substring(1, 3);
+
+              return Center(
+                child: Text(
+                  cleanText,
+                  style: TextStyle(
+                    color: day.weekday == DateTime.sunday || day.weekday == DateTime.saturday
+                        ? Theme.of(context).colorScheme.error // Red-ish for weekends
+                        : Theme.of(context).colorScheme.onSurface, // Standard color for weekdays
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+              );
+            },
+          ),
+          
+          // UI Theme custom styling that shifts nicely with dark/light mode
+          calendarStyle: CalendarStyle(
+            todayDecoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withAlpha(110),
+              shape: BoxShape.circle,
+            ),
+            selectedDecoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              shape: BoxShape.circle,
+            ),
+          ),
+        )
+      ],
+    );
   }
 }

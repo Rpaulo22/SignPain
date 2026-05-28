@@ -28,7 +28,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 	@override
 	Widget build(BuildContext context) {
     final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
-    final bool isDarkMode = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final paddingSlider = MediaQuery.widthOf(context)/10;
 
 		return Scaffold(
