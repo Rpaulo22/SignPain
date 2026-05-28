@@ -29,24 +29,11 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
 	@override
 	Widget build(BuildContext context) {
     final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
+    
 
 		return Scaffold(
-			appBar: AppBar(
-        centerTitle: true,
-        title: Text("SignPain"),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // toggle between sign language and text
-              Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
-            },
-            icon: 
-              isSignMode 
-              ? Icon(Icons.sign_language) 
-              : Icon(Icons.sign_language_outlined)
-          )
-        ],
-      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      
 			body: FutureBuilder<List<PainFormData>>(
         future: _painDataFuture, 
         builder: (context, snapshot) {
@@ -308,52 +295,55 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
         borderRadius: BorderRadius.circular(12)
       ),
       padding: EdgeInsetsDirectional.only(top: 15, bottom: 15, start: 10, end: 10),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
+        mainAxisSize: .max,
+        crossAxisAlignment: .center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Dor registada: ${data.painLevel}/10", 
-                style: TextStyle(
-                  fontSize: 14, 
-                  color: Theme.of(context).colorScheme.onPrimary
-                )
-              ),
-              Text(
-                "Data: ${DateFormat('dd-MM-yyy | kk:mm').format(data.date!)}", 
-                style: TextStyle(
-                  fontWeight: FontWeight.bold, 
-                  fontSize: 14,
-                  color: Theme.of(context).colorScheme.onPrimary
-                )
-              )
-            ]
-          ),
-          RichText(
-            textAlign: TextAlign.start,
-            text: TextSpan(
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-              children: <TextSpan>[
-                TextSpan(text: "Descrição da dor: "),
-                TextSpan(text: data.descriptors.isNotEmpty ? data.descriptors.join(", ") : "Nenhuma", style: const TextStyle(fontWeight: FontWeight.bold)),
-              ],
-            )
-          ),
           Text(
-            data.bodyParts.isNotEmpty 
-              ? BodyPartsMapper.listToPortuguese(data.bodyParts).join(", ") 
-              : "Dor não situada", 
+            DateFormat('dd-MM-yyy\nkk:mm').format(data.date!), 
             style: TextStyle(
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.bold, 
               fontSize: 14,
               color: Theme.of(context).colorScheme.onPrimary
-            )
+            ),
+            textAlign: .center,
+          ),
+          VerticalDivider(
+            color: Theme.of(context).colorScheme.secondary,
+            width: 10,
+            thickness: 5,
+          ),
+          Expanded(
+            child: Column(
+              children: [
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                    children: <TextSpan>[
+                      TextSpan(text: "Descrição: "),
+                      TextSpan(text: data.descriptors.isNotEmpty ? data.descriptors.join(", ") : "Nenhuma", style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  )
+                ),
+                SizedBox(height: 5),
+                Text(
+                  data.bodyParts.isNotEmpty 
+                    ? BodyPartsMapper.listToPortuguese(data.bodyParts).join(", ") 
+                    : "Dor não situada", 
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onPrimary
+                  ),
+                  textAlign: .center,
+                )
+              ]
+            ),
           )
-        ],
+        ]
       )
     );
   }

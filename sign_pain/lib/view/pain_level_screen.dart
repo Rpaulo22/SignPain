@@ -32,22 +32,6 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
     final paddingSlider = MediaQuery.widthOf(context)/10;
 
 		return Scaffold(
-			appBar: AppBar(
-        centerTitle: true,
-				title: Text("SignPain"),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // toggle between sign language and text
-              Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
-            },
-            icon: 
-              isSignMode 
-              ? Icon(Icons.sign_language) 
-              : Icon(Icons.sign_language_outlined)
-          )
-        ],
-			),
 			body: Padding(
         padding: EdgeInsetsGeometry.directional(start: 20, end: 20, top: 10, bottom: 50),
         child: Center(
@@ -149,8 +133,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
       ),
 			floatingActionButton: FloatingActionButton(
 				onPressed: () {
-					Navigator.push(
-						context,
+					Navigator.of(context).push(
 						MaterialPageRoute(
 						builder: (context) => PainBodyScreen(formData: _formData),
 						),

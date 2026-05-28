@@ -25,22 +25,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
     final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
 
 		return Scaffold(
-			appBar: AppBar(
-        centerTitle: true,
-				title: Text("SignPain"),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // toggle between sign language and text
-              Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
-            },
-            icon: 
-              isSignMode 
-              ? Icon(Icons.sign_language) 
-              : Icon(Icons.sign_language_outlined)
-          )
-        ],
-			),
+      floatingActionButtonLocation: .centerFloat,
 			body: Center(
         child: Padding(
           padding: EdgeInsetsGeometry.directional(start: 20, end: 20, top: 10, bottom: 50),
@@ -51,9 +36,8 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                 flex: 10,
                 child: Text(
                 "Qual destas palavras melhor caracteriza a tua dor?", 
-                textScaler: TextScaler.linear(1.8), 
                 textAlign: TextAlign.center, 
-                style: TextStyle(fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
               ),
               SizedBox(height:20),
 
@@ -93,24 +77,45 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
             ])
           ),
         ),
-				floatingActionButton: FloatingActionButton(
-					onPressed: () {
-            if (widget.formData.isComplete) {
-              showDialog(
-                context: context,
-                barrierDismissible: false, 
-                builder: (BuildContext context) {
-                  // return the confirm dialog widget
-                  return confirmDialog();
-                }
-              );
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Por favor complete o formulário!")));
-            }
-					},
-					tooltip: 'Save form',
-					child: Icon(Icons.save),
-				)
+				floatingActionButton: SizedBox(
+          width: MediaQuery.of(context).size.width, // Forces full screen width calculation
+          child: Padding(
+            // padding to match standard screen margins
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, // Pushes buttons to opposite ends
+              children: [
+                FloatingActionButton(
+                  heroTag: 'btn_back',
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Icon(Icons.arrow_back),
+                ),
+                FloatingActionButton(
+                  onPressed: () {
+                    if (widget.formData.isComplete) {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false, 
+                        useRootNavigator: true,
+                        builder: (BuildContext context) {
+                          // return the confirm dialog widget
+                          return confirmDialog();
+                        }
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Por favor complete o formulário!")));
+                    }
+                  },
+                  heroTag: 'btn_save',
+                  tooltip: 'Save form',
+                  child: Icon(Icons.save),
+                )
+              ]
+            )
+          ) 
+        )
 		);
 	}
 
@@ -141,7 +146,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                   children: [
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.of(context, rootNavigator: true).pop();
                       },
                       child: const Text(
                         'Não',
@@ -164,20 +169,19 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                           if (!mounted) return;
                           if (successful) { // use viewmodel to save pain form
                             ScaffoldMessenger.of(context).showSnackBar(snackBar("Registo guardado com sucesso!"));
-                            Navigator.pushAndRemoveUntil(
-                              context,
+                            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
                               MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
                               (Route<dynamic> route) => false, // false condition clears the entire stack
                             );
                           }
                           else {
                             ScaffoldMessenger.of(context).showSnackBar(snackBar("Erro a gravar. Por favor tente novamente."));
-                            Navigator.pop(context);
+                            Navigator.of(context, rootNavigator: true).pop();
                           }
                         }
                         else {
                           ScaffoldMessenger.of(context).showSnackBar(snackBar("Formulário incompleto. Por favor indique o seu nível de dor e descreva a sua dor."));
-                          Navigator.pop(context);
+                          Navigator.of(context, rootNavigator: true).pop();
                         }
                       },
                       child: const Text(

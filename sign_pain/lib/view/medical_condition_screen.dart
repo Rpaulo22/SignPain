@@ -42,8 +42,10 @@ class _MedicalConditionScreenState extends State<MedicalConditionScreen> {
                 final data = snapshot.data!;
                 return Column(
                   children: [
-                    for (var medCondition in data)
-                      MedicalConditionWidget(medData: medCondition)
+                    for (var medCondition in data) ...[ // present all conditions (for now)
+                      MedicalConditionWidget(medData: medCondition),
+                      Divider(height: 50, thickness: 3, color: Theme.of(context).colorScheme.primary,)
+                    ]
                   ],
                 );
               }

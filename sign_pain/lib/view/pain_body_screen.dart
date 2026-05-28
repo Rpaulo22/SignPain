@@ -47,22 +47,7 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
       },
 
       child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text("SignPain"),
-          actions: [
-            IconButton(
-              onPressed: () {
-                // toggle between sign language and text
-                Provider.of<SignLanguageProvider>(context, listen: false).toggleMode();
-              },
-              icon: 
-                isSignMode 
-                ? Icon(Icons.sign_language) 
-                : Icon(Icons.sign_language_outlined)
-            )
-          ],
-        ),
+        floatingActionButtonLocation: .centerFloat,
         body: Padding(
           padding: EdgeInsetsGeometry.directional(start: 20, end: 20, top: 10, bottom: 50),
           child: Column(
@@ -105,20 +90,38 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
             ]
           )
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            List<String> partsList = _selectedParts.toList();
-            widget.formData.bodyParts = partsList; // adds body parts to form data (in list format)
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-              builder: (context) => PainDescriptorScreen(formData: widget.formData),
-              ),
-            );
-          },
-          tooltip: 'pain type',
-          child: Icon(Icons.arrow_forward)
-        ),
+        floatingActionButton: SizedBox(
+          width: MediaQuery.of(context).size.width, // Forces full screen width calculation
+          child:Padding(
+            // padding to match standard screen margins
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, // Pushes buttons to opposite ends
+              children: [
+                FloatingActionButton(
+                  heroTag: 'btn_back', // CRUCIAL: Unique tag prevents animation crashes!
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Icon(Icons.arrow_back),
+                ),
+                FloatingActionButton(
+                  onPressed: () {
+                    List<String> partsList = _selectedParts.toList();
+                    widget.formData.bodyParts = partsList; // adds body parts to form data (in list format)
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                      builder: (context) => PainDescriptorScreen(formData: widget.formData),
+                      ),
+                    );
+                  },
+                  tooltip: 'pain type',
+                  child: const Icon(Icons.arrow_forward)
+                ),
+              ]
+            )
+          )
+        )
       )
     );
   }

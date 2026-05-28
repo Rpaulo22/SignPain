@@ -18,25 +18,40 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int selectedIndex = 0;
 
-  // list of screens that you navigate between
-  final List<Widget> _pages = [
-    HomePageScreen(),
-    CommunicationScreen(),
-    MedicalConditionScreen(),
-    SettingsScreen()
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
     });
+    pageController.jumpToPage(index);
   }
+
+  // allows to have a nested navigator (home page can go through different screens and keep its context (appbar and navbar))
+  final GlobalKey<NavigatorState> homeNavigatorKey = GlobalKey<NavigatorState>();
+
+  final PageController pageController = PageController();
 
   @override
   Widget build(BuildContext context) {
     final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
 
     final accountViewModel = AccountViewModel();
+
+    // list of screens that you navigate between
+    final List<Widget> pages = [
+      KeepAliveTabWrapper(
+        child: Navigator(
+          key: homeNavigatorKey,
+          onGenerateRoute: (routeSettings) {
+            return MaterialPageRoute(
+              builder: (context) => const HomePageScreen(),
+            );
+          },
+        ),
+      ),
+      CommunicationScreen(),
+      MedicalConditionScreen(),
+      SettingsScreen()
+    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -103,11 +118,30 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             : Icon(Icons.sign_language_outlined)
           )
         ],
+
+        elevation: 4,
 			),
-      // body displays the class from the list based on the index
-      body: IndexedStack(
-        index: selectedIndex,
-        children: _pages
+      
+      body: PopScope(
+        canPop: false, 
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
+          
+          // only intercept the back button if we are currently on the Home Page (index 0)
+          if (selectedIndex == 0) {
+            final NavigatorState? homeNav = homeNavigatorKey.currentState;
+            if (homeNav != null && homeNav.canPop()) {
+              homeNav.pop(); // close sub-screen inside Home Page
+              return;
+            }
+          }
+        },
+        // body displays the class from the list based on the index
+        child: PageView(
+          controller: pageController,
+          physics: const NeverScrollableScrollPhysics(), // Disable swipe gestures so it feels like a normal tab bar
+          children: pages
+        )
       ),
       
       bottomNavigationBar: Theme(
@@ -150,5 +184,25 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
       )
     );
+  }
+}
+
+class KeepAliveTabWrapper extends StatefulWidget {
+  final Widget child;
+  const KeepAliveTabWrapper({super.key, required this.child});
+
+  @override
+  State<KeepAliveTabWrapper> createState() => _KeepAliveTabWrapperState();
+}
+
+// AutomaticKeepAliveClientMixin is the magic ingredient
+class _KeepAliveTabWrapperState extends State<KeepAliveTabWrapper> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true; // Forces Flutter to preserve this widget's exact state
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // Mandatory line when using this mixin
+    return widget.child;
   }
 }

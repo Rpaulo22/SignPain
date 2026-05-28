@@ -102,8 +102,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         SignVideoPlayer(
                           videoPath: videoPaths[2],
                           onTap: () {
-                            Navigator.push(
-                              context,
+                            Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => const PainLevelScreen(),
                               ),
@@ -118,8 +117,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                             height: 60,
                             child: ElevatedButton(
                               onPressed: () {
-                                Navigator.push(
-                                  context,
+                                Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => const PainLevelScreen(),
                                   ),
@@ -146,8 +144,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         SignVideoPlayer(
                           videoPath: videoPaths[1],
                           onTap: () {
-                            Navigator.push(
-                              context,
+                            Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => const PainInfoScreen(),
                               ),
@@ -162,8 +159,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                             height: 60,
                             child: ElevatedButton(
                               onPressed: () {
-                                Navigator.push(
-                                  context,
+                                Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => const PainInfoScreen(),
                                   ),
