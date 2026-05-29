@@ -403,12 +403,8 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
 
   // visualization of pain history through calendar
   Widget painCalendar(List<PainFormData> data) {
-    CalendarFormat calendarFormat = CalendarFormat.month;
-    DateTime focusedDay = DateTime.now();
-    DateTime? selectedDay;
-
     final firstDay = data.reduce((curr, next) => curr.date!.compareTo(next.date!) < 0 ? curr : next).date!;
-    
+
     // format the list to a map to more easily access data pertaining to a specific day
     Map<DateTime, List<PainFormData>> historyMap = data.fold({}, (map, record) {
       final date = record.date!;
@@ -429,26 +425,30 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
       return Colors.red;
     }
 
+    List<PainFormData> dayPainList = [];
+    if (_selectedDay != null) {
+      final normalizedDate = DateTime.utc(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day);
+      dayPainList = historyMap[normalizedDate] ?? [];
+    }
+
     return Column(
       children: [
         TableCalendar(
           locale: 'pt_PT', 
           firstDay: firstDay,
-          lastDay: focusedDay,
-          focusedDay: focusedDay,
-          calendarFormat: calendarFormat,
-          selectedDayPredicate: (day) => isSameDay(selectedDay, day),
-          // ignore: no_leading_underscores_for_local_identifiers
-          onDaySelected: (_selectedDay, _focusedDay) {
+          lastDay: DateTime.now(),
+          focusedDay: _focusedDay,
+          calendarFormat: _calendarFormat,
+          selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+          onDaySelected: (selectedDay, focusedDay) {
             setState(() {
-              selectedDay = _selectedDay;
-              focusedDay = _focusedDay;
+              _selectedDay = selectedDay;
+              _focusedDay = focusedDay;
             });
-            // TODO: Fetch and show specific records for this day below the calendar!
           },
           onFormatChanged: (format) {
             setState(() {
-              calendarFormat = format;
+              _calendarFormat = format;
             });
           },
           onPageChanged: (focusedDay) {
@@ -516,6 +516,35 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
               shape: BoxShape.circle,
             ),
           ),
+        ),
+        const Divider(height: 20, thickness: 1),
+        Expanded(
+          child: _selectedDay == null
+            ? const Center(
+                child: Text(
+                  "Selecione um dia para ver os registos",
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
+              )
+            : dayPainList.isEmpty
+              ? const Center(
+                  child: Text(
+                    "Sem registos de dor neste dia.",
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                  itemCount: dayPainList.length,
+                  itemBuilder: (context, index) {
+                    final entry = dayPainList[index];
+                    
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: painFormWidget(entry),
+                    );
+                  },
+                ),
         )
       ],
     );
