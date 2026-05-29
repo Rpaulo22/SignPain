@@ -2,8 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
+import 'package:sign_pain/model/pain_form_data.dart';
+import 'package:sign_pain/view/pain_body_screen.dart';
 import 'package:sign_pain/view/pain_info_screen.dart';
-import 'package:sign_pain/view/pain_level_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
 import 'package:sign_pain/widgets/sign_video_player.dart';
 
@@ -104,7 +105,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => const PainLevelScreen(),
+                                builder: (context) => PainBodyScreen(formData: PainFormData()),
                               ),
                             );
                           },
@@ -119,7 +120,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                               onPressed: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (context) => const PainLevelScreen(),
+                                    builder: (context) => PainBodyScreen(formData: PainFormData()),
                                   ),
                                 );
                               },

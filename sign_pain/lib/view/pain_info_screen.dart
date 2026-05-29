@@ -20,7 +20,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
   String userID = FirebaseAuth.instance.currentUser!.uid;
   late Future<List<PainFormData>> _painDataFuture;
   
-  int mode = 0; // 0 -> list | 1 -> graph | 2 -> calendar
+  int mode = 0; // 0 -> calendar | 1 -> graph | 2 -> list
 
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
@@ -70,7 +70,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                   children: [
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: mode == 0 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.primary.withAlpha(80),
+                        backgroundColor: mode == 0 ? Color.fromARGB(255, 233, 129, 64) : Color.fromARGB(255, 233, 129, 64).withAlpha(80),
                         foregroundColor: mode == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onPrimary.withAlpha(80),
                         elevation: 4.0,
                         shape: RoundedRectangleBorder(
@@ -82,11 +82,11 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                           mode = 0;
                         });
                       },
-                      child: const Text("Lista 📋")
+                      child: const Text("Calendário 📅")
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: mode == 1 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.primary.withAlpha(80),
+                        backgroundColor: mode == 1 ? Color.fromARGB(255, 233, 129, 64) : Color.fromARGB(255, 233, 129, 64).withAlpha(80),
                         foregroundColor: mode == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onPrimary.withAlpha(80),
                         elevation: 4.0,
                         shape: RoundedRectangleBorder(
@@ -109,7 +109,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: mode == 2 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.primary.withAlpha(80),
+                        backgroundColor: mode == 2 ? Color.fromARGB(255, 233, 129, 64) : Color.fromARGB(255, 233, 129, 64).withAlpha(80),
                         foregroundColor: mode == 2 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onPrimary.withAlpha(80),
                         elevation: 4.0,
                         shape: RoundedRectangleBorder(
@@ -121,14 +121,14 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                           mode = 2;
                         });
                       },
-                      child: const Text("Calendário 📅")
+                      child: const Text("Lista 📋")
                     )
                   ],
                 ),
                 Expanded(
                   child: Builder(
                     builder: (context) {
-                      if (mode == 0) {
+                      if (mode == 2) {
                         // LIST VIEW
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -191,8 +191,8 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).colorScheme.primaryContainer),
-        color: Theme.of(context).colorScheme.primary,
+        border: Border.all(color: getPainColor(data.painLevel!)),
+        color: getPainColor(data.painLevel!).withAlpha(150),
         borderRadius: BorderRadius.circular(12)
       ),
       padding: EdgeInsetsDirectional.only(top: 15, bottom: 15, start: 10, end: 10),
@@ -201,10 +201,10 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
         crossAxisAlignment: .center,
         children: [
           Text(
-            DateFormat('dd-MM-yyy\nkk:mm').format(data.date!), 
+            "Dor ${data.painLevel!}/10", 
             style: TextStyle(
               fontWeight: FontWeight.bold, 
-              fontSize: 14,
+              fontSize: 18,
               color: Theme.of(context).colorScheme.onPrimary
             ),
             textAlign: .center,
@@ -291,7 +291,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                     ascendingData[i].painLevel!.toDouble(),
                   )
               ],
-              color: Theme.of(context).colorScheme.inversePrimary,
+              color: Color.fromARGB(255, 233, 129, 64),
               barWidth: 4,
               isStrokeCapRound: true,
             ),
@@ -300,7 +300,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
           // When user taps a point
           lineTouchData: LineTouchData( 
             touchTooltipData: LineTouchTooltipData(
-              getTooltipColor: (LineBarSpot touchedSpot) => Theme.of(context).colorScheme.inversePrimary,
+              getTooltipColor: (LineBarSpot touchedSpot) => Color.fromARGB(255, 233, 129, 64),
               tooltipPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
               tooltipMargin: 30.0, // margin so that finger does not obstruct the information
               getTooltipItems: (List<LineBarSpot> touchedSpots) {
@@ -313,7 +313,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                   return LineTooltipItem(
                     'Dor: ${spot.y.toInt()}\n',
                     TextStyle(
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
@@ -321,7 +321,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                       TextSpan(
                         text: dateString,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
+                          color: Theme.of(context).colorScheme.onPrimary.withAlpha(200),
                           fontWeight: FontWeight.normal,
                           fontSize: 12,
                         ),
@@ -418,13 +418,6 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
       return historyMap[day]; 
     }
 
-    Color getMarkerColor(int painLevel) {
-      if (painLevel < 3) return Colors.green;
-      if (painLevel < 6) return Colors.orange;
-      if (painLevel < 9) return Colors.redAccent;
-      return Colors.red;
-    }
-
     List<PainFormData> dayPainList = [];
     if (_selectedDay != null) {
       final normalizedDate = DateTime.utc(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day);
@@ -473,7 +466,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                   height: 16,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: getMarkerColor(painLevel),
+                    color: getPainColor(painLevel),
                   ),
                   child: Text(
                     painLevel.toString(),
@@ -549,4 +542,11 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
       ],
     );
   }
+
+  Color getPainColor(int painLevel) {
+      if (painLevel < 3) return Colors.green;
+      if (painLevel < 6) return Colors.orange;
+      if (painLevel < 9) return Colors.redAccent;
+      return Colors.red;
+    }
 }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
-import 'package:sign_pain/view/pain_descriptor_screen.dart';
+import 'package:sign_pain/view/pain_level_screen.dart';
 import 'package:sign_pain/widgets/step_indicator.dart';
 
 class PainBodyScreen extends StatefulWidget {
@@ -82,7 +82,7 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 64.0),
                   child: StepIndicator(
-                    currentStep: 2, // user is on page 2
+                    currentStep: 1, // user is on page 1
                     totalSteps: 3,  // of 3 pages total
                   ),
                 ),
@@ -111,7 +111,7 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
                     widget.formData.bodyParts = partsList; // adds body parts to form data (in list format)
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                      builder: (context) => PainDescriptorScreen(formData: widget.formData),
+                      builder: (context) => PainLevelScreen(formData: widget.formData),
                       ),
                     );
                   },

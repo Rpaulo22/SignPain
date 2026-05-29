@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
-import 'package:sign_pain/view/pain_body_screen.dart';
+import 'package:sign_pain/view/pain_descriptor_screen.dart';
 import 'package:sign_pain/widgets/sign_video_player.dart';
 import 'package:sign_pain/widgets/step_indicator.dart';
 
 class PainLevelScreen extends StatefulWidget {
-  const PainLevelScreen({super.key});
+  const PainLevelScreen({super.key, required this.formData});
 
+  final PainFormData formData;
+  
   @override
   State<PainLevelScreen> createState() => _PainLevelScreenState();
 }
 
 class _PainLevelScreenState extends State<PainLevelScreen> {
-  final PainFormData _formData = PainFormData();
-
 	final painScale = [0,1,2,3,4,5,6,7,8,9,10];
 
   double currentSliderValue = 0;
@@ -109,7 +109,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                           onChanged: (double value) {
                             setState(() {
                               currentSliderValue = value;
-                              _formData.painLevel = currentSliderValue.toInt();
+                              widget.formData.painLevel = currentSliderValue.toInt();
                             });
                           },
                         ),
@@ -123,7 +123,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 64.0),
                   child: StepIndicator(
-                    currentStep: 1, // user is on page 1
+                    currentStep: 2, // user is on page 2
                     totalSteps: 3,  // of 3 pages total
                   ),
                 ),
@@ -151,7 +151,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                    builder: (context) => PainBodyScreen(formData: _formData),
+                    builder: (context) => PainDescriptorScreen(formData: widget.formData),
                     ),
                   );
                 },
