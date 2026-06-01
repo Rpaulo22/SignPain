@@ -544,9 +544,9 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
   }
 
   Color getPainColor(int painLevel) {
-      if (painLevel < 3) return Colors.green;
-      if (painLevel < 6) return Colors.orange;
-      if (painLevel < 9) return Colors.redAccent;
-      return Colors.red;
-    }
+    if (painLevel < 3) return Colors.green;
+    if (painLevel < 6) return Colors.orange;
+    if (painLevel < 9) return Colors.redAccent;
+    return Colors.red;
+  }
 }
