@@ -107,7 +107,15 @@ class MyApp extends StatelessWidget {
           builder: (context, _) {
             
             // what mode it is on
-            final bool isDark = themeController.themeMode == ThemeMode.dark;
+            bool isDark;
+      
+            if (themeController.themeMode == ThemeMode.system) {
+              // If set to system, ask the physical device what brightness it is using
+              isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+            } else {
+              // Otherwise, strictly follow the user's manual override
+              isDark = themeController.themeMode == ThemeMode.dark;
+            }
 
             return Theme(
               data: isDark
