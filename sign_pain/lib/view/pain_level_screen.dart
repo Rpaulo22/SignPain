@@ -20,10 +20,18 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 
   double currentSliderValue = 0;
 
+  final ValueNotifier<int> scaleNotifier = ValueNotifier<int>(0);
+
+  @override
+  void dispose() {
+    scaleNotifier.dispose();
+    super.dispose();
+  }
+
 	final snackBar = SnackBar(
 		content: Text('Reset pain level!'),
 		duration: const Duration(milliseconds: 1500),
-		);
+  );
 
 	@override
 	Widget build(BuildContext context) {
@@ -56,66 +64,96 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
               ),
               Expanded(
                 flex: 55,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Image(
-                      image: AssetImage(
-                        isDarkMode 
-                        ? 'assets/images/ipt_dark.png'
-                        : 'assets/images/ipt.png'
-                      ),
-                      fit: BoxFit.contain, 
-                    ),
-                    SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        trackHeight: 30.0, 
-                        activeTrackColor: Colors.white,   // Must be white so the gradient shader can paint over it
-                        inactiveTrackColor: Colors.white.withAlpha(100), // Gives a dimmed background gradient
-                        thumbColor: Colors.white,          
-                        
-                        // This removes the default overlay halo when tapping so it doesn't look messy
-                        overlayColor: Colors.transparent, 
-
-                        valueIndicatorShape: const PaddleSliderValueIndicatorShape(), 
-
-                        valueIndicatorColor: getGradientColor(currentSliderValue),
-    
-                        valueIndicatorTextStyle: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                child: ValueListenableBuilder<int>(
+                  valueListenable: scaleNotifier,
+                  builder: (context, scaleMode, _) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FilterChip(
+                              label: const Text("Termómetro 🌡️"),
+                              selected: scaleMode == 0,
+                              onSelected: (_) => scaleNotifier.value = 0,
+                            ),
+                            const SizedBox(width: 8),
+                            FilterChip(
+                              label: const Text("Caras 🙁"),
+                              selected: scaleMode == 1,
+                              onSelected: (_) => scaleNotifier.value = 1,
+                            ),
+                          ],
                         ),
-                      ),
-                      child: ShaderMask(
-                        blendMode: BlendMode.srcIn, 
-                        
-                        
-                        shaderCallback: (Rect bounds) {
-                          return LinearGradient(
-                            colors: [
-                              Colors.white70,
-                              Colors.red,
-                            ],
-                          ).createShader(bounds);
-                        },
-                        
-                        child: Slider(
-                          value: currentSliderValue,
-                          max: 10,
-                          divisions: 10,
-                          label: currentSliderValue.round().toString(),
-                          showValueIndicator: ShowValueIndicator.alwaysVisible,
-                          padding: EdgeInsetsDirectional.only(top: 30.0, start: paddingSlider, end: paddingSlider),
-                          onChanged: (double value) {
-                            setState(() {
-                              currentSliderValue = value;
-                              widget.formData.painLevel = currentSliderValue.toInt();
-                            });
-                          },
+                        SizedBox(height:20),
+                        Image(
+                          image: AssetImage(
+                            isDarkMode
+                            ? switch (scaleMode) {
+                              0 => 'assets/images/ipt_dark.png',
+                              1 => 'assets/images/faces_pain_scale_dark.png',
+                              _ => 'assets/images/ipt_dark.png',
+                            }
+                            : switch (scaleMode) {
+                              0 => 'assets/images/ipt.png',
+                              1 => 'assets/images/faces_pain_scale.png',
+                              _ => 'assets/images/ipt.png',
+                            }
+                          ),
+                          fit: BoxFit.contain, 
                         ),
-                      ),
-                    )
-                  ],
+                        SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            trackHeight: 30.0, 
+                            activeTrackColor: Colors.white,   // Must be white so the gradient shader can paint over it
+                            inactiveTrackColor: Colors.white.withAlpha(100), // Gives a dimmed background gradient
+                            thumbColor: Colors.white,          
+                            
+                            // This removes the default overlay halo when tapping so it doesn't look messy
+                            overlayColor: Colors.transparent, 
+
+                            valueIndicatorShape: const PaddleSliderValueIndicatorShape(), 
+
+                            valueIndicatorColor: getGradientColor(currentSliderValue),
+        
+                            valueIndicatorTextStyle: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          child: ShaderMask(
+                            blendMode: BlendMode.srcIn, 
+                            
+                            
+                            shaderCallback: (Rect bounds) {
+                              return LinearGradient(
+                                colors: [
+                                  Colors.white70,
+                                  Colors.red,
+                                ],
+                              ).createShader(bounds);
+                            },
+                            
+                            child: Slider(
+                              value: currentSliderValue,
+                              max: 10,
+                              divisions: 10,
+                              label: currentSliderValue.round().toString(),
+                              showValueIndicator: ShowValueIndicator.alwaysVisible,
+                              padding: EdgeInsetsDirectional.only(top: 30.0, start: paddingSlider, end: paddingSlider),
+                              onChanged: (double value) {
+                                setState(() {
+                                  currentSliderValue = value;
+                                  widget.formData.painLevel = currentSliderValue.toInt();
+                                });
+                              },
+                            ),
+                          ),
+                        )
+                      ],
+                    );
+                  }
                 )
               ),
               Expanded(

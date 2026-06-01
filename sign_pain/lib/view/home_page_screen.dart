@@ -39,6 +39,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   @override
   void dispose() {
+    chartIntervalNotifier.dispose();
     selectedDayNotifier.dispose(); 
     super.dispose();
   }
@@ -204,6 +205,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
                           child: painChart(userEntries),
                         )
                       ),
+                      
+                      SizedBox(height:20)
                     ]
                   ),
                 ),
