@@ -113,11 +113,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                         fontSize: 26,
                                         color: Color.fromARGB(255, 233, 129, 64)
                                       ),
-                                    ),
-                                    const TextSpan(
-                                      text: '\n\nBem vindo ao SignPain!',
-                                      style: TextStyle(fontSize: 20),
-                                    ),
+                                    )
                                   ],
                                 ),
                               );
@@ -297,6 +293,15 @@ class _HomePageScreenState extends State<HomePageScreen> {
   
   // chart representing the evolution of 
   Widget painChart(List<PainFormData> data) {
+    if (data.length < 2) {
+      return const Center(
+        child: Text(
+          "❌📋\nRegiste mais vezes para ver progressão",
+          textAlign: TextAlign.center,
+          textScaler: TextScaler.linear(1.6),
+        ),
+      );
+    }
 
     final ascendingData = List<PainFormData>.from(data);
     ascendingData.sort((a,b) => a.date!.compareTo(b.date!));
@@ -498,10 +503,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   // visualization of pain history through calendar
   Widget painCalendar(List<PainFormData> data, Map<DateTime, List<PainFormData>> historyMap) {
+    DateTime firstDay = DateTime.now();
 
-    DateTime firstDay = data.reduce((curr, next) => curr.date!.compareTo(next.date!) < 0 ? curr : next).date!;
-
-    if (data.isEmpty) firstDay = DateTime.now();
+    if (data.isNotEmpty) {
+      firstDay = data.reduce((curr, next) => curr.date!.compareTo(next.date!) < 0 ? curr : next).date!;
+    }
 
     return ValueListenableBuilder<DateTime?>(
       valueListenable: selectedDayNotifier,

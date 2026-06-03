@@ -6,6 +6,7 @@ import 'package:sign_pain/utils/app_exception.dart';
 class AccountViewModel extends ChangeNotifier{
   
   var isSmsCodeSent = false; // switch for the ui to react to the sms verification
+  var requestPassword = false; // switch for the ui to react to email/password login
   String? verificationID; // verification code for the sms verification
   String? errorMessage;
   bool isLoading = false;
@@ -30,6 +31,35 @@ class AccountViewModel extends ChangeNotifier{
     } catch (e) { // could not retrieve user info
       return "Utilizador";
     }
+  }
+
+  // Given a string, determines whether user is trying to login using email or phone number, and verifies validity of request
+  Future<void> verifyUserString(String userString) async {
+    isLoading = true;
+    notifyListeners();
+    userString = userString.trim();
+
+    final RegExp emailRegExp = RegExp(
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    );
+
+    final RegExp numericRegExp = RegExp(r'^[0-9]+$');
+  
+    if (emailRegExp.hasMatch(userString)) { // is email
+      isLoading = false;
+      requestPassword = true;
+      notifyListeners();
+      return;
+    }
+    else if (numericRegExp.hasMatch(userString)) { // is phone number
+      if (userString[0] == '9' || userString.length == 9) { // not a valid portuguese phone number
+        loginUserWithPhoneAuth(userString); // try verification of phone number
+        return;
+      }
+    }
+    isLoading = false;
+    notifyListeners();
+    throw AppException("E-mail ou nº de telemóvel inválido");
   }
 
   // Given an email and a password, attempts to login the user into the app (through Firebase)

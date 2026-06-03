@@ -1,90 +1,45 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_pain/view/create_account_screen.dart';
-import 'package:sign_pain/view/password_screen.dart';
-import 'package:sign_pain/view/phone_verification_screen.dart';
+import 'package:sign_pain/view/main_navigation_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class PasswordScreen extends StatefulWidget {
+  const PasswordScreen({super.key, required this.accountViewModel, required this.email});
+
+  final AccountViewModel accountViewModel;
+  final String email;
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<PasswordScreen> createState() => _PasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _PasswordScreenState extends State<PasswordScreen> {
 
-  late TextEditingController userStringController;
-
-  final accountViewModel = AccountViewModel();
-
+  late TextEditingController passwordController;
   var obscurePassword = true;
 
   @override
   void initState() {
     super.initState();
-    userStringController = TextEditingController();
+    passwordController = TextEditingController();
   }
 
   @override
   void dispose() {
-    userStringController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
   @override
-	Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
 
     return Scaffold(
       body: ListenableBuilder(
-        listenable: accountViewModel, 
+        listenable: widget.accountViewModel, 
         builder: (BuildContext context, Widget? child) {
-          bool isLoading = accountViewModel.isLoading;
-
-          if (accountViewModel.errorMessage != null) {
-            // tells flutter to wait to render the snackbar after the rest of elements (to avoid error)
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(accountViewModel.errorMessage!))
-              );
-              
-              // only show error message once
-              accountViewModel.errorMessage = null; 
-            });
-          }
-
-          if (accountViewModel.isSmsCodeSent) { // if user is logging in with phone
-            WidgetsBinding.instance.addPostFrameCallback((_) { // makes it not crash
-              if (!mounted) return;
-              
-              accountViewModel.isSmsCodeSent = false; 
-              
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PhoneVerificationScreen(accountViewModel: accountViewModel, firstTime: false)
-                )
-              );
-            });
-          }
-
-          else if (accountViewModel.requestPassword) {
-            // navigate to "password screen"
-            WidgetsBinding.instance.addPostFrameCallback((_) { // makes it not crash
-              if (!mounted) return;
-              
-              accountViewModel.requestPassword = false; 
-              
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PasswordScreen(accountViewModel: accountViewModel, email: userStringController.text)
-                )
-              );
-            });
-          }
           
+          bool isLoading = widget.accountViewModel.isLoading;
 
           return Stack(
             children: [
@@ -124,17 +79,27 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height:80),
                           AutofillGroup(
-                          child: TextField(
-                              controller: userStringController,
-                              obscureText: false,
+                            child: TextField(
+                              controller: passwordController,
+                              obscureText: obscurePassword,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: 'E-mail/Nº telemóvel',
+                                labelText: 'Palavra-passe',
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    obscurePassword ? Icons.visibility_off : Icons.visibility
+                                  ),
+                                  onPressed: () => setState(() {
+                                    obscurePassword = !obscurePassword;
+                                  })
+                                )
                               ),
-                              keyboardType: TextInputType.emailAddress,
-                              autofillHints: [AutofillHints.email, AutofillHints.telephoneNumber],
-                              textInputAction: TextInputAction.next,
-                            )
+                              keyboardType: TextInputType.visiblePassword,
+                              autofillHints: [AutofillHints.password],
+
+                              textInputAction: TextInputAction.done,
+                              onSubmitted: (_) => _login(),
+                            ),
                           ),
                           Padding(
                             padding: EdgeInsetsGeometry.directional(top:16.0),
@@ -149,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               
                               onPressed: () => _login(),
-                              child: Text("Continuar")
+                              child: Text("Entrar")
                             ),
                           ),
                           SizedBox(height:25),
@@ -178,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   )
                 )
               ),
-              if (accountViewModel.isLoading)
+              if (widget.accountViewModel.isLoading)
                 Container(
                   color: Colors.black.withAlpha(123), 
                   child: const Center(
@@ -193,16 +158,21 @@ class _LoginScreenState extends State<LoginScreen> {
       )
     );
   }
-
-  Future<void> _login() async {
+  
+  void _login() async {
     try {
-      await accountViewModel.verifyUserString(userStringController.text);
+      await widget.accountViewModel.loginUser(widget.email, passwordController.text); 
       if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const MainNavigationScreen(),
+        ),
+      );
     }
     catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()))
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 }
