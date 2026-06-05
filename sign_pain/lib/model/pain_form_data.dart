@@ -86,9 +86,12 @@ extension BodyPartsMapper on BodyParts {
     "rightElbow" : "Cotovelo Direito",
     "rightLowerArm" : "Antebraço Direito",
     "rightHand" : "Mão Direita",
-    "upperBody" : "Caixa Torácica",
-    "lowerBody" : "Barriga/Dorsal",
-    "abdomen" : "Anca",
+    "chest" : "Peito",
+    "abdomen" : "Abdómen",
+    "back": "Costas",
+    "lumbar": "Lombar",
+    "upperBody": "Peito/Costas",
+    "lowerBody": "Lombar/Abdómen",
     "leftUpperLeg" : "Coxa Esquerda",
     "leftKnee" : "Joelho Esquerdo",
     "leftLowerLeg" : "Perna Esquerda",
@@ -102,5 +105,51 @@ extension BodyPartsMapper on BodyParts {
   // Given a list of body parts (which are in English), outputs a list with the portuguese translation
   static List<String> listToPortuguese(List<String> parts) {
     return parts.map((part) => bodyTranslationsPT[part] ?? part).toList();
+  }
+
+  // Transforms two BodyParts objects (back and front) into a List of strings of body parts
+  static List<String> toListBackAndFront(BodyParts back, BodyParts front) {
+    final List<String> selected = [];
+
+    // first add the shared body parts, which are not exclusive to a side
+    if (front.head) selected.add("head");
+    if (front.neck) selected.add("neck");
+    
+    if (front.leftShoulder) selected.add("leftShoulder");
+    if (front.rightShoulder) selected.add("rightShoulder");
+    
+    if (front.leftUpperArm) selected.add("leftUpperArm");
+    if (front.rightUpperArm) selected.add("rightUpperArm");
+    
+    if (front.leftElbow) selected.add("leftElbow");
+    if (front.rightElbow) selected.add("rightElbow");
+    
+    if (front.leftLowerArm) selected.add("leftLowerArm");
+    if (front.rightLowerArm) selected.add("rightLowerArm");
+    
+    if (front.leftHand) selected.add("leftHand");
+    if (front.rightHand) selected.add("rightHand");
+    
+    if (front.leftUpperLeg) selected.add("leftUpperLeg"); 
+    if (front.rightUpperLeg) selected.add("rightUpperLeg");
+    
+    if (front.leftKnee) selected.add("leftKnee");
+    if (front.rightKnee) selected.add("rightKnee");
+    
+    if (front.leftLowerLeg) selected.add("leftLowerLeg"); 
+    if (front.rightLowerLeg) selected.add("rightLowerLeg");
+    
+    if (front.leftFoot) selected.add("leftFoot");
+    if (front.rightFoot) selected.add("rightFoot");
+
+    // body parts exclusive to the front part for now
+    if (front.upperBody) selected.add("chest"); 
+    if (front.lowerBody) selected.add("abdomen");
+
+    // body parts exclusive to the back part for now
+    if (back.upperBody) selected.add("back");
+    if (back.lowerBody) selected.add("lumbar");
+
+    return selected;
   }
 }

@@ -17,14 +17,15 @@ class PainBodyScreen extends StatefulWidget {
 }
 
 class _PainBodyScreenState extends State<PainBodyScreen> {
-  BodyParts _selectedParts = BodyParts();
+  BodyParts _selectedPartsFront = BodyParts();
+  BodyParts _selectedPartsBack = BodyParts();
 
   @override
   void initState() {
     super.initState();
 
     if (widget.formData.bodyParts.isNotEmpty) {
-      _selectedParts = BodyPartsMapper.fromList(widget.formData.bodyParts);
+      _selectedPartsFront = BodyPartsMapper.fromList(widget.formData.bodyParts);
     }
   }
 
@@ -40,7 +41,7 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
         if (didPop) return;
 
         // saves body parts even if user backs out to previous screen
-        List<String> partsList = _selectedParts.toList();
+        List<String> partsList = _selectedPartsFront.toList();
         widget.formData.bodyParts = partsList; // adds body parts to form data (in list format)
 
         Navigator.pop(context, true);
@@ -64,17 +65,43 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
               ),
               Expanded(
                 flex: 75,
-                child:SafeArea(
-                  child: BodyPartSelectorTurnable(
-                    bodyParts: _selectedParts,
-                    onSelectionUpdated: (p) => setState(() => _selectedParts = p),
-                    labelData: const RotationStageLabelData(
-                      front: 'Frente',
-                      left: 'Esquerda',
-                      right: 'Direita',
-                      back: 'Trás',
+                child: Row(
+                  mainAxisSize: .max,
+                  children: [
+                    Expanded(
+                      child: SafeArea(
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: BodyPartSelector(
+                                bodyParts: _selectedPartsFront,
+                                onSelectionUpdated: _onFrontUpdated,
+                                side: BodySide.front
+                              )
+                            ),
+                            Text("Frente", style: TextStyle(fontWeight: .bold))
+                          ]
+                        )
+                      )
                     ),
-                  ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: SafeArea(
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: BodyPartSelector(
+                                bodyParts: _selectedPartsBack,
+                                onSelectionUpdated: _onBackUpdated,
+                                side: BodySide.back
+                              )
+                            ),
+                            Text("Trás", style: TextStyle(fontWeight: .bold))
+                          ]
+                        )
+                      )
+                    )
+                  ]
                 )
               ),
               Expanded(
@@ -107,7 +134,7 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
                 ),
                 FloatingActionButton(
                   onPressed: () {
-                    List<String> partsList = _selectedParts.toList();
+                    List<String> partsList = BodyPartsMapper.toListBackAndFront(_selectedPartsBack, _selectedPartsFront);
                     widget.formData.bodyParts = partsList; // adds body parts to form data (in list format)
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -126,4 +153,67 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
     );
   }
   
+  // Handles clicks on the front body
+  void _onFrontUpdated(BodyParts updatedFront) {
+    setState(() {
+      // Accept all changes for the front
+      _selectedPartsFront = updatedFront;
+
+      // Mirror only the shared limbs to the back model
+      _selectedPartsBack = _selectedPartsBack.copyWith(
+        head: updatedFront.head,
+        neck: updatedFront.neck,
+        leftShoulder: updatedFront.leftShoulder,
+        rightShoulder: updatedFront.rightShoulder,
+        leftUpperArm: updatedFront.leftUpperArm,
+        rightUpperArm: updatedFront.rightUpperArm,
+        leftElbow: updatedFront.leftElbow,
+        rightElbow: updatedFront.rightElbow,
+        leftLowerArm: updatedFront.leftLowerArm,
+        rightLowerArm: updatedFront.rightLowerArm,
+        leftHand: updatedFront.leftHand,
+        rightHand: updatedFront.rightHand,
+        leftUpperLeg: updatedFront.leftUpperLeg,
+        rightUpperLeg: updatedFront.rightUpperLeg,
+        leftKnee: updatedFront.leftKnee,
+        rightKnee: updatedFront.rightKnee,
+        leftLowerLeg: updatedFront.leftLowerLeg,
+        rightLowerLeg: updatedFront.rightLowerLeg,
+        leftFoot: updatedFront.leftFoot,
+        rightFoot: updatedFront.rightFoot
+      );
+    });
+  }
+
+  // Handles clicks on the back body
+  void _onBackUpdated(BodyParts updatedBack) {
+    setState(() {
+      // Accept all changes for the back
+      _selectedPartsBack = updatedBack;
+
+      // Mirror only the shared limbs back to the front model
+      _selectedPartsFront = _selectedPartsFront.copyWith(
+        head: updatedBack.head,
+        neck: updatedBack.neck,
+        leftShoulder: updatedBack.leftShoulder,
+        rightShoulder: updatedBack.rightShoulder,
+        leftUpperArm: updatedBack.leftUpperArm,
+        rightUpperArm: updatedBack.rightUpperArm,
+        leftElbow: updatedBack.leftElbow,
+        rightElbow: updatedBack.rightElbow,
+        leftLowerArm: updatedBack.leftLowerArm,
+        rightLowerArm: updatedBack.rightLowerArm,
+        leftHand: updatedBack.leftHand,
+        rightHand: updatedBack.rightHand,
+        leftUpperLeg: updatedBack.leftUpperLeg,
+        rightUpperLeg: updatedBack.rightUpperLeg,
+        leftKnee: updatedBack.leftKnee,
+        rightKnee: updatedBack.rightKnee,
+        leftLowerLeg: updatedBack.leftLowerLeg,
+        rightLowerLeg: updatedBack.rightLowerLeg,
+        leftFoot: updatedBack.leftFoot,
+        rightFoot: updatedBack.rightFoot
+      );
+    });
+  }
 }
