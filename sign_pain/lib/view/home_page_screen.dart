@@ -124,6 +124,36 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
                       SizedBox(height: 30),
 
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                          elevation: 4.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => PainBodyScreen(formData: PainFormData()),
+                            ),
+                          );
+                        },
+                        child: Row(
+                          mainAxisSize: .min,
+                          mainAxisAlignment: .center,
+                          children: [
+                            Text("Registar dor"),
+                            SizedBox(width: 10),
+                            Icon(Icons.add_circle_outline)
+                          ]
+                        )
+                      ),
+
+                      SizedBox(height: 30),
+
+
                       Text(
                         "Calendário da dor", 
                         style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
@@ -147,35 +177,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         child: painCalendar(userEntries, historyMap),
                       ),
                       SizedBox(height: 20),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                          elevation: 4.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => PainBodyScreen(formData: PainFormData()),
-                            ),
-                          );
-                        },
-                        child: Row(
-                          mainAxisSize: .min,
-                          mainAxisAlignment: .center,
-                          children: [
-                            Text("Registar hoje"),
-                            SizedBox(width: 10),
-                            Icon(Icons.add_circle_outline)
-                          ]
-                        )
-                      ),
-
-                      SizedBox(height: 30),
-
+                      
                       Text(
                         "Evolução da dor", 
                         style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),

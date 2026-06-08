@@ -41,7 +41,7 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
         if (didPop) return;
 
         // saves body parts even if user backs out to previous screen
-        List<String> partsList = _selectedPartsFront.toList();
+        List<String> partsList = BodyPartsMapper.toListBackAndFront(_selectedPartsBack, _selectedPartsFront);
         widget.formData.bodyParts = partsList; // adds body parts to form data (in list format)
 
         Navigator.pop(context, true);
@@ -135,12 +135,17 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
                 FloatingActionButton(
                   onPressed: () {
                     List<String> partsList = BodyPartsMapper.toListBackAndFront(_selectedPartsBack, _selectedPartsFront);
-                    widget.formData.bodyParts = partsList; // adds body parts to form data (in list format)
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                      builder: (context) => PainLevelScreen(formData: widget.formData),
-                      ),
-                    );
+                    if (partsList.isNotEmpty) {
+                      widget.formData.bodyParts = partsList; // adds body parts to form data (in list format)
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                        builder: (context) => PainLevelScreen(formData: widget.formData),
+                        ),
+                      );
+                    }
+                    else {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Selecione pelo menos uma parte do corpo para continuar.")));
+                    }
                   },
                   tooltip: 'pain type',
                   child: const Icon(Icons.arrow_forward)

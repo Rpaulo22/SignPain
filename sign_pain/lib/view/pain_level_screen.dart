@@ -187,11 +187,16 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
               ),
               FloatingActionButton(
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                    builder: (context) => PainDescriptorScreen(formData: widget.formData),
-                    ),
-                  );
+                  if (widget.formData.painLevel != null) { // no level has been selected
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                      builder: (context) => PainDescriptorScreen(formData: widget.formData),
+                      ),
+                    );
+                  }
+                  else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Selecione nível de dor atual para continuar.")));
+                  }
                 },
                 tooltip: 'pain type',
                 child: const Icon(Icons.arrow_forward)
