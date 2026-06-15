@@ -47,6 +47,9 @@ dependencies:
   firebase_auth: ^6.4.0
   table_calendar: ^3.2.0
   auto_size_text: ^3.0.0
+  pdf: ^3.12.0
+  share_plus: ^13.1.0
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:
@@ -75,6 +78,9 @@ flutter:
     - assets/images/
     - assets/videos/
     - .env
+    - assets\fonts\Roboto-Bold.ttf
+    - assets\fonts\Roboto-Italic.ttf
+    - assets\fonts\Roboto-Regular.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

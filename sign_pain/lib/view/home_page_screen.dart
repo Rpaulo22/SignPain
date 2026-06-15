@@ -3,8 +3,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
+import 'package:sign_pain/utils/pdf_service.dart';
 import 'package:sign_pain/view/pain_body_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
@@ -204,7 +206,72 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         )
                       ),
                       
-                      SizedBox(height:20)
+                      SizedBox(height:20),
+
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.tertiary,
+                          foregroundColor: Theme.of(context).colorScheme.onTertiary,
+                          elevation: 4.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () async {
+                          BuildContext? dialogContext;
+                          // Show a loading indicator
+                          showDialog(
+                            context: context, 
+                            barrierDismissible: false,
+                            builder: (BuildContext innerContext) {
+                              // Capture the distinct build context of the dialog itself  
+                              dialogContext = innerContext; 
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                          );
+
+                          try {
+                            // Generate and share pdf
+                            final file = await PdfService.generateAndSharePainReport(userEntries);
+
+                            if (!context.mounted) return;
+
+                            if (dialogContext != null && dialogContext!.mounted) {
+                              Navigator.pop(dialogContext!);
+                              dialogContext = null; // Clear the handle so the finally block doesn't double-pop
+                            }
+
+                            // trigger the share pop up
+                            await SharePlus.instance.share(
+                              ShareParams(
+                                files: [XFile(file.path)],
+                                text: 'Aqui está o meu relatório de dor exportado do SignPain.'
+                              )
+                            );
+
+                          } catch (e) {
+                            if (context.mounted) { 
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Erro ao gerar resumo: $e"))
+                              );
+                            }
+                          } finally {
+                            if (dialogContext != null && dialogContext!.mounted) {
+                              Navigator.pop(dialogContext!);
+                            }
+                          }
+                        },
+                        child: Row(
+                          mainAxisSize: .min,
+                          mainAxisAlignment: .center,
+                          children: [
+                            Text("Partilhar registos"),
+                            SizedBox(width: 10),
+                            Icon(Icons.picture_as_pdf)
+                          ]
+                        )
+                      ),
+                      SizedBox(height: 20)
                     ]
                   ),
                 ),
