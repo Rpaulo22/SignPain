@@ -1,5 +1,6 @@
 import 'package:body_part_selector/body_part_selector.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sign_pain/widgets/pain_frequency.dart';
 
 class PainFormData {
   String userID = FirebaseAuth.instance.currentUser!.uid; // registers as being the current user
@@ -7,12 +8,13 @@ class PainFormData {
   Set<String> descriptors = {}; // adjectives which describe the felt pain
   DateTime? date; // date of the form's submission
   List<String> bodyParts = []; // body parts which the pain is inflicted on
+  PainFrequency frequency = PainFrequency.none; // frequency of pain, e.g. continuous, intermitent
   
-  PainFormData.fromForm(this.userID, this.descriptors, this.painLevel, this.date, this.bodyParts);
+  PainFormData.fromForm(this.userID, this.descriptors, this.painLevel, this.date, this.bodyParts, this.frequency);
   PainFormData();
 
   // helper to check if the form is complete
-  bool get isComplete => painLevel != null && descriptors.isNotEmpty && bodyParts.isNotEmpty;
+  bool get isComplete => painLevel != null && descriptors.isNotEmpty && bodyParts.isNotEmpty && frequency != null;
 
 }
 
@@ -90,6 +92,8 @@ extension BodyPartsMapper on BodyParts {
     "abdomen" : "Abdómen",
     "back": "Costas",
     "lumbar": "Lombar",
+    "pelvic": "Pélvis",
+    "glutes": "Glúteos",
     "upperBody": "Peito/Costas",
     "lowerBody": "Lombar/Abdómen",
     "leftUpperLeg" : "Coxa Esquerda",
@@ -144,11 +148,13 @@ extension BodyPartsMapper on BodyParts {
 
     // body parts exclusive to the front part for now
     if (front.upperBody) selected.add("chest"); 
-    if (front.lowerBody) selected.add("abdomen");
+    if (front.lowerBody) selected.add("abdomen"); // yes, this packages "abdomen" is the pelvic area
+    if (front.abdomen) selected.add("pelvic");
 
     // body parts exclusive to the back part for now
     if (back.upperBody) selected.add("back");
     if (back.lowerBody) selected.add("lumbar");
+    if (back.abdomen) selected.add("glutes");
 
     return selected;
   }

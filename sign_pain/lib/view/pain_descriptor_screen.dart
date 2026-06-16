@@ -4,6 +4,7 @@ import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/main_navigation_screen.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
+import 'package:sign_pain/widgets/pain_frequency.dart';
 import 'package:sign_pain/widgets/step_indicator.dart';
 
 class PainDescriptorScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class PainDescriptorScreen extends StatefulWidget {
 }
 
 class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
-	final painDescriptors = ["Moedeira", "Tensão", "Latejante", "Ardor", "Formigueiro", "Perfurante", "Frio", "Choque", "Localizada", "Mecânica", "Difusa", "Irradiada", "Aguda", "Intermitente", "Cansaço", "Rigidez", "Peso"];
+	final painDescriptors = ["Moedeira", "Tensão", "Latejante", "Ardor", "Formigueiro", "Perfurante", "Frio", "Choque", "Localizada", "Mecânica", "Difusa", "Irradiada", "Aguda", "Cansaço", "Rigidez", "Peso"];
   final FormViewModel formViewModel = FormViewModel();
 
 	@override
@@ -69,8 +70,8 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                 child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 64.0),
                 child: StepIndicator(
-                  currentStep: 3, // user is on page 3
-                  totalSteps: 3,  // of 3 pages total
+                  currentStep: 4, // user is on page 4
+                  totalSteps: 4,  // of 4 pages total
                 ),
               ),
               )
@@ -139,6 +140,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
               Text("Nível: ${widget.formData.painLevel}/10"),
               Text("Descrição: ${widget.formData.descriptors.join(", ")}"),
               Text("Parte(s) do corpo: ${BodyPartsMapper.listToPortuguese(widget.formData.bodyParts).join(", ")}"),
+              Text("Frequência: ${painFrequencyToStringPT(widget.formData.frequency)}"),
               Padding(
                 padding: EdgeInsetsGeometry.directional(start:20, end:20),
                 child:Row(

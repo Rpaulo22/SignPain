@@ -110,7 +110,7 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 64.0),
                   child: StepIndicator(
                     currentStep: 1, // user is on page 1
-                    totalSteps: 3,  // of 3 pages total
+                    totalSteps: 4,  // of 4 pages total
                   ),
                 ),
               )

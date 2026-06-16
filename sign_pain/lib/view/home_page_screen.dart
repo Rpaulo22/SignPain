@@ -265,7 +265,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                           mainAxisSize: .min,
                           mainAxisAlignment: .center,
                           children: [
-                            Text("Partilhar registos"),
+                            Text("Partilhar"),
                             SizedBox(width: 10),
                             Icon(Icons.picture_as_pdf)
                           ]

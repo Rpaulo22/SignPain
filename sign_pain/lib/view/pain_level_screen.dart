@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/pain_descriptor_screen.dart';
+import 'package:sign_pain/view/pain_frequency_screen.dart';
 import 'package:sign_pain/widgets/sign_video_player.dart';
 import 'package:sign_pain/widgets/step_indicator.dart';
 
@@ -162,7 +163,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 64.0),
                   child: StepIndicator(
                     currentStep: 2, // user is on page 2
-                    totalSteps: 3,  // of 3 pages total
+                    totalSteps: 4,  // of 4 pages total
                   ),
                 ),
               )
@@ -190,7 +191,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                   if (widget.formData.painLevel != null) { // no level has been selected
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                      builder: (context) => PainDescriptorScreen(formData: widget.formData),
+                      builder: (context) => PainFrequencyScreen(formData: widget.formData),
                       ),
                     );
                   }
