@@ -10,6 +10,7 @@ import 'package:sign_pain/utils/pdf_service.dart';
 import 'package:sign_pain/view/pain_body_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
+import 'package:sign_pain/widgets/pain_form_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomePageScreen extends StatefulWidget {
@@ -280,69 +281,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
           }
         )
       ),
-    );
-  }
-
-  // Auxiliary widgets
-  Widget painFormWidget(PainFormData data) {
-
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: getPainColor(data.painLevel!)),
-        color: getPainColor(data.painLevel!).withAlpha(150),
-        borderRadius: BorderRadius.circular(12)
-      ),
-      padding: EdgeInsetsDirectional.only(top: 15, bottom: 15, start: 10, end: 10),
-      child: Row(
-        mainAxisSize: .max,
-        crossAxisAlignment: .center,
-        children: [
-          Text(
-            "Dor ${data.painLevel!}/10", 
-            style: TextStyle(
-              fontWeight: FontWeight.bold, 
-              fontSize: 18,
-              color: Theme.of(context).colorScheme.onPrimary
-            ),
-            textAlign: .center,
-          ),
-          VerticalDivider(
-            color: Theme.of(context).colorScheme.secondary,
-            width: 10,
-            thickness: 5,
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    children: <TextSpan>[
-                      TextSpan(text: "Descrição: "),
-                      TextSpan(text: data.descriptors.isNotEmpty ? data.descriptors.join(", ") : "Nenhuma", style: const TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                  )
-                ),
-                SizedBox(height: 5),
-                Text(
-                  data.bodyParts.isNotEmpty 
-                    ? BodyPartsMapper.listToPortuguese(data.bodyParts).join(", ") 
-                    : "Dor não situada", 
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onPrimary
-                  ),
-                  textAlign: .center,
-                )
-              ]
-            ),
-          )
-        ]
-      )
     );
   }
 
@@ -710,7 +648,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
-                          child: painFormWidget(entry),
+                          child: PainFormWidget(data: entry)
                         );
                       },
                     ),

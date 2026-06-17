@@ -43,6 +43,50 @@ extension BodyPartsMapper on BodyParts {
     return BodyParts.fromJson(bodyMap);
   }
 
+  // Transforms a List of body part strings into a BodyParts object as seen from the front
+  static BodyParts frontFromList(List<String> bodyParts) {
+    Map<String, dynamic> bodyMap = BodyParts().toJson();
+
+    for (String part in bodyParts) {
+      if (bodyMap.containsKey(part)) { 
+        bodyMap[part] = true;
+      }
+      else if (part == "chest") {
+        bodyMap["upperBody"] = true;
+      }
+      else if (part == "abdomen") {
+        bodyMap["lowerBody"] = true;
+      }
+      else if (part == "pelvic") {
+        bodyMap["abdomen"] = true;
+      }
+    }
+
+    return BodyParts.fromJson(bodyMap);
+  }
+
+  // Transforms a List of body part strings into a BodyParts object as seen from the back
+  static BodyParts backFromList(List<String> bodyParts) {
+    Map<String, dynamic> bodyMap = BodyParts().toJson();
+
+    for (String part in bodyParts) {
+      if (bodyMap.containsKey(part)) { 
+        bodyMap[part] = true;
+      }
+      else if (part == "back") {
+        bodyMap["upperBody"] = true;
+      }
+      else if (part == "lumbar") {
+        bodyMap["lowerBody"] = true;
+      }
+      else if (part == "glutes") {
+        bodyMap["abdomen"] = true;
+      }
+    }
+
+    return BodyParts.fromJson(bodyMap);
+  }
+
   // Transforms a BodyParts object into a List of strings in portuguese, for visualization in UI
   List<String> toPortugueseList() {
     List<String> parts = [];
