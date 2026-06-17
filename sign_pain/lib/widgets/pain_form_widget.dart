@@ -1,5 +1,6 @@
 import 'package:body_part_selector/body_part_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/widgets/pain_frequency.dart';
 
@@ -83,7 +84,7 @@ class PainFormWidget extends StatelessWidget {
                   crossAxisAlignment: .start,
                   children: [
                     Text(
-                      data.date.toString(),
+                      DateFormat('dd/MM/yyyy HH:mm').format(data.date!),
                       style: TextStyle(
                         color: Colors.grey
                       )
