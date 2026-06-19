@@ -29,8 +29,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
   ];
 
   final accountViewModel = AccountViewModel();
-  final FormViewModel formViewModel = FormViewModel();
-  late Future<List<PainFormData>> painDataFuture;
   late Future<String> userNameFuture;
 
   CalendarFormat _calendarFormat = CalendarFormat.month;
@@ -48,33 +46,31 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // Fetch data exactly once when the screen mounts
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<FormViewModel>().getUserPainData(FirebaseAuth.instance.currentUser!.uid);
+    });
+    userNameFuture = accountViewModel.getUserName(FirebaseAuth.instance.currentUser!.uid);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
-    User? currentUser = FirebaseAuth.instance.currentUser;
-
-    // safely handle the split-second where it might be null
-    if (currentUser == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    painDataFuture = formViewModel.getUserPainData(currentUser.uid);
-    userNameFuture = accountViewModel.getUserName(currentUser.uid);
 
     return Scaffold(  
       body: SingleChildScrollView(
-        child: FutureBuilder<List<PainFormData>>(
-          future: painDataFuture, 
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) { 
+        child: ListenableBuilder(
+          listenable: context.read<FormViewModel>(),
+          builder: (context, child) {
+            final formViewModel = context.read<FormViewModel>();
+
+            if (formViewModel.isLoading) {
               return const Center(child: CircularProgressIndicator());
-            } 
-            else if (snapshot.hasError) { 
-              return Center(child: Text("Erro a carregar página: ${snapshot.error}"));
-            } 
+            }
             else {
-              final userEntries = snapshot.data!;
+              final userEntries = formViewModel.painRecords;
 
               // pre-compile calendar history map once only
               final Map<DateTime, List<PainFormData>> historyMap = userEntries.fold({}, (map, record) {
@@ -331,6 +327,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
           if (minimumX < 0) minimumX = 0;
         }
 
+        if (maximumX <= minimumX) {
+          maximumX = minimumX + 1;
+        }
+
         double currentSpan = maximumX - minimumX;
         double strictInterval = (currentSpan / 5).ceilToDouble();
         if (strictInterval < 1) strictInterval = 1.0;
@@ -510,11 +510,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   // visualization of pain history through calendar
   Widget painCalendar(List<PainFormData> data, Map<DateTime, List<PainFormData>> historyMap) {
-    DateTime firstDay = DateTime.now();
-
-    if (data.isNotEmpty) {
-      firstDay = data.reduce((curr, next) => curr.date!.compareTo(next.date!) < 0 ? curr : next).date!;
-    }
 
     return ValueListenableBuilder<DateTime?>(
       valueListenable: selectedDayNotifier,
@@ -535,8 +530,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
           children: [
             TableCalendar(
               locale: 'pt_PT', 
-              firstDay: firstDay,
-              lastDay: DateTime.now(),
+              firstDay: DateTime.utc(2020, 1, 1), 
+              lastDay: DateTime.now().add(const Duration(days: 365)),
               focusedDay: focusedDay,
               calendarFormat: _calendarFormat,
               selectedDayPredicate: (day) => isSameDay(selectedDay, day),

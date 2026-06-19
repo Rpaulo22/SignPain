@@ -1,12 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
+import 'package:sign_pain/utils/app_exception.dart';
 import 'package:sign_pain/widgets/pain_frequency.dart';
 
 
-class FormViewModel {
+class FormViewModel extends ChangeNotifier {
+
+  List<PainFormData> _painRecords = [];
+  List<PainFormData> get painRecords => _painRecords;
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
   
   // Given a pain form entry (and the user currently logged in), saves it to firebase
-  Future<bool> saveDailyForm(PainFormData formData) async {
+  Future<bool> savePainForm(PainFormData formData) async {
 
     var db = FirebaseFirestore.instance;
     
@@ -37,7 +46,10 @@ class FormViewModel {
     }
   }
 
-  Future<List<PainFormData>> getUserPainData(String userID) async {
+  Future<void> getUserPainData(String userID) async {
+    _isLoading = true;
+    notifyListeners();
+
     var db = FirebaseFirestore.instance;
     List<PainFormData> data = [];
 
@@ -51,8 +63,9 @@ class FormViewModel {
 
       // loop through results
       for (var entry in userEntries.docs) {
-        var _data = entry.data(); 
+        var _data = entry.data();
         
+        var id = entry.id;
         var date = (_data['date'] as Timestamp).toDate();
         var descriptors = Set<String>.from(_data['descriptors'] ?? []);
         var painLevel = _data['painIntensity'] as int;
@@ -77,13 +90,43 @@ class FormViewModel {
           }
         }
 
-        PainFormData painForm = PainFormData.fromForm(userID, descriptors, painLevel, date, bodyParts, frequency);
+        PainFormData painForm = PainFormData.fromForm(userID, descriptors, painLevel, date, bodyParts, frequency, id);
         data.add(painForm);
       }
+    _painRecords = data;
+
     } catch(e) {
       rethrow;
     }
+    finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
-    return data;
+  Future<void> deletePainForm(String entryID) async {
+    final userID = FirebaseAuth.instance.currentUser?.uid;
+    if (userID == null) return;
+
+    final index = painRecords.indexWhere((entry) => entry.docID == entryID);
+    final entryBackup = painRecords[index];
+
+    // OPTIMISTIC UPDATE: Remove it from the local list instantly
+    painRecords.removeAt(index);
+    notifyListeners();
+
+    try {
+      await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userID)
+        .collection('userEntries')
+        .doc(entryID)
+        .delete();
+    } catch (e) {
+      // If Firebase fails (e.g., no internet), put it back and show an error
+      painRecords.insert(index, entryBackup);
+      notifyListeners();
+      throw AppException("Erro ao apagar o registo. Verifique a sua ligação.");
+    } 
   }
 }

@@ -18,7 +18,7 @@ class PainInfoScreen extends StatefulWidget {
 class _PainInfoScreenState extends State<PainInfoScreen> {
   final FormViewModel formViewModel = FormViewModel();
   String userID = FirebaseAuth.instance.currentUser!.uid;
-  late Future<List<PainFormData>> _painDataFuture;
+  late Future<void> _painDataFuture;
   
   int mode = 0; // 0 -> calendar | 1 -> graph | 2 -> list
 
@@ -40,7 +40,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
 		return Scaffold(
       floatingActionButtonLocation: .startFloat,
       
-			body: FutureBuilder<List<PainFormData>>(
+			body: FutureBuilder<void>(
         future: _painDataFuture, 
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) { 
@@ -50,7 +50,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
             return Center(child: Text("Erro a carregar página: ${snapshot.error}"));
           } 
           else if (snapshot.hasData) { 
-            final data = snapshot.data!;
+            final data = formViewModel.painRecords;
               
             if (data.isEmpty) {
               return const Center(

@@ -1,7 +1,9 @@
 import 'package:body_part_selector/body_part_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
+import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'package:sign_pain/widgets/pain_frequency.dart';
 
 class PainFormWidget extends StatelessWidget {
@@ -194,7 +196,26 @@ class PainFormWidget extends StatelessWidget {
                         ),
 
                         TextButton(
-                          onPressed: () {}, // implement delete function
+                          onPressed: () async {
+                            try {
+                              // global, single instance of FormViewModel
+                              final formViewModel = context.read<FormViewModel>();
+                              
+                              await formViewModel.deletePainForm(data.docID!);
+                              
+                              if (!dialogContext.mounted) return;
+
+                              Navigator.pop(dialogContext);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Registo apagado com sucesso!")),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Erro ao apagar: $e")),
+                              );
+                            }
+                          }, // implement delete function
                           child: Text(
                             "Eliminar",
                             style: TextStyle(

@@ -167,7 +167,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                     TextButton(
                       onPressed: () async {
                         if (widget.formData.isComplete) {
-                          bool successful = await formViewModel.saveDailyForm(widget.formData);
+                          bool successful = await formViewModel.savePainForm(widget.formData);
                           if (!mounted) return;
                           if (successful) { // use viewmodel to save pain form
                             ScaffoldMessenger.of(context).showSnackBar(snackBar("Registo guardado com sucesso!"));

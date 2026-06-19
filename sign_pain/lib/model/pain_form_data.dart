@@ -9,8 +9,9 @@ class PainFormData {
   DateTime? date; // date of the form's submission
   List<String> bodyParts = []; // body parts which the pain is inflicted on
   PainFrequency frequency = PainFrequency.none; // frequency of pain, e.g. continuous, intermitent
+  String? docID; // ID of document in Firebase
   
-  PainFormData.fromForm(this.userID, this.descriptors, this.painLevel, this.date, this.bodyParts, this.frequency);
+  PainFormData.fromForm(this.userID, this.descriptors, this.painLevel, this.date, this.bodyParts, this.frequency, this.docID);
   PainFormData();
 
   // helper to check if the form is complete
