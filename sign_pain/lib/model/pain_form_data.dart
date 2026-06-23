@@ -6,16 +6,38 @@ class PainFormData {
   String userID = FirebaseAuth.instance.currentUser!.uid; // registers as being the current user
   int? painLevel; // self-reported pain level (on a scale of 0-10)
   Set<String> descriptors = {}; // adjectives which describe the felt pain
-  DateTime? date; // date of the form's submission
+  DateTime? date; // date of the form's original submission
+  DateTime? updatedDate; // date of last update to form submission
   List<String> bodyParts = []; // body parts which the pain is inflicted on
   PainFrequency frequency = PainFrequency.none; // frequency of pain, e.g. continuous, intermitent
   String? docID; // ID of document in Firebase
   
-  PainFormData.fromForm(this.userID, this.descriptors, this.painLevel, this.date, this.bodyParts, this.frequency, this.docID);
+  PainFormData.fromForm(this.userID, this.descriptors, this.painLevel, this.date, this.bodyParts, this.frequency, this.docID, this.updatedDate);
   PainFormData();
 
   // helper to check if the form is complete
-  bool get isComplete => painLevel != null && descriptors.isNotEmpty && bodyParts.isNotEmpty && frequency != null;
+  bool get isComplete => painLevel != null && descriptors.isNotEmpty && bodyParts.isNotEmpty && frequency != PainFrequency.none;
+
+  PainFormData copyWith({
+    String? userID,
+    int? painLevel,
+    Set<String>? descriptors,
+    DateTime? date,
+    List<String>? bodyParts,
+    PainFrequency? frequency,
+    String? docID
+  }) {
+    return PainFormData.fromForm(
+      userID ?? this.userID,
+      descriptors ?? Set<String>.from(this.descriptors),
+      painLevel ?? this.painLevel,
+      date ?? this.date,
+      bodyParts ?? List<String>.from(this.bodyParts),
+      frequency ?? this.frequency,
+      docID ?? this.docID,
+      null // if user updates, this parameter is defined upon submitting it, it is useless now
+    );
+  }
 
 }
 
@@ -202,5 +224,101 @@ extension BodyPartsMapper on BodyParts {
     if (back.abdomen) selected.add("glutes");
 
     return selected;
+  }
+
+  // Transforms a List of strings back into two separate BodyParts objects
+  static ({BodyParts front, BodyParts back}) fromListToBackAndFront(List<String> selected) {
+    
+    // Used by both Front and Back models
+    bool head = selected.contains("head");
+    bool neck = selected.contains("neck");
+    
+    bool leftShoulder = selected.contains("leftShoulder");
+    bool rightShoulder = selected.contains("rightShoulder");
+    
+    bool leftUpperArm = selected.contains("leftUpperArm");
+    bool rightUpperArm = selected.contains("rightUpperArm");
+    
+    bool leftElbow = selected.contains("leftElbow");
+    bool rightElbow = selected.contains("rightElbow");
+    
+    bool leftLowerArm = selected.contains("leftLowerArm");
+    bool rightLowerArm = selected.contains("rightLowerArm");
+    
+    bool leftHand = selected.contains("leftHand");
+    bool rightHand = selected.contains("rightHand");
+    
+    bool leftUpperLeg = selected.contains("leftUpperLeg");
+    bool rightUpperLeg = selected.contains("rightUpperLeg");
+    
+    bool leftKnee = selected.contains("leftKnee");
+    bool rightKnee = selected.contains("rightKnee");
+    
+    bool leftLowerLeg = selected.contains("leftLowerLeg");
+    bool rightLowerLeg = selected.contains("rightLowerLeg");
+    
+    bool leftFoot = selected.contains("leftFoot");
+    bool rightFoot = selected.contains("rightFoot");
+
+    // front body parts
+    BodyParts front = BodyParts(
+      head: head,
+      neck: neck,
+      leftShoulder: leftShoulder,
+      rightShoulder: rightShoulder,
+      leftUpperArm: leftUpperArm,
+      rightUpperArm: rightUpperArm,
+      leftElbow: leftElbow,
+      rightElbow: rightElbow,
+      leftLowerArm: leftLowerArm,
+      rightLowerArm: rightLowerArm,
+      leftHand: leftHand,
+      rightHand: rightHand,
+      leftUpperLeg: leftUpperLeg,
+      rightUpperLeg: rightUpperLeg,
+      leftKnee: leftKnee,
+      rightKnee: rightKnee,
+      leftLowerLeg: leftLowerLeg,
+      rightLowerLeg: rightLowerLeg,
+      leftFoot: leftFoot,
+      rightFoot: rightFoot,
+      
+      // Front-exclusive mappings
+      upperBody: selected.contains("chest"),
+      lowerBody: selected.contains("abdomen"),
+      abdomen: selected.contains("pelvic"),
+    );
+
+    // back body parts
+    BodyParts back = BodyParts(
+      head: head,
+      neck: neck,
+      leftShoulder: leftShoulder,
+      rightShoulder: rightShoulder,
+      leftUpperArm: leftUpperArm,
+      rightUpperArm: rightUpperArm,
+      leftElbow: leftElbow,
+      rightElbow: rightElbow,
+      leftLowerArm: leftLowerArm,
+      rightLowerArm: rightLowerArm,
+      leftHand: leftHand,
+      rightHand: rightHand,
+      leftUpperLeg: leftUpperLeg,
+      rightUpperLeg: rightUpperLeg,
+      leftKnee: leftKnee,
+      rightKnee: rightKnee,
+      leftLowerLeg: leftLowerLeg,
+      rightLowerLeg: rightLowerLeg,
+      leftFoot: leftFoot,
+      rightFoot: rightFoot,
+      
+      // Back-exclusive mappings
+      upperBody: selected.contains("back"),
+      lowerBody: selected.contains("lumbar"),
+      abdomen: selected.contains("glutes"),
+    );
+
+    // return both objects packaged together
+    return (front: front, back: back);
   }
 }

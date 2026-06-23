@@ -8,9 +8,10 @@ import 'package:sign_pain/view/pain_level_screen.dart';
 import 'package:sign_pain/widgets/step_indicator.dart';
 
 class PainBodyScreen extends StatefulWidget {
-  const PainBodyScreen({super.key, required this.formData});
+  const PainBodyScreen({super.key, required this.formData, this.editing = false});
 
   final PainFormData formData;
+  final bool editing; // false: form is new, true: form is an already existing one
 
   @override
   State<PainBodyScreen> createState() => _PainBodyScreenState();
@@ -25,7 +26,9 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
     super.initState();
 
     if (widget.formData.bodyParts.isNotEmpty) {
-      _selectedPartsFront = BodyPartsMapper.fromList(widget.formData.bodyParts);
+      final loadedParts = BodyPartsMapper.fromListToBackAndFront(widget.formData.bodyParts);
+      _selectedPartsFront = loadedParts.front;
+      _selectedPartsBack = loadedParts.back;
     }
   }
 
@@ -139,7 +142,7 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
                       widget.formData.bodyParts = partsList; // adds body parts to form data (in list format)
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                        builder: (context) => PainLevelScreen(formData: widget.formData),
+                        builder: (context) => PainLevelScreen(formData: widget.formData, editing: widget.editing),
                         ),
                       );
                     }

@@ -67,6 +67,7 @@ class FormViewModel extends ChangeNotifier {
         
         var id = entry.id;
         var date = (_data['date'] as Timestamp).toDate();
+        DateTime? updatedDate = (_data['updatedDate'] as Timestamp?)?.toDate();
         var descriptors = Set<String>.from(_data['descriptors'] ?? []);
         var painLevel = _data['painIntensity'] as int;
         var bodyParts = List<String>.from(_data['bodyParts'] ?? []);
@@ -90,7 +91,7 @@ class FormViewModel extends ChangeNotifier {
           }
         }
 
-        PainFormData painForm = PainFormData.fromForm(userID, descriptors, painLevel, date, bodyParts, frequency, id);
+        PainFormData painForm = PainFormData.fromForm(userID, descriptors, painLevel, date, bodyParts, frequency, id, updatedDate);
         data.add(painForm);
       }
     _painRecords = data;
@@ -128,5 +129,33 @@ class FormViewModel extends ChangeNotifier {
       notifyListeners();
       throw AppException("Erro ao apagar o registo. Verifique a sua ligação.");
     } 
+  }
+
+  Future<void> updatePainForm(PainFormData formData) async {
+    var db = FirebaseFirestore.instance;
+
+    String frequency = painFrequencyToString(formData.frequency);
+    
+    final formEntry = <String, dynamic>{
+      "userID": formData.userID, 
+      "painIntensity": formData.painLevel,
+      "descriptors": formData.descriptors.toList(),
+      "bodyParts": formData.bodyParts,
+      "date": formData.date,
+      "updatedDate": DateTime.now(),
+      "frequency": frequency
+    };
+
+    try {
+      final userEntries = db
+        .collection('Users')
+        .doc(formData.userID)
+        .collection('userEntries'); // form entries subcollection
+
+      await userEntries.doc(formData.docID).update(formEntry);
+    }
+    catch (e) {
+      throw AppException("Erro a editar formulário. Tente novamente");
+    }
   }
 }

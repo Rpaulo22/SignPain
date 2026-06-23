@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
+import 'package:sign_pain/view/pain_body_screen.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'package:sign_pain/widgets/pain_frequency.dart';
 
@@ -91,6 +92,14 @@ class PainFormWidget extends StatelessWidget {
                         color: Colors.grey
                       )
                     ),
+                    if (data.updatedDate != null)
+                      Text(
+                        "Editado a ${DateFormat('dd/MM/yyyy HH:mm').format(data.updatedDate!)}",
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 12
+                        )
+                      ),
 
                     ConstrainedBox(
                       constraints: BoxConstraints(maxHeight: dialogHeight/2),
@@ -185,7 +194,14 @@ class PainFormWidget extends StatelessWidget {
                       mainAxisAlignment: .spaceBetween,
                       children: [
                         TextButton(
-                          onPressed: () {}, // implement edit entry function
+                          onPressed: () {
+                            Navigator.pop(dialogContext);
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => PainBodyScreen(formData: data.copyWith(), editing: true), 
+                              ),
+                            );
+                          }, // implement edit entry function
                           child: Text(
                             "Editar",
                             style: TextStyle(
@@ -247,7 +263,7 @@ class PainFormWidget extends StatelessWidget {
 
   Color getPainColor(int painLevel) {
     if (painLevel < 3) return Colors.green;
-    if (painLevel < 6) return Colors.orange;
+    if (painLevel < 7) return Colors.orange;
     if (painLevel < 9) return Colors.redAccent;
     return Colors.red;
   }

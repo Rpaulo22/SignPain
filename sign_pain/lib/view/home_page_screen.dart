@@ -656,7 +656,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   Color getPainColor(int painLevel) {
     if (painLevel < 3) return Colors.green;
-    if (painLevel < 6) return Colors.orange;
+    if (painLevel < 7) return Colors.orange;
     if (painLevel < 9) return Colors.redAccent;
     return Colors.red;
   }

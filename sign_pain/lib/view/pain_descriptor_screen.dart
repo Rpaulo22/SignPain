@@ -9,9 +9,10 @@ import 'package:sign_pain/widgets/step_indicator.dart';
 
 class PainDescriptorScreen extends StatefulWidget {
 
-	const PainDescriptorScreen({super.key, required this.formData});
+	const PainDescriptorScreen({super.key, required this.formData, this.editing = false});
 
   final PainFormData formData;
+  final bool editing; // false: form is new, true: form is an already existing one
 
 	@override
   State<PainDescriptorScreen> createState() => _PainDescriptorScreenState();
@@ -167,18 +168,34 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                     TextButton(
                       onPressed: () async {
                         if (widget.formData.isComplete) {
-                          bool successful = await formViewModel.savePainForm(widget.formData);
-                          if (!mounted) return;
-                          if (successful) { // use viewmodel to save pain form
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar("Registo guardado com sucesso!"));
-                            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                              MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
-                              (Route<dynamic> route) => false, // false condition clears the entire stack
-                            );
+                          if (widget.editing) {
+                            try {
+                              await formViewModel.updatePainForm(widget.formData);
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar("Registo guardado com sucesso!"));
+                              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                                MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
+                                (Route<dynamic> route) => false, // false condition clears the entire stack
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar(e.toString()));
+                              Navigator.of(context, rootNavigator: true).pop();
+                            } 
                           }
                           else {
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar("Erro a gravar. Por favor tente novamente."));
-                            Navigator.of(context, rootNavigator: true).pop();
+                            bool successful = await formViewModel.savePainForm(widget.formData);
+                            if (!mounted) return;
+                            if (successful) { // use viewmodel to save pain form
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar("Registo guardado com sucesso!"));
+                              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                                MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
+                                (Route<dynamic> route) => false, // false condition clears the entire stack
+                              );
+                            }
+                            else {
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar("Erro a gravar. Por favor tente novamente."));
+                              Navigator.of(context, rootNavigator: true).pop();
+                            }
                           }
                         }
                         else {

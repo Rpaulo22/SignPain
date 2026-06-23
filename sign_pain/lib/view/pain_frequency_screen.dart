@@ -5,9 +5,10 @@ import 'package:sign_pain/widgets/pain_frequency.dart';
 import 'package:sign_pain/widgets/step_indicator.dart';
 
 class PainFrequencyScreen extends StatefulWidget {
-  const PainFrequencyScreen({super.key, required this.formData});
+  const PainFrequencyScreen({super.key, required this.formData, this.editing = false});
 
   final PainFormData formData;
+  final bool editing; // false: form is new, true: form is an already existing one
 
   @override
   State<PainFrequencyScreen> createState() => _PainFrequencyScreenState();
@@ -88,7 +89,7 @@ class _PainFrequencyScreenState extends State<PainFrequencyScreen> {
                     if (widget.formData.frequency != PainFrequency.none) { // no frequency has been selected
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                        builder: (context) => PainDescriptorScreen(formData: widget.formData),
+                        builder: (context) => PainDescriptorScreen(formData: widget.formData, editing: widget.editing),
                         ),
                       );
                     }
@@ -96,9 +97,8 @@ class _PainFrequencyScreenState extends State<PainFrequencyScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Selecione a frequência da dor para continuar.")));
                     }
                   },
-                  heroTag: 'btn_save',
-                  tooltip: 'Save form',
-                  child: Icon(Icons.save),
+                  tooltip: 'Next step',
+                  child: Icon(Icons.arrow_forward),
                 )
               ]
             )

@@ -8,9 +8,10 @@ import 'package:sign_pain/widgets/sign_video_player.dart';
 import 'package:sign_pain/widgets/step_indicator.dart';
 
 class PainLevelScreen extends StatefulWidget {
-  const PainLevelScreen({super.key, required this.formData});
+  const PainLevelScreen({super.key, required this.formData, this.editing = false});
 
   final PainFormData formData;
+  final bool editing; // false: form is new, true: form is an already existing one
   
   @override
   State<PainLevelScreen> createState() => _PainLevelScreenState();
@@ -18,8 +19,6 @@ class PainLevelScreen extends StatefulWidget {
 
 class _PainLevelScreenState extends State<PainLevelScreen> {
 	final painScale = [0,1,2,3,4,5,6,7,8,9,10];
-
-  double currentSliderValue = 0;
 
   final ValueNotifier<int> scaleNotifier = ValueNotifier<int>(0);
 
@@ -39,6 +38,8 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
     final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final paddingSlider = MediaQuery.widthOf(context)/10;
+
+    double currentSliderValue = widget.formData.painLevel?.toDouble() ?? 0;
 
 		return Scaffold(
       floatingActionButtonLocation: .centerFloat,
@@ -191,7 +192,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                   if (widget.formData.painLevel != null) { // no level has been selected
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                      builder: (context) => PainFrequencyScreen(formData: widget.formData),
+                      builder: (context) => PainFrequencyScreen(formData: widget.formData, editing: widget.editing),
                       ),
                     );
                   }
