@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'package:intl/intl.dart';
@@ -20,7 +18,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
   String userID = FirebaseAuth.instance.currentUser!.uid;
   late Future<void> _painDataFuture;
   
-  int mode = 0; // 0 -> calendar | 1 -> graph | 2 -> list
+  int mode = 0; // 0 -> calendar | 1 -> graph | 2 -> list (future implementations, please use enums!!)
 
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
@@ -34,9 +32,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
 
 	@override
 	Widget build(BuildContext context) {
-    final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
     
-
 		return Scaffold(
       floatingActionButtonLocation: .startFloat,
       

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/main_navigation_screen.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
@@ -24,7 +22,6 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
 
 	@override
 	Widget build(BuildContext context) {
-    final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
 
 		return Scaffold(
       floatingActionButtonLocation: .centerFloat,

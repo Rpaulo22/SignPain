@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/utils/pdf_service.dart';
 import 'package:sign_pain/view/pain_body_screen.dart';
@@ -57,8 +56,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
-
     return Scaffold(  
       body: SingleChildScrollView(
         child: ListenableBuilder(

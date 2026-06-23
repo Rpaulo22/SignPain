@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw; // 'pw' to avoid conflicts with standard Flutter widgets
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 

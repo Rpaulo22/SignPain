@@ -1,8 +1,6 @@
 
 import 'package:body_part_selector/body_part_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/pain_level_screen.dart';
 import 'package:sign_pain/widgets/step_indicator.dart';
@@ -34,7 +32,6 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
     
     return PopScope(
       // Tell Flutter not to pop the screen automatically
