@@ -5,11 +5,15 @@ import 'package:pdf/widgets.dart' as pw; // 'pw' to avoid conflicts with standar
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
+import 'package:sign_pain/widgets/pain_frequency.dart';
+
+const maxEntries = 30;
 
 class PdfService {
+
   
   // function which generates a pdf report of the user's pain records and allows the user to share it
-  static Future<File> generateAndSharePainReport(List<PainFormData> records) async {
+  static Future<File> generateAndSharePainReport(List<PainFormData> records, String user) async {
     final pdf = pw.Document();
 
     final regularFontData = await rootBundle.load("assets/fonts/Roboto-Regular.ttf");
@@ -21,8 +25,13 @@ class PdfService {
     final robotoItalic = pw.Font.ttf(italicFontData);
 
     // Sort records chronologically
-    final sortedRecords = List<PainFormData>.from(records)
+    final descendingRecords = List<PainFormData>.from(records)
       ..sort((a, b) => b.date!.compareTo(a.date!));
+    
+    final mostRecentRecords = descendingRecords.length > maxEntries ? descendingRecords.getRange(0, maxEntries).toList() : descendingRecords; // limit records to the most recent maxEntries entries
+
+    final ascendingRecords = List<PainFormData>.from(records)..sort((a,b) => a.date!.compareTo(b.date!)); // inverted chronological order
+
 
     // build the pdf Layout
     pdf.addPage(
@@ -39,11 +48,13 @@ class PdfService {
 
         build: (pw.Context context) {
           return [
-            _buildHeader(),
+            _buildHeader(user),
             pw.SizedBox(height: 20),
-            _buildSummary(sortedRecords),
+            _buildSummary(descendingRecords),
             pw.SizedBox(height: 20),
-            _buildDataTable(sortedRecords),
+            _buildDataTable(mostRecentRecords),
+            pw.SizedBox(height: 20),
+            _buildGraphs(ascendingRecords)
           ];
         },
       ),
@@ -57,12 +68,12 @@ class PdfService {
 
   // --- PDF WIDGET BUILDERS ---
 
-  static pw.Widget _buildHeader() {
+  static pw.Widget _buildHeader(String user) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          'Relatório de Dor - SignPain',
+          'Relatório de Dor SignPain - $user',
           style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
         ),
         pw.Text(
@@ -96,12 +107,13 @@ class PdfService {
 
   static pw.Widget _buildDataTable(List<PainFormData> records) {
     return pw.TableHelper.fromTextArray(
-      headers: ['Data', 'Nível de Dor', 'Área Afetada', 'Descrição'],
+      headers: ['Data', 'Nível de Dor', 'Área Afetada', 'Frequência', 'Descrição'],
       data: records.map((record) {
         return [
           DateFormat('dd/MM/yyyy').format(record.date!),
           record.painLevel.toString(),
-          BodyPartsMapper.listToPortuguese(record.bodyParts).join(", "), // Assuming you have a list of areas
+          BodyPartsMapper.listToPortuguese(record.bodyParts).join(", "),
+          painFrequencyToStringPT(record.frequency),
           record.descriptors.join(", ")
         ];
       }).toList(),
@@ -112,5 +124,99 @@ class PdfService {
       ),
       cellAlignment: pw.Alignment.centerLeft,
     );
+  }
+  
+  static pw.Widget _buildGraphs(List<PainFormData> records) {
+    if (records.isEmpty) return pw.SizedBox();
+
+    final dataX = getDataX(records);
+    final int maxDays = dataX.isNotEmpty ? dataX.last : 0;
+
+    // date of the most recent entry
+    final DateTime lastEntryDate = records.last.date!;
+    
+    // date 30 days before that
+    final DateTime thirtyDaysAgo = lastEntryDate.subtract(const Duration(days: 30));
+    
+    // filtered list of records in last 30 days
+    final List<PainFormData> recentRecords = records.where((entry) {
+      return entry.date!.isAfter(thirtyDaysAgo) || entry.date!.isAtSameMomentAs(thirtyDaysAgo);
+    }).toList();
+
+    return pw.Inseparable(
+      child:pw.Column(
+        children: [
+          pw.Text("Evolução da Dor", style: pw.TextStyle(fontSize: 20)),
+          pw.SizedBox(height: 20),
+          _buildChartWidget("Todo o histórico", records),
+          if (maxDays > 30 && recentRecords.length > 1) ...[
+            pw.SizedBox(height: 30), 
+            _buildChartWidget("Últimos 30 Dias", recentRecords),
+          ]
+        ]
+      )
+    );
+  }
+
+  static pw.Widget _buildChartWidget(String title, List<PainFormData> chartRecords) {
+    if (chartRecords.isEmpty) return pw.SizedBox();
+
+    // Calculate limits specifically for this subset of records
+    final dataX = getDataX(chartRecords);
+    final int maxDays = dataX.isNotEmpty ? dataX.last : 0;
+    final DateTime dayOne = chartRecords.first.date!;
+    final int labelStep = maxDays > 6 ? (maxDays / 5).ceil() : 1;
+
+    return pw.Inseparable(
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(title, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+          pw.SizedBox(height: 15),
+          pw.Container(
+            height: 200,
+            child: pw.Chart(
+              grid: pw.CartesianGrid(
+                xAxis: pw.FixedAxis.fromStrings(
+                  List.generate(maxDays + 1, (dayIndex) {
+                    final DateTime currentDate = dayOne.add(Duration(days: dayIndex));
+                    if (dayIndex % labelStep != 0 && dayIndex != maxDays) return '';
+                    return "${currentDate.day.toString().padLeft(2, '0')}/${currentDate.month.toString().padLeft(2, '0')}";
+                  }),
+                  ticks: true,
+                ),
+                yAxis: pw.FixedAxis([0, 2, 4, 6, 8, 10]), 
+              ),
+              datasets: [
+                pw.LineDataSet(
+                  color: PdfColors.orange,
+                  lineWidth: 3,
+                  isCurved: true,
+                  smoothness: 0.05,
+                  data: List<pw.PointChartValue>.generate(
+                    chartRecords.length,
+                    (i) => pw.PointChartValue(dataX[i].toDouble(), chartRecords[i].painLevel!.toDouble()),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // returns a list of days passed since first registered form for each submitted form
+  static List<int> getDataX(List<PainFormData> data) {
+    DateTime dayOne = data.first.date!;
+    DateTime dayOneAux = DateTime(dayOne.year, dayOne.month, dayOne.day); // 00:00:00 of each day (so that difference >= 24h)
+    List<int> days = [0];
+    for (var entry in data.skip(1)) {
+      DateTime entryDate = entry.date!;
+      DateTime dateAux = DateTime(entryDate.year, entryDate.month, entryDate.day);
+
+      days.add(dateAux.difference(dayOneAux).inDays); // days elapsed between first registered form and this one
+    }
+    return days;
   }
 }
