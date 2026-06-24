@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/widgets/pain_frequency.dart';
 
-const maxEntries = 30;
+const maxEntries = 20;
 
 class PdfService {
 
