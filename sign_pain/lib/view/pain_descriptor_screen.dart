@@ -65,13 +65,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
               ),
               Expanded(
                 flex: 15,
-                child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 64.0),
-                child: StepIndicator(
-                  currentStep: 4, // user is on page 4
-                  totalSteps: 4,  // of 4 pages total
-                ),
-              ),
+                child: SizedBox()
               )
             ])
           ),
@@ -90,6 +84,15 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                     Navigator.of(context).pop();
                   },
                   child: const Icon(Icons.arrow_back),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: StepIndicator(
+                      currentStep: 4, // user is on page 4
+                      totalSteps: 4,  // of 4 pages total
+                    ),
+                  )
                 ),
                 FloatingActionButton(
                   onPressed: () {

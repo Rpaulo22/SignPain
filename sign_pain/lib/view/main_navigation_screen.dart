@@ -172,7 +172,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.medical_information),
-              label: 'Info. Médica',
+              label: 'Info. Dor',
               backgroundColor: Color.fromARGB(255, 233, 129, 64),
             ),
             BottomNavigationBarItem(

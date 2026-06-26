@@ -58,13 +58,7 @@ class _PainFrequencyScreenState extends State<PainFrequencyScreen> {
               ),
               Expanded(
                 flex: 15,
-                child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 64.0),
-                child: StepIndicator(
-                  currentStep: 3, // user is on page 3
-                  totalSteps: 4,  // of 3 pages total
-                ),
-              ),
+                child: SizedBox()
               )
             ])
           ),
@@ -83,6 +77,15 @@ class _PainFrequencyScreenState extends State<PainFrequencyScreen> {
                     Navigator.of(context).pop();
                   },
                   child: const Icon(Icons.arrow_back),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: StepIndicator(
+                      currentStep: 3, // user is on page 3
+                      totalSteps: 4,  // of 4 pages total
+                    ),
+                  )
                 ),
                 FloatingActionButton(
                   onPressed: () {

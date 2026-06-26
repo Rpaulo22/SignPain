@@ -64,39 +64,44 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
                 ),
               ),
               Expanded(
-                flex: 75,
+                flex: 80,
                 child: Row(
-                  mainAxisSize: .max,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
                     Expanded(
                       child: SafeArea(
-                        child: Column(
+                        child: Stack(
+                          alignment: Alignment.center,
                           children: [
-                            Expanded(
-                              child: BodyPartSelector(
-                                bodyParts: _selectedPartsFront,
-                                onSelectionUpdated: _onFrontUpdated,
-                                side: BodySide.front
-                              )
+                            // The body map fills the background
+                            BodyPartSelector(
+                              bodyParts: _selectedPartsFront,
+                              onSelectionUpdated: _onFrontUpdated,
+                              side: BodySide.front
                             ),
-                            Text("Frente", style: TextStyle(fontWeight: .bold))
+                            const Positioned(
+                              bottom: 35,
+                              child: Text("Frente", style: TextStyle(fontWeight: FontWeight.bold))
+                            )
                           ]
                         )
                       )
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: SafeArea(
-                        child: Column(
+                        child: Stack(
+                          alignment: Alignment.center,
                           children: [
-                            Expanded(
-                              child: BodyPartSelector(
-                                bodyParts: _selectedPartsBack,
-                                onSelectionUpdated: _onBackUpdated,
-                                side: BodySide.back
-                              )
+                            BodyPartSelector(
+                              bodyParts: _selectedPartsBack,
+                              onSelectionUpdated: _onBackUpdated,
+                              side: BodySide.back
                             ),
-                            Text("Trás", style: TextStyle(fontWeight: .bold))
+                            const Positioned(
+                              bottom: 35,
+                              child: Text("Trás", style: TextStyle(fontWeight: FontWeight.bold))
+                            )
                           ]
                         )
                       )
@@ -105,14 +110,8 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
                 )
               ),
               Expanded(
-                flex: 15,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 64.0),
-                  child: StepIndicator(
-                    currentStep: 1, // user is on page 1
-                    totalSteps: 4,  // of 4 pages total
-                  ),
-                ),
+                flex: 10,
+                child: SizedBox()
               )
             ]
           )
@@ -131,6 +130,16 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
                     Navigator.of(context).pop();
                   },
                   child: const Icon(Icons.arrow_back),
+                ),
+                // included step indicator here to make it align with FABs
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0), 
+                    child: StepIndicator(
+                      currentStep: 1, // step 1 of the pain form
+                      totalSteps: 4, // total amount of steps in pain form
+                    ),
+                  ),
                 ),
                 FloatingActionButton(
                   onPressed: () {
