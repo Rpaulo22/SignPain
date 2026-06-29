@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:sign_pain/utils/theme_controller.dart';
 import 'package:sign_pain/view/login_screen.dart';
 import 'package:sign_pain/view/main_navigation_screen.dart';
+import 'package:sign_pain/viewmodel/conditions_view_model.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'utils/firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -46,6 +47,8 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => SignLanguageProvider()),
         
         ChangeNotifierProvider(create: (_) => FormViewModel()),
+
+        ChangeNotifierProvider(create: (_) => ConditionsViewModel())
       ],
       child: const MyApp(), // Or whatever your root app widget is named
     ),

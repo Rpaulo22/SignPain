@@ -24,6 +24,7 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
       padding: EdgeInsetsDirectional.symmetric(vertical: 10, horizontal: 15),
       child: Column(
         mainAxisAlignment: .center,
+        crossAxisAlignment: .start,
         children: [
           Text(
             medData.name, 
@@ -31,12 +32,15 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
               fontWeight: FontWeight.bold,
               fontSize: 18
             ),
-            textAlign: .center,
+            textAlign: .start,
           ),
 
           Text(
             medData.description,
-            textAlign: .center,
+            textAlign: .start,
+            style: TextStyle(
+              color: Colors.grey, fontWeight: FontWeight.w600
+            )
           ),
           SizedBox(height:25),
 
@@ -78,7 +82,7 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
                   children: medData.commonDescriptors.map((cd) {
                     return Chip(
                       backgroundColor: Theme.of(context).colorScheme.tertiary,
-                      label: Text(cd, style: TextStyle(color: Theme.of(context).colorScheme.onTertiary)),
+                      label: Text("$cd ${descriptorIconMap[cd]}", style: TextStyle(color: Theme.of(context).colorScheme.onTertiary)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     );
                   }).toList(),
@@ -102,7 +106,7 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
                   children: medData.uncommonDescriptors.map((cd) {
                     return Chip(
                       backgroundColor: Theme.of(context).colorScheme.primary,
-                      label: Text(cd, style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
+                      label: Text("$cd ${descriptorIconMap[cd]}", style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     );
                   }).toList(),
@@ -157,4 +161,24 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
       _ => BodySide.front 
     };
   }
+
+  static const Map<String, String> descriptorIconMap = {
+    "Ardor": "🔥",
+    "Formigueiro": "🐜",
+    "Frio": "❄️",
+    "Mecânica": "⚙️",
+    "Peso": "🏋️",
+    "Cansaço": "🥱",
+    "Choque": "⚡",
+    "Moedeira": "🔨",  
+    "Tensão": "🗜️",        
+    "Latejante": "💓",         
+    "Perfurante": "🗡️",    
+    "Localizada": "🎯",    
+    "Difusa": "🌫️",        
+    "Irradiada": "🔆",     
+    "Aguda": "🪡",          
+    "Intermitente": "🌊",   
+    "Rigidez": "🧱",
+  };
 }

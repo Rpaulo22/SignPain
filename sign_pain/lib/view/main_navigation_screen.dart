@@ -4,7 +4,7 @@ import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:sign_pain/view/home_page_screen.dart';
 import 'package:sign_pain/view/communication_screen.dart';
 import 'package:sign_pain/view/login_screen.dart';
-import 'package:sign_pain/view/medical_condition_screen.dart';
+import 'package:sign_pain/view/pain_info_screen.dart';
 import 'package:sign_pain/view/settings_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
 
@@ -49,7 +49,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
       ),
       CommunicationScreen(),
-      MedicalConditionScreen(),
+      PainInfoScreen(),
       SettingsScreen()
     ];
 

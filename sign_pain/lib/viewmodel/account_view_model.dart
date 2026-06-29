@@ -165,7 +165,8 @@ class AccountViewModel extends ChangeNotifier{
         'name': name,
         'email': emailAddress,
         'createdAt': DateTime.now(),
-        'phoneVerified': false
+        'phoneVerified': false,
+        'medicalConditions': []
       };
 
       if (hasNumber) userMap['phoneNumber'] = phoneNumber; 
