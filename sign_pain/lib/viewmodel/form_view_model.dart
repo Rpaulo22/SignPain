@@ -26,7 +26,7 @@ class FormViewModel extends ChangeNotifier {
       "painIntensity": formData.painLevel,
       "descriptors": formData.descriptors.toList(),
       "bodyParts": formData.bodyParts,
-      "date": DateTime.now(),
+      "date": formData.date,
       "frequency": frequency
     };
 

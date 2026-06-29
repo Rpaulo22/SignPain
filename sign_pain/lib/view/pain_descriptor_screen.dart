@@ -89,8 +89,8 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: StepIndicator(
-                      currentStep: 4, // user is on page 4
-                      totalSteps: 4,  // of 4 pages total
+                      currentStep: 5, // user is on page 5
+                      totalSteps: 5,  // of 5 pages total
                     ),
                   )
                 ),

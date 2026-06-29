@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
-import 'package:sign_pain/view/pain_body_screen.dart';
+import 'package:sign_pain/view/pain_date_screen.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'package:sign_pain/widgets/pain_frequency.dart';
 
@@ -87,7 +87,7 @@ class PainFormWidget extends StatelessWidget {
                   crossAxisAlignment: .start,
                   children: [
                     Text(
-                      DateFormat('dd/MM/yyyy HH:mm').format(data.date!),
+                      DateFormat('dd/MM/yyyy HH:mm').format(data.date),
                       style: TextStyle(
                         color: Colors.grey
                       )
@@ -198,7 +198,7 @@ class PainFormWidget extends StatelessWidget {
                             Navigator.pop(dialogContext);
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => PainBodyScreen(formData: data.copyWith(), editing: true), 
+                                builder: (context) => PainDateScreen(formData: data.copyWith(), editing: true), 
                               ),
                             );
                           }, // implement edit entry function

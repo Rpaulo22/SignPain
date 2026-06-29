@@ -6,7 +6,7 @@ class PainFormData {
   String userID = FirebaseAuth.instance.currentUser!.uid; // registers as being the current user
   int? painLevel; // self-reported pain level (on a scale of 0-10)
   Set<String> descriptors = {}; // adjectives which describe the felt pain
-  DateTime? date; // date of the form's original submission
+  DateTime date = DateTime.now(); // date of the form's original submission
   DateTime? updatedDate; // date of last update to form submission
   List<String> bodyParts = []; // body parts which the pain is inflicted on
   PainFrequency frequency = PainFrequency.none; // frequency of pain, e.g. continuous, intermitent

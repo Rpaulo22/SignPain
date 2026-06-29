@@ -184,8 +184,8 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: StepIndicator(
-                    currentStep: 2, // user is on page 2
-                    totalSteps: 4,  // of 4 pages total
+                    currentStep: 3, // user is on page 3
+                    totalSteps: 5,  // of 5 pages total
                   ),
                 )
               ),

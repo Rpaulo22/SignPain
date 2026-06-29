@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/utils/pdf_service.dart';
-import 'package:sign_pain/view/pain_body_screen.dart';
+import 'package:sign_pain/view/pain_date_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'package:sign_pain/widgets/pain_form_widget.dart';
@@ -71,7 +71,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
               // pre-compile calendar history map once only
               final Map<DateTime, List<PainFormData>> historyMap = userEntries.fold({}, (map, record) {
-                final date = record.date!;
+                final date = record.date;
                 final normalizedKey = DateTime.utc(date.year, date.month, date.day);
                 map.putIfAbsent(normalizedKey, () => []).add(record);
                 return map;
@@ -132,7 +132,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         onPressed: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => PainBodyScreen(formData: PainFormData()),
+                              builder: (context) => PainDateScreen(formData: PainFormData()),
                             ),
                           );
                         },
@@ -290,11 +290,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   // returns a list of days passed since first registered form for each submitted form
   List<int> getDataX(List<PainFormData> data) {
-    DateTime dayOne = data.first.date!;
+    DateTime dayOne = data.first.date;
     DateTime dayOneAux = DateTime(dayOne.year, dayOne.month, dayOne.day); // 00:00:00 of each day (so that difference >= 24h)
     List<int> days = [0];
     for (var entry in data.skip(1)) {
-      DateTime entryDate = entry.date!;
+      DateTime entryDate = entry.date;
       DateTime dateAux = DateTime(entryDate.year, entryDate.month, entryDate.day);
 
       days.add(dateAux.difference(dayOneAux).inDays); // days elapsed between first registered form and this one
@@ -315,7 +315,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     }
 
     final ascendingData = List<PainFormData>.from(data);
-    ascendingData.sort((a,b) => a.date!.compareTo(b.date!));
+    ascendingData.sort((a,b) => a.date.compareTo(b.date));
     final dataX = getDataX(ascendingData);
 
     return ValueListenableBuilder<int>(
@@ -406,7 +406,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         getTooltipItems: (List<LineBarSpot> touchedSpots) {
                           return touchedSpots.map((LineBarSpot spot) {
                             
-                            DateTime dayOne = ascendingData.first.date!;
+                            DateTime dayOne = ascendingData.first.date;
                             DateTime d = dayOne.add(Duration(days: spot.x.toInt()));
                             String dateString = DateFormat('d MMM', 'pt_PT').format(d);
 
@@ -454,7 +454,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                               return const SizedBox.shrink();
                             }
                             // Convert offset back to a Date
-                            DateTime dayOne = ascendingData.first.date!;
+                            DateTime dayOne = ascendingData.first.date;
                             DateTime d = dayOne.add(Duration(days: value.toInt()));
                             
                             return SideTitleWidget(
@@ -617,6 +617,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
               
               // UI Theme custom styling that shifts nicely with dark/light mode
               calendarStyle: CalendarStyle(
+                weekendTextStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                defaultTextStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 todayDecoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary.withAlpha(110),
                   shape: BoxShape.circle,
