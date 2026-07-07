@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/model/user_data.dart';
+import 'package:sign_pain/utils/notification_service.dart';
 import 'package:sign_pain/utils/pdf_service.dart';
 import 'package:sign_pain/view/pain_date_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
@@ -51,6 +52,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     // Fetch data exactly once when the screen mounts
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<FormViewModel>().getUserPainData(FirebaseAuth.instance.currentUser!.uid);
+      NotificationService().requestNotificationPermissions();
     });
     userDataFuture = accountViewModel.getUserData(FirebaseAuth.instance.currentUser!.uid);
   }

@@ -214,19 +214,22 @@ class PainFormWidget extends StatelessWidget {
                         TextButton(
                           onPressed: () async {
                             try {
+                              final scaffoldMessenger = ScaffoldMessenger.of(context);
                               // global, single instance of FormViewModel
                               final formViewModel = context.read<FormViewModel>();
                               
                               await formViewModel.deletePainForm(data.docID!);
                               
-                              if (!dialogContext.mounted) return;
+                              if (dialogContext.mounted) {
+                                Navigator.pop(dialogContext);
+                              }
 
-                              Navigator.pop(dialogContext);
-
-                              ScaffoldMessenger.of(context).showSnackBar(
+                              scaffoldMessenger.showSnackBar(
                                 const SnackBar(content: Text("Registo apagado com sucesso!")),
                               );
                             } catch (e) {
+                              if (!context.mounted) return;
+                              
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text("Erro ao apagar: $e")),
                               );

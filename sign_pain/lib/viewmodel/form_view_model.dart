@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/utils/app_exception.dart';
+import 'package:sign_pain/utils/notification_service.dart';
 import 'package:sign_pain/widgets/pain_frequency.dart';
 
 
@@ -37,11 +38,18 @@ class FormViewModel extends ChangeNotifier {
 
     try {
       // attempt to upload
-      await userEntries.add(formEntry);
+      final DocumentReference docRef = await userEntries.add(formEntry);
+      formData.docID = docRef.id;
+
+      painRecords.add(formData);
+      notifyListeners();
+
+      await NotificationService().scheduleRollingPainReminder();
 
       return true;
       
     } catch (e) {
+      debugPrint("Erro: ${e.toString()}");
       return false;
     }
   }

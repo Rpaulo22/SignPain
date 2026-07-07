@@ -11,6 +11,7 @@ import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'utils/firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 
 final themeController = ThemeController();
 
@@ -40,6 +41,9 @@ Future<void> main() async {
 
   // load the Portuguese date formatting data (could crash if not awaited for)
   await initializeDateFormatting('pt_PT', null);
+
+  // initialize the time zone database
+  tz.initializeTimeZones();
   
   runApp(
     MultiProvider(

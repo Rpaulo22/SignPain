@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/view/main_navigation_screen.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
@@ -18,7 +19,6 @@ class PainDescriptorScreen extends StatefulWidget {
 
 class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
 	final painDescriptors = ["Moedeira", "Tensão", "Latejante", "Ardor", "Formigueiro", "Perfurante", "Frio", "Choque", "Localizada", "Mecânica", "Difusa", "Irradiada", "Aguda", "Cansaço", "Rigidez", "Peso"];
-  final FormViewModel formViewModel = FormViewModel();
 
 	@override
 	Widget build(BuildContext context) {
@@ -101,9 +101,9 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                         context: context,
                         barrierDismissible: false, 
                         useRootNavigator: true,
-                        builder: (BuildContext context) {
+                        builder: (BuildContext dialogContext) {
                           // return the confirm dialog widget
-                          return confirmDialog();
+                          return confirmDialog(dialogContext);
                         }
                       );
                     } else {
@@ -122,7 +122,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
 	}
 
   // Pop-up used for confirming a form submission
-  Dialog confirmDialog() {
+  Dialog confirmDialog(BuildContext dialogContext){
     // size is info of screen size, used so that pop-up is consistent across devices
     final size = MediaQuery.of(context).size;
 
@@ -149,7 +149,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                   children: [
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context, rootNavigator: true).pop();
+                        Navigator.pop(dialogContext);
                       },
                       child: const Text(
                         'Não',
@@ -168,18 +168,22 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                     TextButton(
                       onPressed: () async {
                         if (widget.formData.isComplete) {
+                          final formViewModel = context.read<FormViewModel>();
                           if (widget.editing) {
                             try {
                               await formViewModel.updatePainForm(widget.formData);
                               if (!mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(snackBar("Registo guardado com sucesso!"));
-                              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                                MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
-                                (Route<dynamic> route) => false, // false condition clears the entire stack
-                              );
+                              
+                              if (dialogContext.mounted) {
+                                Navigator.pop(dialogContext);
+                              }
+                              Navigator.of(context).popUntil((route) => route.isFirst);
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(snackBar(e.toString()));
-                              Navigator.of(context, rootNavigator: true).pop();
+                              if (dialogContext.mounted) {
+                                Navigator.pop(dialogContext);
+                              }
                             } 
                           }
                           else {
@@ -187,20 +191,24 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                             if (!mounted) return;
                             if (successful) { // use viewmodel to save pain form
                               ScaffoldMessenger.of(context).showSnackBar(snackBar("Registo guardado com sucesso!"));
-                              Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                                MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
-                                (Route<dynamic> route) => false, // false condition clears the entire stack
-                              );
+                              if (dialogContext.mounted) {
+                                Navigator.pop(dialogContext);
+                              }
+                              Navigator.of(context).popUntil((route) => route.isFirst);
                             }
                             else {
                               ScaffoldMessenger.of(context).showSnackBar(snackBar("Erro a gravar. Por favor tente novamente."));
-                              Navigator.of(context, rootNavigator: true).pop();
+                              if (dialogContext.mounted) {
+                                Navigator.pop(dialogContext);
+                              }
                             }
                           }
                         }
                         else {
                           ScaffoldMessenger.of(context).showSnackBar(snackBar("Formulário incompleto. Por favor indique o seu nível de dor e descreva a sua dor."));
-                          Navigator.of(context, rootNavigator: true).pop();
+                          if (dialogContext.mounted) {
+                            Navigator.pop(dialogContext);
+                          }
                         }
                       },
                       child: const Text(
