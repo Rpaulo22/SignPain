@@ -12,7 +12,20 @@ class NotificationService {
     await _notificationsPlugin.cancel(id: rollingReminderId);
 
     // schedule to exactly 4 hours after now
-    final tz.TZDateTime scheduledTime = tz.TZDateTime.now(tz.local).add(const Duration(hours: 4));
+    tz.TZDateTime scheduledTime = tz.TZDateTime.now(tz.local).add(const Duration(hours: 4));
+
+    if (scheduledTime.hour > 0 && scheduledTime.hour < 7) {
+      // do not allow notifications to land between midnight and 7am, force to 8am
+      scheduledTime = tz.TZDateTime(
+        scheduledTime.location, 
+        scheduledTime.year,     
+        scheduledTime.month,    
+        scheduledTime.day,      
+        8,                      
+        0,                      
+        0,                      
+      );
+    }
 
     await _notificationsPlugin.zonedSchedule(
       id: rollingReminderId,

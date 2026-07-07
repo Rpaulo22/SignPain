@@ -38,6 +38,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
           else {
             final userMedicalConditionsIDs = conditionsViewModel.userMedicalConditions;
             final allMedicalConditions = conditionsViewModel.medicalConditions;
+            final allMedicalConditionsIDs = allMedicalConditions.map((entry) => entry.id).toList();
 
             final userMedicalConditions = allMedicalConditions.where((entry) => userMedicalConditionsIDs.contains(entry.id)).toList();
 
@@ -58,20 +59,56 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                       SizedBox()
                     else ... [
                       painInfo(),
+                      Divider(
+                        height: 50,
+                        thickness: 2,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                        
+                      SizedBox(height: 20.0),
+                      Text(
+                        "As suas condições médicas 🩺", 
+                        style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
+                        textAlign: .start,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Theme.of(context).colorScheme.onSurface),
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05), // Very soft modern shadow
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            // list of available conditions
+                            for (var condition in allMedicalConditionsIDs)
+                              CheckboxListTile(
+                                title: Text(allMedicalConditions.firstWhere((entry) => entry.id == condition).name),
+                                value: userMedicalConditionsIDs.contains(condition),
+                                onChanged: (bool? checked) async {  
+                                  try {
+                                    if (checked == true) {
+                                      await conditionsViewModel.addCondition(condition);
+                                    } else {
+                                      await conditionsViewModel.removeCondition(condition);
+                                    }
+                                    if (!context.mounted) return;
+                                  } catch(e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+                                  }
+                                },
+                              )
+                          ],
+                        )
+                      ),
+                      SizedBox(height: 20.0),
                       if (userMedicalConditions.isNotEmpty) ...[
-                        Divider(
-                          height: 50,
-                          thickness: 2,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        Text(
-                          "🩺 As suas condições médicas",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: .bold
-                          ),
-                        ),
-                        SizedBox(height: 20.0),
                         medicalConditionsInfo(userMedicalConditions)
                       ]
                     ],
@@ -94,11 +131,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
       children: [
         for (var medicalCondition in userMedicalConditions) ... [
           MedicalConditionWidget(medData: medicalCondition),
-          Divider(
-            height: 50,
-            thickness: 1,
-            color: Theme.of(context).colorScheme.primary,
-          )
+          SizedBox(height: 20)
         ]
       ]
     );

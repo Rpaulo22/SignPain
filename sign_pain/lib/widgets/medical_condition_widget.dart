@@ -21,6 +21,18 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
     BodyParts parts = BodyPartsMapper.fromList(medData.bodyPartsAffected); // BodyParts object which holds the body parts affected by the condition for visualization purposes
 
     return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface),
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05), // Very soft modern shadow
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
       padding: EdgeInsetsDirectional.symmetric(vertical: 10, horizontal: 15),
       child: Column(
         mainAxisAlignment: .center,

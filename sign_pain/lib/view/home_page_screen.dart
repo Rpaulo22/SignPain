@@ -37,7 +37,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
   final ValueNotifier<DateTime?> selectedDayNotifier = ValueNotifier<DateTime?>(null);
 
   // 0 -> show all entries, 1 -> show last week's entries, 2 -> show last month's entries
-  final ValueNotifier<int> chartIntervalNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<int> chartIntervalNotifier = ValueNotifier<int>(2);
 
   @override
   void dispose() {
@@ -386,15 +386,15 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 ),
                 const SizedBox(width: 8),
                 FilterChip(
-                  label: const Text("7 Dias"),
-                  selected: chartIntervalMode == 1,
-                  onSelected: (_) => chartIntervalNotifier.value = 1,
-                ),
-                const SizedBox(width: 8),
-                FilterChip(
                   label: const Text("1 Mês"),
                   selected: chartIntervalMode == 2,
                   onSelected: (_) => chartIntervalNotifier.value = 2,
+                ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: const Text("7 Dias"),
+                  selected: chartIntervalMode == 1,
+                  onSelected: (_) => chartIntervalNotifier.value = 1,
                 ),
               ],
             ),
