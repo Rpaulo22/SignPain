@@ -65,7 +65,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
                           color: Theme.of(context).colorScheme.primary,
                         ),
                         Text(
-                          "🩺 A suas condições médicas",
+                          "🩺 As suas condições médicas",
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: .bold
@@ -86,7 +86,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
   }
 
   Widget painInfo() {
-    return Text("Dor é má.\nTome Brufen se for mesmo muito má e marque consulta mal puder.");
+    return Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
   }
   
   Widget medicalConditionsInfo(List<MedicalConditionData> userMedicalConditions) {

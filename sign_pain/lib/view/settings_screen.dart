@@ -59,7 +59,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       SizedBox(height: 20.0),
                       Text(
-                        "Condições médicas 🩺", 
+                        "As suas condições médicas 🩺", 
                         style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
                         textAlign: .start,
                       ),

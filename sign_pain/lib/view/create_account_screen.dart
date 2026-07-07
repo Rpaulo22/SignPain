@@ -18,7 +18,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   late TextEditingController passwordController;
   late TextEditingController numberController;
   late TextEditingController nameController;
-  late TextEditingController verificationCodeController;
+  late TextEditingController healthIdentifierController;
 
   var obscurePassword = true;
 
@@ -29,7 +29,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     passwordController = TextEditingController();
     numberController = TextEditingController();
     nameController = TextEditingController();
-    verificationCodeController = TextEditingController();
+    healthIdentifierController = TextEditingController();
   }
 
   @override
@@ -38,7 +38,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     passwordController.dispose();
     numberController.dispose();
     nameController.dispose();
-    verificationCodeController.dispose();
+    healthIdentifierController.dispose();
     super.dispose();
   }
 
@@ -49,8 +49,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
         listenable: accountViewModel, 
         builder: (BuildContext context, Widget? child) {
           bool isLoading = accountViewModel.isLoading;
-
-
 
           if (accountViewModel.errorMessage != null) {
             // tells flutter to wait to render the snackbar after the rest of elements (to avoid error)
@@ -129,6 +127,17 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                                   ),
                                   keyboardType: TextInputType.name,
                                   autofillHints: [AutofillHints.name],
+                                  textInputAction: TextInputAction.next
+                                ),
+                                const Divider(height: 10.0, color: Colors.transparent),
+                                TextField(
+                                  controller: healthIdentifierController,
+                                  obscureText: false,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: 'Nº de utente SNS',
+                                  ),
+                                  keyboardType: TextInputType.number,
                                   textInputAction: TextInputAction.next
                                 ),
                                 const Divider(height: 10.0, color: Colors.transparent),
@@ -226,7 +235,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
         userStringController.text, 
         numberController.text, 
         passwordController.text, 
-        nameController.text
+        nameController.text,
+        healthIdentifierController.text
       );
 
       TextInput.finishAutofillContext();

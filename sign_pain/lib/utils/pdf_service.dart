@@ -5,6 +5,7 @@ import 'package:pdf/widgets.dart' as pw; // 'pw' to avoid conflicts with standar
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
+import 'package:sign_pain/model/user_data.dart';
 import 'package:sign_pain/widgets/pain_frequency.dart';
 
 const maxEntries = 20;
@@ -13,7 +14,7 @@ class PdfService {
 
   
   // function which generates a pdf report of the user's pain records and allows the user to share it
-  static Future<File> generateAndSharePainReport(List<PainFormData> records, String user) async {
+  static Future<File> generateAndSharePainReport(List<PainFormData> records, UserData user) async {
     final pdf = pw.Document();
 
     final regularFontData = await rootBundle.load("assets/fonts/Roboto-Regular.ttf");
@@ -68,13 +69,17 @@ class PdfService {
 
   // --- PDF WIDGET BUILDERS ---
 
-  static pw.Widget _buildHeader(String user) {
+  static pw.Widget _buildHeader(UserData user) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          'Relatório de Dor SignPain - $user',
+          'Relatório de Dor SignPain - ${user.fullName}',
           style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+        ),
+        pw.Text(
+          'Nº de utente SNS: ${user.healthIdentifer}',
+          style: pw.TextStyle(fontSize: 20),
         ),
         pw.Text(
           'Gerado a: ${DateFormat('dd/MM/yyyy').format(DateTime.now())}',

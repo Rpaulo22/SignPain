@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
+import 'package:sign_pain/model/user_data.dart';
 import 'package:sign_pain/utils/pdf_service.dart';
 import 'package:sign_pain/view/pain_date_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
@@ -28,7 +29,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
   ];
 
   final accountViewModel = AccountViewModel();
-  late Future<String> userNameFuture;
+  late Future<UserData> userDataFuture;
 
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime focusedDay = DateTime.now();
@@ -51,7 +52,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<FormViewModel>().getUserPainData(FirebaseAuth.instance.currentUser!.uid);
     });
-    userNameFuture = accountViewModel.getUserName(FirebaseAuth.instance.currentUser!.uid);
+    userDataFuture = accountViewModel.getUserData(FirebaseAuth.instance.currentUser!.uid);
   }
 
   @override
@@ -86,32 +87,60 @@ class _HomePageScreenState extends State<HomePageScreen> {
                       Padding(
                         padding: const EdgeInsets.all(12),
                         child: FutureBuilder(
-                          future: userNameFuture,
+                          future: userDataFuture,
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               return const Center(child: CircularProgressIndicator());
                             } else {
-                              return RichText(
-                                textAlign: TextAlign.center,
-                                text: TextSpan(
-                                  style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                  ),
-                                  children: <TextSpan>[
-                                    const TextSpan(
-                                      text: '👋\nOlá ',
-                                      style: TextStyle(fontSize: 26),
-                                    ),
-                                    TextSpan(
-                                      text: '${snapshot.data}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold, 
-                                        fontSize: 26,
-                                        color: Color.fromARGB(255, 233, 129, 64)
+                              return Column(
+                                children: [
+                                  // user name text
+                                  RichText( 
+                                    textAlign: TextAlign.center,
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onSurface,
                                       ),
-                                    )
-                                  ],
-                                ),
+                                      children: <TextSpan>[
+                                        const TextSpan(
+                                          text: '👋\nOlá ',
+                                          style: TextStyle(fontSize: 26),
+                                        ),
+                                        TextSpan(
+                                          text: snapshot.data!.fullName,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold, 
+                                            fontSize: 26,
+                                            color: Color.fromARGB(255, 233, 129, 64)
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  // health identifier text
+                                  RichText(
+                                    textAlign: TextAlign.center,
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onSurface,
+                                      ),
+                                      children: <TextSpan>[
+                                        const TextSpan(
+                                          text: 'Nº de utente ',
+                                          style: TextStyle(fontSize: 22),
+                                        ),
+                                        TextSpan(
+                                          text: snapshot.data!.healthIdentifer,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold, 
+                                            fontSize: 22,
+                                            color: Color.fromARGB(255, 233, 129, 64)
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ]
                               );
                             }
                           },
@@ -202,7 +231,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                       
                       SizedBox(height:20),
                       FutureBuilder(
-                        future: userNameFuture,
+                        future: userDataFuture,
                         builder: (context, snapshot) {
                           return ElevatedButton(
                             style: ElevatedButton.styleFrom(

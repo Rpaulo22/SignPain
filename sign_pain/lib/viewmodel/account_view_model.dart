@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:sign_pain/model/user_data.dart';
 import 'package:sign_pain/utils/app_exception.dart';
 
 class AccountViewModel extends ChangeNotifier{
@@ -11,8 +12,8 @@ class AccountViewModel extends ChangeNotifier{
   String? errorMessage;
   bool isLoading = false;
 
-  // Given a user ID, obtains the corresponding user's name in Firebase
-  Future<String> getUserName(String userID) async {
+  // Given a user ID, obtains the corresponding user's data from Firebase
+  Future<UserData> getUserData(String userID) async {
     var db = FirebaseFirestore.instance;
 
     try {
@@ -23,13 +24,18 @@ class AccountViewModel extends ChangeNotifier{
       
       if (userInfo.exists && userInfo.data() != null) {
         final data = userInfo.data() as Map<String, dynamic>;
+
+        final name = data['name'] as String;
+        final email = data['email'] as String;
+        final medicalConditions = List<String>.from(data['medicalConditions'] ?? []);
+        final healthIdentifer = data['healthIdentifier'] ?? "111111111";
       
-        return data['name'] as String? ?? 'Utilizador';
+        return UserData(email: email, fullName: name, medicalConditions: medicalConditions, healthIdentifer: healthIdentifer);
       }
-      return "Utilizador";
+      return UserData(email: "", fullName: "Utilizador", healthIdentifer: "111111111", medicalConditions: []);
 
     } catch (e) { // could not retrieve user info
-      return "Utilizador";
+      return UserData(email: "", fullName: "Utilizador", healthIdentifer: "111111111", medicalConditions: []);
     }
   }
 
@@ -124,7 +130,7 @@ class AccountViewModel extends ChangeNotifier{
 
   // Given a new user's information (email, phone number, password and name), attempts to create a new account
   // and asks for verification of phone number. If it is verified, it then logs in user
-  Future<void> createUser(String emailAddress, String phoneNumber, String password, String name) async {
+  Future<void> createUser(String emailAddress, String phoneNumber, String password, String name, String healthIdentifer) async {
     var hasNumber = true;
 
     // allows the app to display loading circle
@@ -152,6 +158,7 @@ class AccountViewModel extends ChangeNotifier{
       notifyListeners();
       hasNumber = false;
     }
+    // if (healthIdentifer) ADD check for correctness
 
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -166,7 +173,8 @@ class AccountViewModel extends ChangeNotifier{
         'email': emailAddress,
         'createdAt': DateTime.now(),
         'phoneVerified': false,
-        'medicalConditions': []
+        'medicalConditions': [],
+        'healthIdentifier': healthIdentifer
       };
 
       if (hasNumber) userMap['phoneNumber'] = phoneNumber; 
