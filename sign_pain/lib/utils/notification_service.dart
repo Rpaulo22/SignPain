@@ -11,10 +11,10 @@ class NotificationService {
     // cancel any previously scheduled alarms
     await _notificationsPlugin.cancel(id: rollingReminderId);
 
-    // schedule to exactly 4 hours after now
-    tz.TZDateTime scheduledTime = tz.TZDateTime.now(tz.local).add(const Duration(hours: 4));
+    // schedule to exactly 3 hours after now
+    tz.TZDateTime scheduledTime = tz.TZDateTime.now(tz.local).add(const Duration(hours: 3));
 
-    if (scheduledTime.hour > 0 && scheduledTime.hour < 7) {
+    if (scheduledTime.hour >= 0 && scheduledTime.hour < 7) {
       // do not allow notifications to land between midnight and 7am, force to 8am
       scheduledTime = tz.TZDateTime(
         scheduledTime.location, 
@@ -37,7 +37,7 @@ class NotificationService {
           'rolling_reminders_channel',
           'Acompanhamento de Dor',
           channelDescription: 'Alerta disparado x horas após o último registo',
-          icon: '@mipmap/ic_launcher',
+          icon: 'ic_stat_signpain',
           importance: Importance.max,
           priority: Priority.high,
         ),
