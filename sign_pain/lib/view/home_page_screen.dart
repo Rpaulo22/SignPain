@@ -391,21 +391,21 @@ class _HomePageScreenState extends State<HomePageScreen> {
           minimumX = maximumX - (oneDay * 30);
           
           minimumX = (minimumX / oneDay).floorToDouble() * oneDay;
-          maximumX = (maximumX / oneDay).ceilToDouble() * oneDay;
+          maximumX += oneHour * 12;
         } 
         else if (chartIntervalMode == 1) {
           minimumX = maximumX - (oneDay * 7);
           strictInterval = oneDay * 2; // step every 2 days
           
           minimumX = (minimumX / oneDay).floorToDouble() * oneDay;
-          maximumX = (maximumX / oneDay).ceilToDouble() * oneDay;
+          maximumX += oneHour * 6;
         } 
         else if (chartIntervalMode == 2) {
           minimumX = maximumX - oneDay;
-          strictInterval = oneHour * 6; // step every 6 hours
+          strictInterval = oneHour * 8; // step every 8 hours
 
           minimumX = (minimumX / strictInterval).floorToDouble() * strictInterval;
-          maximumX = (maximumX / strictInterval).ceilToDouble() * strictInterval;
+          maximumX += oneHour;
         }
 
         if (maximumX <= minimumX) {
@@ -508,7 +508,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         sideTitles: SideTitles(
                           showTitles: true,
                           interval: strictInterval,
-                          reservedSize: 34,
+                          reservedSize: 40,
                           getTitlesWidget: (value, meta) {
                             if (value < meta.min || value > meta.max) {
                               return const SizedBox.shrink();
@@ -525,7 +525,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                             String labelText;
                             if (chartIntervalMode == 2) {
                               // 24h view: show hours
-                              labelText = DateFormat('HH:mm').format(d);
+                              labelText = DateFormat('HH:mm\ndd/MM').format(d);
                             } else {
                               // Week/Month view: view day
                               labelText = DateFormat('dd/MM').format(d);

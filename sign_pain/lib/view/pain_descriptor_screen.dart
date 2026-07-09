@@ -250,8 +250,7 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
     "Localizada": "🎯",    
     "Difusa": "🌫️",        
     "Irradiada": "🔆",     
-    "Aguda": "🪡",          
-    "Intermitente": "🌊",   
+    "Aguda": "🪡",
     "Rigidez": "🧱",
   };
 }

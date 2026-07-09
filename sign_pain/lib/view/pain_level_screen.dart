@@ -36,7 +36,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
 	Widget build(BuildContext context) {
     final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final paddingSlider = MediaQuery.widthOf(context)/10;
+    final paddingSlider = MediaQuery.widthOf(context)/16;
 
     double currentSliderValue = widget.formData.painLevel?.toDouble() ?? 0;
 
@@ -88,22 +88,26 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                           ],
                         ),
                         SizedBox(height:20),
-                        Image(
-                          image: AssetImage(
-                            isDarkMode
-                            ? switch (scaleMode) {
-                              0 => 'assets/images/ipt_dark.png',
-                              1 => 'assets/images/faces_pain_scale_dark.png',
-                              _ => 'assets/images/ipt_dark.png',
-                            }
-                            : switch (scaleMode) {
-                              0 => 'assets/images/ipt.png',
-                              1 => 'assets/images/faces_pain_scale.png',
-                              _ => 'assets/images/ipt.png',
-                            }
-                          ),
-                          fit: BoxFit.contain, 
+                        Padding(
+                          padding: EdgeInsetsGeometry.symmetric(horizontal: paddingSlider),
+                          child: Image(
+                            image: AssetImage(
+                              isDarkMode
+                              ? switch (scaleMode) {
+                                0 => 'assets/images/ipt_dark.png',
+                                1 => 'assets/images/faces_pain_scale_dark.png',
+                                _ => 'assets/images/ipt_dark.png',
+                              }
+                              : switch (scaleMode) {
+                                0 => 'assets/images/ipt.png',
+                                1 => 'assets/images/faces_pain_scale.png',
+                                _ => 'assets/images/ipt.png',
+                              }
+                            ),
+                            fit: BoxFit.contain, 
+                          )
                         ),
+                        SizedBox(height: 20),
                         SliderTheme(
                           data: SliderTheme.of(context).copyWith(
                             trackHeight: 30.0, 
