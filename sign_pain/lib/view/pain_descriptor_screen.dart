@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
-import 'package:sign_pain/view/main_navigation_screen.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'package:sign_pain/widgets/pain_frequency.dart';
 import 'package:sign_pain/widgets/step_indicator.dart';

@@ -36,8 +36,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
   DateTime focusedDay = DateTime.now();
   final ValueNotifier<DateTime?> selectedDayNotifier = ValueNotifier<DateTime?>(null);
 
-  // 0 -> show all entries, 1 -> show last week's entries, 2 -> show last month's entries
-  final ValueNotifier<int> chartIntervalNotifier = ValueNotifier<int>(2);
+  // 0 -> show last month's entries, 1 -> show last week's entries, 2 -> show last 24h
+  final ValueNotifier<int?> chartIntervalNotifier = ValueNotifier<int?>(null);
 
   @override
   void dispose() {
@@ -71,6 +71,31 @@ class _HomePageScreenState extends State<HomePageScreen> {
             }
             else {
               final userEntries = formViewModel.painRecords;
+
+              // depending on the date of the last pain entry, change the graph's interval accordingly
+              // in the last 24hrs => last 24hrs graph
+              // in the last week => last week graph
+              // in the last month => last month graph
+              if (chartIntervalNotifier.value == null) {
+                // if there are no entries yet, default to last 24hrs, although the graph will not show anything until there are 2 entries
+                if (userEntries.isEmpty) {
+                  chartIntervalNotifier.value = 2;
+                } else {
+                  DateTime lastEntry = userEntries.first.date;
+                  // last 24hrs
+                  if (lastEntry.isAfter(DateTime.now().subtract(Duration(days: 1)))) {
+                    chartIntervalNotifier.value = 2;
+                  }
+                  // last week
+                  else if (lastEntry.isAfter(DateTime.now().subtract(Duration(days: 7)))) {
+                    chartIntervalNotifier.value = 1;
+                  }
+                  // last month
+                  else if (lastEntry.isAfter(DateTime.now().subtract(Duration(days: 30)))) {
+                    chartIntervalNotifier.value = 0;
+                  }
+                }
+              }
 
               // pre-compile calendar history map once only
               final Map<DateTime, List<PainFormData>> historyMap = userEntries.fold({}, (map, record) {
@@ -319,18 +344,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  // returns a list of days passed since first registered form for each submitted form
-  List<int> getDataX(List<PainFormData> data) {
-    DateTime dayOne = data.first.date;
-    DateTime dayOneAux = DateTime(dayOne.year, dayOne.month, dayOne.day); // 00:00:00 of each day (so that difference >= 24h)
-    List<int> days = [0];
-    for (var entry in data.skip(1)) {
-      DateTime entryDate = entry.date;
-      DateTime dateAux = DateTime(entryDate.year, entryDate.month, entryDate.day);
-
-      days.add(dateAux.difference(dayOneAux).inDays); // days elapsed between first registered form and this one
-    }
-    return days;
+  // returns a list of each entry's timestamp for the x-axis
+  List<double> getDataX(List<PainFormData> data) {
+    return data.map((entry) => entry.date.millisecondsSinceEpoch.toDouble()).toList();
   }
   
   // chart representing the evolution of 
@@ -349,30 +365,52 @@ class _HomePageScreenState extends State<HomePageScreen> {
     ascendingData.sort((a,b) => a.date.compareTo(b.date));
     final dataX = getDataX(ascendingData);
 
-    return ValueListenableBuilder<int>(
+    return ValueListenableBuilder<int?>(
       valueListenable: chartIntervalNotifier,
       builder: (context, chartIntervalMode, _) {
 
-        double maximumX = dataX.last.toDouble();
+        if (chartIntervalMode == null) {
+          return const Center(
+            child: Text(
+              "❌📋\nNão tem registos este mês.\nRegiste para ver progressão",
+              textAlign: TextAlign.center,
+              textScaler: TextScaler.linear(1.6),
+            ),
+          );
+        }
+
+        double maximumX = dataX.last;
         double minimumX = 0;
 
-        if (chartIntervalMode == 1) {
-          // last 7 days
-          minimumX = maximumX - 7;
-          if (minimumX < 0) minimumX = 0;
-        } else if (chartIntervalMode == 2) {
-          // last month
-          minimumX = maximumX - 30;
-          if (minimumX < 0) minimumX = 0;
+        final double oneHour = const Duration(hours: 1).inMilliseconds.toDouble();
+        final double oneDay = const Duration(days: 1).inMilliseconds.toDouble();
+
+        double strictInterval = oneDay * 7.5; // Default to 7.5 days for a Month
+
+        if (chartIntervalMode == 0) {
+          minimumX = maximumX - (oneDay * 30);
+          
+          minimumX = (minimumX / oneDay).floorToDouble() * oneDay;
+          maximumX = (maximumX / oneDay).ceilToDouble() * oneDay;
+        } 
+        else if (chartIntervalMode == 1) {
+          minimumX = maximumX - (oneDay * 7);
+          strictInterval = oneDay * 2; // step every 2 days
+          
+          minimumX = (minimumX / oneDay).floorToDouble() * oneDay;
+          maximumX = (maximumX / oneDay).ceilToDouble() * oneDay;
+        } 
+        else if (chartIntervalMode == 2) {
+          minimumX = maximumX - oneDay;
+          strictInterval = oneHour * 6; // step every 6 hours
+
+          minimumX = (minimumX / strictInterval).floorToDouble() * strictInterval;
+          maximumX = (maximumX / strictInterval).ceilToDouble() * strictInterval;
         }
 
         if (maximumX <= minimumX) {
           maximumX = minimumX + 1;
         }
-
-        double currentSpan = maximumX - minimumX;
-        double strictInterval = (currentSpan / 5).ceilToDouble();
-        if (strictInterval < 1) strictInterval = 1.0;
 
         return Column(
           children: [
@@ -380,21 +418,21 @@ class _HomePageScreenState extends State<HomePageScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 FilterChip(
-                  label: const Text("Tudo"),
+                  label: const Text("1 Mês"),
                   selected: chartIntervalMode == 0,
                   onSelected: (_) => chartIntervalNotifier.value = 0,
-                ),
-                const SizedBox(width: 8),
-                FilterChip(
-                  label: const Text("1 Mês"),
-                  selected: chartIntervalMode == 2,
-                  onSelected: (_) => chartIntervalNotifier.value = 2,
                 ),
                 const SizedBox(width: 8),
                 FilterChip(
                   label: const Text("7 Dias"),
                   selected: chartIntervalMode == 1,
                   onSelected: (_) => chartIntervalNotifier.value = 1,
+                ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: const Text("Últimas 24h"),
+                  selected: chartIntervalMode == 2,
+                  onSelected: (_) => chartIntervalNotifier.value = 2,
                 ),
               ],
             ),
@@ -436,10 +474,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         tooltipMargin: 30.0, // margin so that finger does not obstruct the information
                         getTooltipItems: (List<LineBarSpot> touchedSpots) {
                           return touchedSpots.map((LineBarSpot spot) {
-                            
-                            DateTime dayOne = ascendingData.first.date;
-                            DateTime d = dayOne.add(Duration(days: spot.x.toInt()));
-                            String dateString = DateFormat('d MMM', 'pt_PT').format(d);
+                            DateTime d = DateTime.fromMillisecondsSinceEpoch(spot.x.toInt());
+    
+                            String dateString = DateFormat('d MMM, HH:mm', 'pt_PT').format(d);
 
                             return LineTooltipItem(
                               'Dor: ${spot.y.toInt()}\n',
@@ -471,28 +508,34 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         sideTitles: SideTitles(
                           showTitles: true,
                           interval: strictInterval,
-                          reservedSize: 30,
+                          reservedSize: 34,
                           getTitlesWidget: (value, meta) {
-                            bool isGridStep = (value % strictInterval).abs() < 0.01 || 
-                                              (value % strictInterval - strictInterval).abs() < 0.01;
-        
-                            if (!isGridStep) {
-                              return const SizedBox.shrink(); // Instantly kill non-grid labels
+                            if (value < meta.min || value > meta.max) {
+                              return const SizedBox.shrink();
                             }
 
                             // bounds check as a final safety net
                             if (value < meta.min || value > meta.max) {
                               return const SizedBox.shrink();
                             }
-                            // Convert offset back to a Date
-                            DateTime dayOne = ascendingData.first.date;
-                            DateTime d = dayOne.add(Duration(days: value.toInt()));
+
+                            // Convert timestamp back to a Date
+                            DateTime d = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+
+                            String labelText;
+                            if (chartIntervalMode == 2) {
+                              // 24h view: show hours
+                              labelText = DateFormat('HH:mm').format(d);
+                            } else {
+                              // Week/Month view: view day
+                              labelText = DateFormat('dd/MM').format(d);
+                            }
                             
                             return SideTitleWidget(
                               meta: meta,
                               space: 8.0, // Proper spacing from the X-axis line
                               child: Text(
-                                DateFormat('dd/MM').format(d), 
+                                labelText, 
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: Theme.of(context).colorScheme.onSurfaceVariant,

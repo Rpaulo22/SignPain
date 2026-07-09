@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
@@ -111,36 +112,39 @@ class _PainDateScreenState extends State<PainDateScreen> {
 
   Future<void> _pickDateTime() async {
     // show the calendar
-    final DateTime? pickedDate = await showDatePicker(
+    await showCupertinoModalPopup(
       context: context,
-      initialDate: widget.formData.date,
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now(), // Prevent picking tomorrow
-      helpText: 'Selecione o dia da dor',
+      builder: (popupContext) => Container(
+        height: 300, 
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                CupertinoButton(
+                  child: const Text('Concluído'),
+                  onPressed: () => Navigator.of(popupContext).pop(),
+                )
+              ],
+            ),
+            Expanded(
+              child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.dateAndTime,
+                use24hFormat: true,
+                initialDateTime: widget.formData.date, 
+                // restrict it so they can't log pain in the future
+                maximumDate: DateTime.now(), 
+                onDateTimeChanged: (DateTime pickedDate) {
+                  setState(() {
+                    widget.formData.date = pickedDate;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      )
     );
-
-    if (pickedDate != null) {
-      if (!mounted) return;
-      
-      // show the clock
-      final TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(widget.formData.date),
-        helpText: 'Selecione a hora',
-      );
-
-      if (pickedTime != null) {
-        // update the time of the entry
-        setState(() {
-          widget.formData.date = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
-        });
-      }
-    }
   }
 }

@@ -140,6 +140,16 @@ class FormViewModel extends ChangeNotifier {
   }
 
   Future<void> updatePainForm(PainFormData formData) async {
+    final userID = FirebaseAuth.instance.currentUser?.uid;
+    if (userID == null) return;
+
+    final index = painRecords.indexWhere((entry) => entry.docID == formData.docID);
+    final entryBackup = painRecords[index];
+
+    // OPTIMISTIC UPDATE: update it in the local list instantly
+    painRecords[index] = formData;
+    notifyListeners();
+
     var db = FirebaseFirestore.instance;
 
     String frequency = painFrequencyToString(formData.frequency);
@@ -163,7 +173,10 @@ class FormViewModel extends ChangeNotifier {
       await userEntries.doc(formData.docID).update(formEntry);
     }
     catch (e) {
-      throw AppException("Erro a editar formulário. Tente novamente");
+      // If Firebase fails (e.g., no internet), put it back and show an error
+      painRecords[index] = entryBackup;
+      notifyListeners();
+      throw AppException("Erro a editar entrada. Tente novamente");
     }
   }
 }
