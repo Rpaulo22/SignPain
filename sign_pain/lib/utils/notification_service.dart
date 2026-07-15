@@ -7,6 +7,8 @@ class NotificationService {
   // fixed ID for rolling tracking reminder
   static const int rollingReminderId = 999;
 
+  static const int dailyReminderID = 998;
+
   Future<void> scheduleRollingPainReminder() async {
     // cancel any previously scheduled alarms
     await _notificationsPlugin.cancel(id: rollingReminderId);
@@ -44,6 +46,43 @@ class NotificationService {
         iOS: DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle
+    );
+  }
+
+  Future<void> scheduleDailyReminder() async {
+    // figure out what time 20:00 is today
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    tz.TZDateTime scheduledDate = tz.TZDateTime(
+      tz.local, 
+      now.year, 
+      now.month, 
+      now.day, 
+      20,
+      0,  
+    );
+
+    // if already past 20:00, notifications start tomorrow
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    await _notificationsPlugin.zonedSchedule(
+      id: dailyReminderID,
+      title: 'SignPain',
+      body: 'Como está a sua dor hoje? Registe em 1 minuto.',
+      scheduledDate: scheduledDate,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'daily_reminder_channel',
+          'Lembrete Diário',
+          icon: 'ic_stat_signpain',
+          importance: Importance.high,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexact,
+      
+      // tell OS to repeat everyday
+      matchDateTimeComponents: DateTimeComponents.time, 
     );
   }
 

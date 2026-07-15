@@ -53,6 +53,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<FormViewModel>().getUserPainData(FirebaseAuth.instance.currentUser!.uid);
       NotificationService().requestNotificationPermissions();
+      NotificationService().scheduleDailyReminder();
     });
     userDataFuture = accountViewModel.getUserData(FirebaseAuth.instance.currentUser!.uid);
   }
