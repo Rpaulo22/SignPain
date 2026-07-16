@@ -146,7 +146,7 @@ class _PainFrequencyScreenState extends State<PainFrequencyScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: StepIndicator(
                       currentStep: 4, // user is on page 4
-                      totalSteps: 5,  // of 5 pages total
+                      totalSteps: 6,  // of 6 pages total
                     ),
                   )
                 ),

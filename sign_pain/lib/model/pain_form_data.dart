@@ -10,13 +10,15 @@ class PainFormData {
   DateTime? updatedDate; // date of last update to form submission
   List<String> bodyParts = []; // body parts which the pain is inflicted on
   PainFrequency frequency = PainFrequency.none; // frequency of pain, e.g. continuous, intermitent
+  bool? tookMedication;
+  String? medicationNotes;
   String? docID; // ID of document in Firebase
   
-  PainFormData.fromForm(this.userID, this.descriptors, this.painLevel, this.date, this.bodyParts, this.frequency, this.docID, this.updatedDate);
+  PainFormData.fromForm(this.userID, this.descriptors, this.painLevel, this.date, this.bodyParts, this.frequency, this.tookMedication, this.medicationNotes, this.docID, this.updatedDate);
   PainFormData();
 
   // helper to check if the form is complete
-  bool get isComplete => painLevel != null && descriptors.isNotEmpty && bodyParts.isNotEmpty && frequency != PainFrequency.none;
+  bool get isComplete => painLevel != null && descriptors.isNotEmpty && bodyParts.isNotEmpty && frequency != PainFrequency.none && tookMedication != null;
 
   PainFormData copyWith({
     String? userID,
@@ -25,6 +27,8 @@ class PainFormData {
     DateTime? date,
     List<String>? bodyParts,
     PainFrequency? frequency,
+    bool? tookMedication,
+    String? medicationNotes,
     String? docID
   }) {
     return PainFormData.fromForm(
@@ -34,6 +38,8 @@ class PainFormData {
       date ?? this.date,
       bodyParts ?? List<String>.from(this.bodyParts),
       frequency ?? this.frequency,
+      tookMedication ?? this.tookMedication,
+      medicationNotes ?? this.medicationNotes,
       docID ?? this.docID,
       null // if user updates, this parameter is defined upon submitting it, it is useless now
     );

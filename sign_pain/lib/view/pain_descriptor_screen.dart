@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
+import 'package:sign_pain/view/pain_medication_screen.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'package:sign_pain/widgets/pain_frequency.dart';
 import 'package:sign_pain/widgets/step_indicator.dart';
@@ -151,29 +152,25 @@ class _PainDescriptorScreenState extends State<PainDescriptorScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: StepIndicator(
                       currentStep: 5, // user is on page 5
-                      totalSteps: 5,  // of 5 pages total
+                      totalSteps: 6,  // of 6 pages total
                     ),
                   )
                 ),
                 FloatingActionButton(
                   onPressed: () {
-                    if (widget.formData.isComplete) {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false, 
-                        useRootNavigator: true,
-                        builder: (BuildContext dialogContext) {
-                          // return the confirm dialog widget
-                          return confirmDialog(dialogContext);
-                        }
+                    if (widget.formData.descriptors.isNotEmpty) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                        builder: (context) => PainMedicationScreen(formData: widget.formData, editing: widget.editing),
+                        ),
                       );
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Por favor complete o formulário!")));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Por favor descreva a sua dor.")));
                     }
                   },
                   heroTag: 'btn_save',
                   tooltip: 'Save form',
-                  child: Icon(Icons.save),
+                  child: Icon(Icons.arrow_forward),
                 )
               ]
             )

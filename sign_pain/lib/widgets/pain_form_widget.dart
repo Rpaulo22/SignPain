@@ -75,7 +75,7 @@ class PainFormWidget extends StatelessWidget {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text("Registo de dor"),
+          title: const Center(child: Text("Registo de dor")),
           content: SizedBox(
             height: dialogHeight,
             width: dialogWidth,
@@ -186,8 +186,14 @@ class PainFormWidget extends StatelessWidget {
                       ]
                     ),
 
+                    SizedBox(height: 15),
+
+                    Text(
+                      '${data.tookMedication! ? '✅' : '❌'} Medicação \n${(data.medicationNotes != null && data.medicationNotes!.isNotEmpty) ? '"${data.medicationNotes}"' : ''}'
+                    ),
+
                     SizedBox(
-                      height:40
+                      height:10
                     ),
 
                     Row(

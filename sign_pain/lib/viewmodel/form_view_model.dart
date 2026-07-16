@@ -24,12 +24,17 @@ class FormViewModel extends ChangeNotifier {
     
     final formEntry = <String, dynamic>{
       "userID": formData.userID, 
-      "painIntensity": formData.painLevel,
+      "painIntensity": formData.painLevel, // no worries, can't reach here if null
       "descriptors": formData.descriptors.toList(),
       "bodyParts": formData.bodyParts,
       "date": formData.date,
-      "frequency": frequency
+      "frequency": frequency,
+      "tookMedication": formData.tookMedication, // no worries, can't reach here if null
     };
+
+    if (formData.medicationNotes != null && formData.medicationNotes!.isNotEmpty) {
+      formEntry.addAll({"medicationNotes": formData.medicationNotes!});
+    }
 
     final userEntries = db
       .collection('Users')
@@ -79,6 +84,8 @@ class FormViewModel extends ChangeNotifier {
         var descriptors = Set<String>.from(_data['descriptors'] ?? []);
         var painLevel = _data['painIntensity'] as int;
         var bodyParts = List<String>.from(_data['bodyParts'] ?? []);
+        var tookMedication = (_data['tookMedication'] ?? false) as bool;
+        var medicationNotes = _data['medicationNotes'] as String?;
         var frequencyString = _data['frequency'];
 
         PainFrequency frequency = PainFrequency.none;
@@ -99,7 +106,7 @@ class FormViewModel extends ChangeNotifier {
           }
         }
 
-        PainFormData painForm = PainFormData.fromForm(userID, descriptors, painLevel, date, bodyParts, frequency, id, updatedDate);
+        PainFormData painForm = PainFormData.fromForm(userID, descriptors, painLevel, date, bodyParts, frequency, tookMedication, medicationNotes, id, updatedDate);
         data.add(painForm);
       }
     _painRecords = data;
@@ -156,14 +163,19 @@ class FormViewModel extends ChangeNotifier {
     
     final formEntry = <String, dynamic>{
       "userID": formData.userID, 
-      "painIntensity": formData.painLevel,
+      "painIntensity": formData.painLevel, // no worries, can't reach here if null
       "descriptors": formData.descriptors.toList(),
       "bodyParts": formData.bodyParts,
       "date": formData.date,
       "updatedDate": DateTime.now(),
-      "frequency": frequency
+      "frequency": frequency,
+      "tookMedication": formData.tookMedication, // no worries, can't reach here if null
     };
 
+    if (formData.medicationNotes != null && formData.medicationNotes!.isNotEmpty) {
+      formEntry.addAll({"medicationNotes": formData.medicationNotes!});
+    }
+  
     try {
       final userEntries = db
         .collection('Users')
@@ -176,7 +188,7 @@ class FormViewModel extends ChangeNotifier {
       // If Firebase fails (e.g., no internet), put it back and show an error
       painRecords[index] = entryBackup;
       notifyListeners();
-      throw AppException("Erro a editar entrada. Tente novamente");
+      throw AppException("Erro a editar registo. Tente novamente");
     }
   }
 }
