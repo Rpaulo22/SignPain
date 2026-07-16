@@ -27,11 +27,11 @@ class PdfService {
 
     // Sort records chronologically
     final descendingRecords = List<PainFormData>.from(records)
-      ..sort((a, b) => b.date!.compareTo(a.date!));
+      ..sort((a, b) => b.date.compareTo(a.date));
     
     final mostRecentRecords = descendingRecords.length > maxEntries ? descendingRecords.getRange(0, maxEntries).toList() : descendingRecords; // limit records to the most recent maxEntries entries
 
-    final ascendingRecords = List<PainFormData>.from(records)..sort((a,b) => a.date!.compareTo(b.date!)); // inverted chronological order
+    final ascendingRecords = List<PainFormData>.from(records)..sort((a,b) => a.date.compareTo(b.date)); // inverted chronological order
 
 
     // build the pdf Layout
@@ -79,7 +79,11 @@ class PdfService {
         ),
         pw.Text(
           'Nº de utente SNS: ${user.healthIdentifer}',
-          style: pw.TextStyle(fontSize: 20),
+          style: pw.TextStyle(fontSize: 16, color: PdfColors.grey800),
+        ),
+        pw.Text(
+          'Data de nascimento: ${DateFormat("dd/MM/yyyy").format(user.birthDate)}',
+          style: pw.TextStyle(fontSize: 16, color: PdfColors.grey800),
         ),
         pw.Text(
           'Gerado a: ${DateFormat('dd/MM/yyyy').format(DateTime.now())}',
@@ -115,7 +119,7 @@ class PdfService {
       headers: ['Data', 'Nível de Dor', 'Área Afetada', 'Frequência', 'Descrição'],
       data: records.map((record) {
         return [
-          DateFormat('dd/MM/yyyy').format(record.date!),
+          DateFormat('dd/MM/yyyy').format(record.date),
           record.painLevel.toString(),
           BodyPartsMapper.listToPortuguese(record.bodyParts).join(", "),
           painFrequencyToStringPT(record.frequency),
@@ -138,14 +142,14 @@ class PdfService {
     final int maxDays = dataX.isNotEmpty ? dataX.last : 0;
 
     // date of the most recent entry
-    final DateTime lastEntryDate = records.last.date!;
+    final DateTime lastEntryDate = records.last.date;
     
     // date 30 days before that
     final DateTime thirtyDaysAgo = lastEntryDate.subtract(const Duration(days: 30));
     
     // filtered list of records in last 30 days
     final List<PainFormData> recentRecords = records.where((entry) {
-      return entry.date!.isAfter(thirtyDaysAgo) || entry.date!.isAtSameMomentAs(thirtyDaysAgo);
+      return entry.date.isAfter(thirtyDaysAgo) || entry.date.isAtSameMomentAs(thirtyDaysAgo);
     }).toList();
 
     return pw.Inseparable(
@@ -169,7 +173,7 @@ class PdfService {
     // Calculate limits specifically for this subset of records
     final dataX = getDataX(chartRecords);
     final int maxDays = dataX.isNotEmpty ? dataX.last : 0;
-    final DateTime dayOne = chartRecords.first.date!;
+    final DateTime dayOne = chartRecords.first.date;
     final int labelStep = maxDays > 6 ? (maxDays / 5).ceil() : 1;
 
     return pw.Inseparable(
@@ -213,11 +217,11 @@ class PdfService {
 
   // returns a list of days passed since first registered form for each submitted form
   static List<int> getDataX(List<PainFormData> data) {
-    DateTime dayOne = data.first.date!;
+    DateTime dayOne = data.first.date;
     DateTime dayOneAux = DateTime(dayOne.year, dayOne.month, dayOne.day); // 00:00:00 of each day (so that difference >= 24h)
     List<int> days = [0];
     for (var entry in data.skip(1)) {
-      DateTime entryDate = entry.date!;
+      DateTime entryDate = entry.date;
       DateTime dateAux = DateTime(entryDate.year, entryDate.month, entryDate.day);
 
       days.add(dateAux.difference(dayOneAux).inDays); // days elapsed between first registered form and this one

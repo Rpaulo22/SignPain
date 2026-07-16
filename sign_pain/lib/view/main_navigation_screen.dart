@@ -52,6 +52,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: SizedBox(), // placeholder to avoid 'go back' button
         centerTitle: true,
 				title: Text("SignPain"),
         actions: [
