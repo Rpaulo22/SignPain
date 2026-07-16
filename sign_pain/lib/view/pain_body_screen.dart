@@ -32,6 +32,7 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     
     return PopScope(
       // Tell Flutter not to pop the screen automatically
@@ -49,6 +50,67 @@ class _PainBodyScreenState extends State<PainBodyScreen> {
 
       child: Scaffold(
         floatingActionButtonLocation: .centerFloat,
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                useRootNavigator: true,
+                builder: (BuildContext dialogContext) {
+                  return Dialog(  
+                    child: SizedBox(
+                      height: size.height*0.25,
+                      child: Padding(
+                        padding: EdgeInsetsGeometry.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            const Text('Cancelar registo da dor?', style: TextStyle(fontSize: 20, fontWeight: .bold)),
+                            const Text('Irá perder estes dados.', style: TextStyle(fontSize: 18)),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(dialogContext);
+                                  },
+                                  child: Text(
+                                    'Continuar',
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface,
+                                      fontSize: 14
+                                    )
+                                  )
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
+                                  },
+                                  child: const Text(
+                                    'Sair',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 14
+                                    )
+                                  )
+                                ),
+                              ]
+                            ),
+                          ],
+                        ),
+                      )
+                    )
+                  );
+                }
+              );
+            },
+            icon: Icon(Icons.close)  
+          ),
+          title: Text("Registo de dor"),
+          centerTitle: true,
+          elevation: 4
+        ),
         body: Padding(
           padding: EdgeInsetsGeometry.directional(start: 20, end: 20, top: 10, bottom: 50),
           child: Column(

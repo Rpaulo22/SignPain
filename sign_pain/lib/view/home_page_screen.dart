@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/model/user_data.dart';
+import 'package:sign_pain/theme/app_colors.dart';
 import 'package:sign_pain/utils/notification_service.dart';
 import 'package:sign_pain/utils/pdf_service.dart';
 import 'package:sign_pain/view/pain_date_screen.dart';
@@ -120,55 +121,27 @@ class _HomePageScreenState extends State<HomePageScreen> {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               return const Center(child: CircularProgressIndicator());
                             } else {
-                              return Column(
-                                children: [
-                                  // user name text
-                                  RichText( 
-                                    textAlign: TextAlign.center,
-                                    text: TextSpan(
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onSurface,
-                                      ),
-                                      children: <TextSpan>[
-                                        const TextSpan(
-                                          text: '👋\nOlá ',
-                                          style: TextStyle(fontSize: 26),
-                                        ),
-                                        TextSpan(
-                                          text: snapshot.data!.fullName,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold, 
-                                            fontSize: 26,
-                                            color: Color.fromARGB(255, 233, 129, 64)
-                                          ),
-                                        )
-                                      ],
-                                    ),
+                              return RichText( 
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurface,
                                   ),
-                                  // health identifier text
-                                  RichText(
-                                    textAlign: TextAlign.center,
-                                    text: TextSpan(
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onSurface,
-                                      ),
-                                      children: <TextSpan>[
-                                        const TextSpan(
-                                          text: 'Nº de utente ',
-                                          style: TextStyle(fontSize: 22),
-                                        ),
-                                        TextSpan(
-                                          text: snapshot.data!.healthIdentifer,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold, 
-                                            fontSize: 22,
-                                            color: Color.fromARGB(255, 233, 129, 64)
-                                          ),
-                                        )
-                                      ],
+                                  children: <TextSpan>[
+                                    const TextSpan(
+                                      text: '👋\nOlá ',
+                                      style: TextStyle(fontSize: 26),
                                     ),
-                                  ),
-                                ]
+                                    TextSpan(
+                                      text: snapshot.data!.fullName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold, 
+                                        fontSize: 26,
+                                        color: AppColors.primaryOrange
+                                      ),
+                                    )
+                                  ],
+                                ),
                               );
                             }
                           },
@@ -187,7 +160,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.of(context).push(
+                          Navigator.of(context, rootNavigator: true).push(
                             MaterialPageRoute(
                               builder: (context) => PainDateScreen(formData: PainFormData()),
                             ),
@@ -458,7 +431,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                               ascendingData[i].painLevel!.toDouble(),
                             )
                         ],
-                        color: Color.fromARGB(255, 233, 129, 64),
+                        color: AppColors.primaryOrange,
                         barWidth: 4,
                         isStrokeCapRound: true,
                         dotData: const FlDotData(show: false),
@@ -470,7 +443,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     // When user taps a point
                     lineTouchData: LineTouchData( 
                       touchTooltipData: LineTouchTooltipData(
-                        getTooltipColor: (LineBarSpot touchedSpot) => Color.fromARGB(255, 233, 129, 64),
+                        getTooltipColor: (LineBarSpot touchedSpot) => AppColors.primaryOrange,
                         tooltipPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                         tooltipMargin: 30.0, // margin so that finger does not obstruct the information
                         getTooltipItems: (List<LineBarSpot> touchedSpots) {

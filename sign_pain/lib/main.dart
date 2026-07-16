@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:sign_pain/theme/app_colors.dart';
 import 'package:sign_pain/utils/theme_controller.dart';
 import 'package:sign_pain/view/login_screen.dart';
 import 'package:sign_pain/view/main_navigation_screen.dart';
@@ -69,18 +70,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'SignPain',
       theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: const Color.fromARGB(255, 233, 129, 64), brightness: .light),
+        colorScheme: .fromSeed(seedColor: AppColors.primaryOrange, brightness: .light),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
-          foregroundColor: Color.fromARGB(255, 233, 129, 64),
+          foregroundColor: AppColors.primaryOrange,
         ),
         brightness: .light
       ),
       darkTheme: ThemeData(
-        colorScheme: .fromSeed(seedColor: const Color.fromARGB(255, 233, 129, 64), brightness: .dark),
+        colorScheme: .fromSeed(seedColor: AppColors.primaryOrange, brightness: .dark),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.black,
-          foregroundColor: Color.fromARGB(255, 233, 129, 64)
+          foregroundColor: AppColors.primaryOrange
         ),
       ),
 
@@ -133,23 +134,23 @@ class MyApp extends StatelessWidget {
               data: isDark
                   ? ThemeData(
                       colorScheme: ColorScheme.fromSeed(
-                        seedColor: const Color.fromARGB(255, 233, 129, 64), 
+                        seedColor: AppColors.primaryOrange, 
                         brightness: Brightness.dark,
                       ),
                       appBarTheme: const AppBarTheme(
                         backgroundColor: Colors.black,
-                        foregroundColor: Color.fromARGB(255, 233, 129, 64),
+                        foregroundColor: AppColors.primaryOrange,
                       ),
                       brightness: Brightness.dark,
                     )
                   : ThemeData(
                       colorScheme: ColorScheme.fromSeed(
-                        seedColor: const Color.fromARGB(255, 233, 129, 64), 
+                        seedColor: AppColors.primaryOrange, 
                         brightness: Brightness.light,
                       ),
                       appBarTheme: const AppBarTheme(
                         backgroundColor: Colors.white,
-                        foregroundColor: Color.fromARGB(255, 233, 129, 64),
+                        foregroundColor: AppColors.primaryOrange,
                       ),
                       brightness: Brightness.light,
                     ),

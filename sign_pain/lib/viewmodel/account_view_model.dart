@@ -27,15 +27,19 @@ class AccountViewModel extends ChangeNotifier{
 
         final name = data['name'] as String;
         final email = data['email'] as String;
-        final medicalConditions = List<String>.from(data['medicalConditions'] ?? []);
         final healthIdentifer = data['healthIdentifier'] ?? "111111111";
-      
-        return UserData(email: email, fullName: name, medicalConditions: medicalConditions, healthIdentifer: healthIdentifer);
+
+        final timestamp = data['birthDate'];
+        final DateTime birthDate = (timestamp is Timestamp) 
+            ? timestamp.toDate() 
+            : DateTime(2000, 1, 1);
+              
+        return UserData(email: email, fullName: name, healthIdentifer: healthIdentifer, birthDate: birthDate);
       }
-      return UserData(email: "", fullName: "Utilizador", healthIdentifer: "111111111", medicalConditions: []);
+      return UserData(email: "", fullName: "Utilizador", healthIdentifer: "111111111", birthDate: DateTime(2000, 1, 1));
 
     } catch (e) { // could not retrieve user info
-      return UserData(email: "", fullName: "Utilizador", healthIdentifer: "111111111", medicalConditions: []);
+      return UserData(email: "", fullName: "Utilizador", healthIdentifer: "111111111", birthDate: DateTime(2000, 1, 1));
     }
   }
 

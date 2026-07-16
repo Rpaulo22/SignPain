@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_pain/core/providers/sign_language_provider.dart';
+import 'package:sign_pain/theme/app_colors.dart';
 import 'package:sign_pain/view/home_page_screen.dart';
 import 'package:sign_pain/view/communication_screen.dart';
-import 'package:sign_pain/view/login_screen.dart';
 import 'package:sign_pain/view/pain_info_screen.dart';
 import 'package:sign_pain/view/settings_screen.dart';
-import 'package:sign_pain/viewmodel/account_view_model.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -34,8 +33,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     final isSignMode = Provider.of<SignLanguageProvider>(context).isSignLanguageMode;
 
-    final accountViewModel = AccountViewModel();
-
     // list of screens that you navigate between
     final List<Widget> pages = [
       KeepAliveTabWrapper(
@@ -55,55 +52,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        // logout option on top
-        leading: IconButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  actionsAlignment: MainAxisAlignment.spaceBetween,
-                  title: const Text("Terminar Sessão", textAlign: TextAlign.center),
-                  content: const Text("Tem a certeza que deseja sair da sua conta?", textAlign: TextAlign.center),
-                  actions: [
-                    // Cancel Button
-                    TextButton(
-                      onPressed: () => Navigator.pop(context), 
-                      child: const Text("Cancelar"),
-                    ),
-                    // Confirm Button
-                    TextButton(
-                      onPressed: () async {
-                        // Close the dialog first
-                        Navigator.pop(context); 
-
-                        try {
-                          await accountViewModel.signOutUser();
-
-                          if (!context.mounted) return;
-
-                          // Send user back to Login
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const LoginScreen()),
-                          );
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')))
-                          );
-                        }
-                      },
-                      child: const Text(
-                        "Sair", 
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          }, 
-          icon: Icon(Icons.logout)),
         centerTitle: true,
 				title: Text("SignPain"),
         actions: [
@@ -163,22 +111,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Início',
-              backgroundColor: Color.fromARGB(255, 233, 129, 64),
+              backgroundColor: AppColors.primaryOrange,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.interpreter_mode),
               label: 'Comunicar',
-              backgroundColor: Color.fromARGB(255, 233, 129, 64),
+              backgroundColor: AppColors.primaryOrange,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.medical_information),
               label: 'Info. Dor',
-              backgroundColor: Color.fromARGB(255, 233, 129, 64),
+              backgroundColor: AppColors.primaryOrange,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),
               label: 'Definições',
-              backgroundColor: Color.fromARGB(255, 233, 129, 64),
+              backgroundColor: AppColors.primaryOrange,
             ),
           ],
         ),
