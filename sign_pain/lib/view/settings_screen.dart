@@ -162,26 +162,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             SizedBox(height: 20),
                             TextButton(
                               onPressed: () async {
-                                // Close the dialog first
-                                Navigator.pop(context); 
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      actionsAlignment: MainAxisAlignment.spaceBetween,
+                                      title: const Text("Terminar Sessão", textAlign: TextAlign.center),
+                                      content: const Text("Tem a certeza que deseja sair da sua conta?", textAlign: TextAlign.center),
+                                      actions: [
+                                        // Cancel Button
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context), 
+                                          child: const Text("Cancelar"),
+                                        ),
+                                        // Confirm Button
+                                        TextButton(
+                                          onPressed: () async {
+                                            // Close the dialog first
+                                            Navigator.pop(context); 
 
-                                try {
-                                  await accountViewModel.signOutUser();
+                                            try {
+                                              await accountViewModel.signOutUser();
 
-                                  if (!context.mounted) return;
+                                              if (!context.mounted) return;
 
-                                  // Send user back to Login
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => const LoginScreen()),
-                                  );
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')))
-                                  );
-                                }
-                              },
-                              
+                                              // Send user back to Login
+                                              Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                                              );
+                                            } catch (e) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')))
+                                              );
+                                            }
+                                          },
+                                          child: const Text(
+                                            "Sair", 
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },               
                               child: Text("Terminar sessão", style: TextStyle(color: Colors.redAccent))
                             )
                           ]
