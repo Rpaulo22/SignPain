@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_pain/model/user_data.dart';
 import 'package:sign_pain/utils/app_exception.dart';
@@ -134,7 +135,7 @@ class AccountViewModel extends ChangeNotifier{
 
   // Given a new user's information (email, phone number, password and name), attempts to create a new account
   // and asks for verification of phone number. If it is verified, it then logs in user
-  Future<void> createUser(String emailAddress, String phoneNumber, String password, String name, String healthIdentifer) async {
+  Future<void> createUser(String emailAddress, String phoneNumber, String password, String name, String healthIdentifer, DateTime? birthDate) async {
     var hasNumber = true;
 
     // allows the app to display loading circle
@@ -163,6 +164,11 @@ class AccountViewModel extends ChangeNotifier{
       hasNumber = false;
     }
     // if (healthIdentifer) ADD check for correctness
+    if (birthDate == null) {
+      isLoading = false;
+      notifyListeners();
+      throw AppException("Por favor indique o seu dia de nascimento");
+    }
 
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -178,7 +184,8 @@ class AccountViewModel extends ChangeNotifier{
         'createdAt': DateTime.now(),
         'phoneVerified': false,
         'medicalConditions': [],
-        'healthIdentifier': healthIdentifer
+        'healthIdentifier': healthIdentifer,
+        'birthDate': birthDate
       };
 
       if (hasNumber) userMap['phoneNumber'] = phoneNumber; 
