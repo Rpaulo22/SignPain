@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/model/user_data.dart';
+import 'package:sign_pain/utils/app_exception.dart';
 import 'package:sign_pain/widgets/pain_frequency.dart';
 
 const maxEntries = 20;
@@ -13,8 +14,16 @@ const maxEntries = 20;
 class PdfService {
 
   
-  // function which generates a pdf report of the user's pain records and allows the user to share it
-  static Future<File> generateAndSharePainReport(List<PainFormData> records, UserData user) async {
+  // function which generates a pdf report of the user's pain records and a time interval and allows the user to share it
+  static Future<File> generateAndSharePainReport(List<PainFormData> records, UserData user, DateTime firstDay, DateTime lastDay) async {
+
+    // only shares info within the specified interval (until 23:59 on the last day)
+    final intervalRecords = records.where((entry) => (entry.date.isAfter(firstDay) && entry.date.isBefore(lastDay.add(Duration(hours: 23, minutes: 59, seconds: 59, milliseconds: 999))))).toList();
+
+    if (intervalRecords.length < 2) {
+      throw AppException("não há registos suficientes neste intervalo de tempo.");
+    }
+
     final pdf = pw.Document();
 
     final regularFontData = await rootBundle.load("assets/fonts/Roboto-Regular.ttf");
@@ -26,12 +35,12 @@ class PdfService {
     final robotoItalic = pw.Font.ttf(italicFontData);
 
     // Sort records chronologically
-    final descendingRecords = List<PainFormData>.from(records)
+    final descendingRecords = List<PainFormData>.from(intervalRecords)
       ..sort((a, b) => b.date.compareTo(a.date));
     
     final mostRecentRecords = descendingRecords.length > maxEntries ? descendingRecords.getRange(0, maxEntries).toList() : descendingRecords; // limit records to the most recent maxEntries entries
 
-    final ascendingRecords = List<PainFormData>.from(records)..sort((a,b) => a.date.compareTo(b.date)); // inverted chronological order
+    final ascendingRecords = List<PainFormData>.from(intervalRecords)..sort((a,b) => a.date.compareTo(b.date)); // inverted chronological order
 
 
     // build the pdf Layout

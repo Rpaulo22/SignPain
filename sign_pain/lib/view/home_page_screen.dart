@@ -3,16 +3,15 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/model/user_data.dart';
 import 'package:sign_pain/theme/app_colors.dart';
 import 'package:sign_pain/utils/notification_service.dart';
-import 'package:sign_pain/utils/pdf_service.dart';
 import 'package:sign_pain/view/pain_date_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
 import 'package:sign_pain/viewmodel/form_view_model.dart';
 import 'package:sign_pain/widgets/pain_form_widget.dart';
+import 'package:sign_pain/widgets/report_dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomePageScreen extends StatefulWidget {
@@ -245,48 +244,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
                             ),
                             onPressed: () async {
                               if (snapshot.hasData) { // only create report after user's name has been loaded
-                                BuildContext? dialogContext;
-                                // Show a loading indicator
+                                final user = snapshot.data!;
                                 showDialog(
                                   context: context, 
-                                  barrierDismissible: false,
-                                  builder: (BuildContext innerContext) {
-                                    // Capture the distinct build context of the dialog itself  
-                                    dialogContext = innerContext; 
-                                    return const Center(child: CircularProgressIndicator());
-                                  }
+                                  builder: (context) => ReportDialog(user: user, userEntries: userEntries)
                                 );
-                              
-                                try {
-                                  // Generate and share pdf
-                                  final file = await PdfService.generateAndSharePainReport(userEntries, snapshot.data!);
-
-                                  if (!context.mounted) return;
-
-                                  if (dialogContext != null && dialogContext!.mounted) {
-                                    Navigator.pop(dialogContext!);
-                                    dialogContext = null; // Clear the handle so the finally block doesn't double-pop
-                                  }
-
-                                  // trigger the share pop up
-                                  await SharePlus.instance.share(
-                                    ShareParams(
-                                      files: [XFile(file.path)],
-                                      text: 'Aqui está o meu relatório de dor exportado do SignPain.'
-                                    )
-                                  );
-
-                                } catch (e) {
-                                  if (context.mounted) { 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Erro ao gerar resumo: $e"))
-                                    );
-                                  }
-                                } finally {
-                                  if (dialogContext != null && dialogContext!.mounted) {
-                                    Navigator.pop(dialogContext!);
-                                  }
-                                }
                               }
                               else {
                                 ScaffoldMessenger.of(context).showSnackBar(

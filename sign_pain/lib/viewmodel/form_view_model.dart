@@ -5,7 +5,7 @@ import 'package:sign_pain/model/pain_form_data.dart';
 import 'package:sign_pain/utils/app_exception.dart';
 import 'package:sign_pain/utils/notification_service.dart';
 import 'package:sign_pain/widgets/pain_frequency.dart';
-
+import 'package:collection/collection.dart';
 
 class FormViewModel extends ChangeNotifier {
 
@@ -46,7 +46,11 @@ class FormViewModel extends ChangeNotifier {
       final DocumentReference docRef = await userEntries.add(formEntry);
       formData.docID = docRef.id;
 
-      painRecords.add(formData);
+      insertInOrder(
+        painRecords, 
+        formData, 
+        (a, b) => b.date.compareTo(a.date), 
+      );
       notifyListeners();
 
       await NotificationService().scheduleRollingPainReminder();
@@ -190,5 +194,19 @@ class FormViewModel extends ChangeNotifier {
       notifyListeners();
       throw AppException("Erro a editar registo. Tente novamente");
     }
+  }
+
+  // function to insert a new item in a sorted list
+  void insertInOrder<T>(List<T> list, T newItem, int Function(T a, T b) compare) {
+    // Finds the index where newItem should go using Binary Search
+    int index = binarySearch(list, newItem, compare: compare);
+
+    // If the item isn't in the list, binarySearch returns a negative bitwise index:
+    // ~index gives you the exact insertion point to maintain sorted order!
+    if (index < 0) {
+      index = ~index;
+    }
+
+    list.insert(index, newItem);
   }
 }
