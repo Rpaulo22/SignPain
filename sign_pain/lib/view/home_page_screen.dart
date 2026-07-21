@@ -315,38 +315,28 @@ class _HomePageScreenState extends State<HomePageScreen> {
           );
         }
 
-        double maximumX = dataX.last;
-        double minimumX = 0;
-
-        final double oneHour = const Duration(hours: 1).inMilliseconds.toDouble();
+        // chart ends at current time
+        final double maximumX = DateTime.now().millisecondsSinceEpoch.toDouble();
+        
+        double minimumX;
         final double oneDay = const Duration(days: 1).inMilliseconds.toDouble();
-
-        double strictInterval = oneDay * 7.5; // Default to 7.5 days for a Month
-
+        
         if (chartIntervalMode == 0) {
-          minimumX = maximumX - (oneDay * 30);
-          
-          minimumX = (minimumX / oneDay).floorToDouble() * oneDay;
-          maximumX += oneHour * 12;
-        } 
-        else if (chartIntervalMode == 1) {
-          minimumX = maximumX - (oneDay * 7);
-          strictInterval = oneDay * 2; // step every 2 days
-          
-          minimumX = (minimumX / oneDay).floorToDouble() * oneDay;
-          maximumX += oneHour * 6;
-        } 
-        else if (chartIntervalMode == 2) {
-          minimumX = maximumX - oneDay;
-          strictInterval = oneHour * 8; // step every 8 hours
-
-          minimumX = (minimumX / strictInterval).floorToDouble() * strictInterval;
-          maximumX += oneHour;
+          minimumX = maximumX - (oneDay * 30); // 1 Month
+        } else if (chartIntervalMode == 1) {
+          minimumX = maximumX - (oneDay * 7);  // 7 Days
+        } else {
+          minimumX = maximumX - oneDay;        // 24 Hours
         }
 
-        if (maximumX <= minimumX) {
-          maximumX = minimumX + 1;
-        }
+        // Failsafe if data is totally broken
+        if (maximumX <= minimumX) minimumX = maximumX - 1;
+
+        // how much time the chart covers in total
+        final double timeSpan = maximumX - minimumX;
+        
+        // Tell the chart to naturally divide that space into roughly 5-6 points
+        final double dynamicInterval = timeSpan / 5; 
 
         return Column(
           children: [
@@ -372,7 +362,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Expanded(
               child: AspectRatio(
                 aspectRatio: 1.5,
@@ -383,7 +373,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     minX: minimumX,
                     maxX: maximumX,
                     
-                    // the data being ilustrated
                     lineBarsData: [
                       LineChartBarData(
                         spots: [
@@ -396,26 +385,64 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         color: AppColors.primaryOrange,
                         barWidth: 4,
                         isStrokeCapRound: true,
-                        dotData: const FlDotData(show: false),
+                        dotData: FlDotData(
+                          show: true,
+                          checkToShowDot: (spot, barData) {
+                            // Find the original entry that matches this spot's X coordinate
+                            final entry = ascendingData.firstWhere(
+                              (e) => e.date.millisecondsSinceEpoch.toDouble() == spot.x,
+                            );
+                            // Only show the dot if they took medication
+                            return entry.tookMedication == true; 
+                          },
+                          getDotPainter: (spot, percent, barData, index) {
+                            return FlDotCirclePainter(
+                              radius: 6,
+                              color: Colors.cyanAccent,
+                              strokeWidth: 3,
+                              strokeColor: Theme.of(context).colorScheme.surface,
+                            );
+                          },
+                        ),
                         isCurved: true,
-                        curveSmoothness: 0.05
+                        curveSmoothness: 0.05,
                       ),
                     ],
+
+                    // dotted lines which appear with entries where the user took medication
+                    extraLinesData: ExtraLinesData(
+                      verticalLines: [
+                        for (var entry in ascendingData)
+                          if (entry.tookMedication == true)
+                            VerticalLine(
+                              x: entry.date.millisecondsSinceEpoch.toDouble(),
+                              color: Colors.cyanAccent,
+                              strokeWidth: 1.5,
+                              dashArray: [5, 5],
+                            ),
+                      ],
+                    ),
                     
-                    // When user taps a point
                     lineTouchData: LineTouchData( 
                       touchTooltipData: LineTouchTooltipData(
                         getTooltipColor: (LineBarSpot touchedSpot) => AppColors.primaryOrange,
                         tooltipPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                        tooltipMargin: 30.0, // margin so that finger does not obstruct the information
+                        tooltipMargin: 30.0,
                         getTooltipItems: (List<LineBarSpot> touchedSpots) {
                           return touchedSpots.map((LineBarSpot spot) {
                             DateTime d = DateTime.fromMillisecondsSinceEpoch(spot.x.toInt());
-    
                             String dateString = DateFormat('d MMM, HH:mm', 'pt_PT').format(d);
 
+                            // entry corresponding to spot
+                            final entry = ascendingData.firstWhere(
+                              (e) => e.date.millisecondsSinceEpoch.toDouble() == spot.x,
+                            );
+
+                            // add medication info if true
+                            String medText = (entry.tookMedication == true) ? "\n💊 ${(entry.medicationNotes != null) ? entry.medicationNotes : "Medicação"}" : "";
+
                             return LineTooltipItem(
-                              'Dor: ${spot.y.toInt()}\n',
+                              'Dor: ${spot.y.toInt()}$medText\n',
                               TextStyle(
                                 color: Theme.of(context).colorScheme.onPrimary,
                                 fontWeight: FontWeight.bold,
@@ -438,40 +465,32 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     ),
                     
                     titlesData: FlTitlesData(
-                      
-                      // Bottom X-Axis: Show the dates
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
-                          interval: strictInterval,
-                          reservedSize: 40,
+                          interval: dynamicInterval,
+                          reservedSize: 45, // tiny bit more room for the 2-line text
                           getTitlesWidget: (value, meta) {
-                            if (value < meta.min || value > meta.max) {
+                            // Don't draw the very first and last label if they touch the edges
+                            if (value == meta.min || value == meta.max) {
                               return const SizedBox.shrink();
                             }
 
-                            // bounds check as a final safety net
-                            if (value < meta.min || value > meta.max) {
-                              return const SizedBox.shrink();
-                            }
-
-                            // Convert timestamp back to a Date
                             DateTime d = DateTime.fromMillisecondsSinceEpoch(value.toInt());
 
                             String labelText;
                             if (chartIntervalMode == 2) {
-                              // 24h view: show hours
                               labelText = DateFormat('HH:mm\ndd/MM').format(d);
                             } else {
-                              // Week/Month view: view day
                               labelText = DateFormat('dd/MM').format(d);
                             }
                             
                             return SideTitleWidget(
                               meta: meta,
-                              space: 8.0, // Proper spacing from the X-axis line
+                              space: 10.0, 
                               child: Text(
                                 labelText, 
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -482,25 +501,20 @@ class _HomePageScreenState extends State<HomePageScreen> {
                           },
                         ),
                       ),
-                                                        
-                      // Left Y-Axis: Pain levels
-                      leftTitles: AxisTitles(
+                                              
+                      leftTitles: const AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
-                          interval: 2, // Show a label every 2 levels (2, 4, 6...)
-                          reservedSize: 30, // Give the text enough room
+                          interval: 2, 
+                          reservedSize: 30, 
                         ),
                       ),
-                      
-                      // Hide the top and right titles for a cleaner look
                       topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                       rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     ),
                     
                     gridData: const FlGridData(show: false),
-
                     clipData: const FlClipData.all(),
-
                     borderData: FlBorderData(
                       show: true,
                       border: Border(
