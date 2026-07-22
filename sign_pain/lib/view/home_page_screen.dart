@@ -560,6 +560,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         if (selectedDay != null) {
           final normalizedDate = DateTime.utc(selectedDay.year, selectedDay.month, selectedDay.day);
           dayPainList = historyMap[normalizedDate] ?? [];
+          dayPainList.sort((a,b) => a.date.compareTo(b.date));
         }
 
         return Column(

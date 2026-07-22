@@ -11,6 +11,8 @@ import 'package:sign_pain/widgets/pain_frequency.dart';
 
 const maxEntries = 20;
 
+enum ChartIntervalMode {allRecords, lastMonthRecords, lastDayRecords}
+
 class PdfService {
 
   
@@ -58,7 +60,7 @@ class PdfService {
 
         build: (pw.Context context) {
           return [
-            _buildHeader(user),
+            _buildHeader(user, firstDay, lastDay),
             pw.SizedBox(height: 20),
             _buildSummary(descendingRecords),
             pw.SizedBox(height: 20),
@@ -78,13 +80,17 @@ class PdfService {
 
   // --- PDF WIDGET BUILDERS ---
 
-  static pw.Widget _buildHeader(UserData user) {
+  static pw.Widget _buildHeader(UserData user, DateTime firstDay, DateTime lastDay) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
           'Relatório de Dor SignPain - ${user.fullName}',
           style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+        ),
+        pw.Text(
+          'Entre ${DateFormat("d MMM", 'pt_PT').format(firstDay)} e ${DateFormat("d MMM", 'pt_PT').format(lastDay)}',
+          style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
         ),
         pw.Text(
           'Nº de utente SNS: ${user.healthIdentifer}',
@@ -165,6 +171,7 @@ class PdfService {
     }).toList();
 
     final bool isLongerThanOneMonth = recentRecords.length < records.length;
+    final bool hasRecordsLastDay = lastDayRecords.length > 1;
 
     return pw.Column(
       children: [
@@ -173,17 +180,17 @@ class PdfService {
         _buildChartWidget("Todo o histórico (${DateFormat("dd/MM/yyyy").format(firstDay)} - ${DateFormat("dd/MM/yyyy").format(lastDay)})", records),
         if (isLongerThanOneMonth && recentRecords.length > 1) ...[
           pw.SizedBox(height: 30), 
-          _buildChartWidget("Últimos 30 Dias (${DateFormat("dd/MM").format(thirtyDaysAgo)} - ${DateFormat("dd/MM").format(lastDay)})", recentRecords),
+          _buildChartWidget("Últimos 30 Dias (${DateFormat("dd/MM").format(thirtyDaysAgo)} - ${DateFormat("dd/MM").format(lastDay)})", recentRecords, mode: .lastMonthRecords),
         ],
-        if (lastDayRecords.length > 2) ... [
+        if (hasRecordsLastDay) ... [
           pw.SizedBox(height: 30), 
-          _buildChartWidget("Últimas 24 Horas (${DateFormat("dd/MM").format(oneDayAgo)} - ${DateFormat("dd/MM").format(lastDay)})", lastDayRecords),
+          _buildChartWidget("Últimas 24 Horas (${DateFormat("dd/MM").format(oneDayAgo)} - ${DateFormat("dd/MM").format(lastDay)})", lastDayRecords, mode: .lastDayRecords),
         ]
       ]
     );
   }
 
-  static pw.Widget _buildChartWidget(String title, List<PainFormData> chartRecords) {
+  static pw.Widget _buildChartWidget(String title, List<PainFormData> chartRecords, {ChartIntervalMode mode = ChartIntervalMode.allRecords}) {
     if (chartRecords.isEmpty) return pw.SizedBox();
 
     final dataX = getDataX(chartRecords);
@@ -213,7 +220,21 @@ class PdfService {
                   xTicks,
                   format: (value) {
                     final DateTime date = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-                    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}";
+                    String dateString;
+
+                    // label presentation depends on interval of time covered by the records
+                    switch (mode) {
+                      case ChartIntervalMode.lastMonthRecords:
+                        dateString = DateFormat("dd/MM").format(date);
+                        break;
+                      case ChartIntervalMode.lastDayRecords:
+                        dateString = DateFormat("HH:mm").format(date);
+                        break;
+                      case ChartIntervalMode.allRecords:
+                        dateString = DateFormat("dd/MM/yyyy").format(date);
+                    }
+
+                    return dateString;
                   },
                 ),
                 // Y-Axis for Pain level (0-10)
