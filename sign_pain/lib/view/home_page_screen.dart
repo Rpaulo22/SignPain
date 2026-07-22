@@ -319,14 +319,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
         final double maximumX = DateTime.now().millisecondsSinceEpoch.toDouble();
         
         double minimumX;
+        double extraSpace; // breathing room for the graph
         final double oneDay = const Duration(days: 1).inMilliseconds.toDouble();
         
         if (chartIntervalMode == 0) {
           minimumX = maximumX - (oneDay * 30); // 1 Month
+          extraSpace = oneDay;    // extra space of one day in chart
         } else if (chartIntervalMode == 1) {
           minimumX = maximumX - (oneDay * 7);  // 7 Days
+          extraSpace = oneDay/4;  // extra space of a quarter of a day
         } else {
           minimumX = maximumX - oneDay;        // 24 Hours
+          extraSpace = oneDay/24; // extra space of 1 hour
         }
 
         // Failsafe if data is totally broken
@@ -371,7 +375,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     minY: 0,
                     maxY: 10,
                     minX: minimumX,
-                    maxX: maximumX,
+                    maxX: maximumX + extraSpace,
                     
                     lineBarsData: [
                       LineChartBarData(
