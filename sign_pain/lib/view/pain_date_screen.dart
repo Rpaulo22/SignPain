@@ -174,40 +174,54 @@ class _PainDateScreenState extends State<PainDateScreen> {
   }
 
   Future<void> _pickDateTime() async {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     // show the calendar
     await showCupertinoModalPopup(
       context: context,
       builder: (popupContext) => Container(
         height: 300, 
         color: Theme.of(context).scaffoldBackgroundColor,
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                CupertinoButton(
-                  child: const Text('Concluído'),
-                  onPressed: () => Navigator.of(popupContext).pop(),
-                )
-              ],
-            ),
-            Expanded(
-              child: CupertinoDatePicker(
-                mode: CupertinoDatePickerMode.dateAndTime,
-                use24hFormat: true,
-                initialDateTime: widget.formData.date, 
-                // restrict it so they can't log pain in the future
-                maximumDate: DateTime.now(), 
-                onDateTimeChanged: (DateTime pickedDate) {
-                  setState(() {
-                    widget.formData.date = pickedDate;
-                  });
-                },
+        
+        child: CupertinoTheme(
+          data: CupertinoThemeData(
+            brightness: isDarkMode ? Brightness.dark : Brightness.light,
+            textTheme: CupertinoTextThemeData(
+              dateTimePickerTextStyle: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface, // Uses high-contrast text color
+                fontSize: 20,
               ),
             ),
-          ],
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  CupertinoButton(
+                    child: const Text('Concluído'),
+                    onPressed: () => Navigator.of(popupContext).pop(),
+                  )
+                ],
+              ),
+              Expanded(
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.dateAndTime,
+                  use24hFormat: true,
+                  initialDateTime: widget.formData.date, 
+                  // restrict it so you can't log pain in the future
+                  maximumDate: DateTime.now(), 
+                  onDateTimeChanged: (DateTime pickedDate) {
+                    setState(() {
+                      widget.formData.date = pickedDate;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
-      )
+      ),
     );
   }
 }
