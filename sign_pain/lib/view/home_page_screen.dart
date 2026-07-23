@@ -390,7 +390,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                         barWidth: 4,
                         isStrokeCapRound: true,
                         dotData: FlDotData(
-                          show: true,
+                          show: chartIntervalMode != 0,
                           checkToShowDot: (spot, barData) {
                             // Find the original entry that matches this spot's X coordinate
                             final entry = ascendingData.firstWhere(
@@ -416,14 +416,15 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     // dotted lines which appear with entries where the user took medication
                     extraLinesData: ExtraLinesData(
                       verticalLines: [
-                        for (var entry in ascendingData)
-                          if (entry.tookMedication == true)
-                            VerticalLine(
-                              x: entry.date.millisecondsSinceEpoch.toDouble(),
-                              color: Colors.cyanAccent,
-                              strokeWidth: 1.5,
-                              dashArray: [5, 5],
-                            ),
+                        if (chartIntervalMode != 0)
+                          for (var entry in ascendingData)
+                            if (entry.tookMedication == true)
+                              VerticalLine(
+                                x: entry.date.millisecondsSinceEpoch.toDouble(),
+                                color: Colors.cyanAccent,
+                                strokeWidth: 1.5,
+                                dashArray: [5, 5],
+                              ),
                       ],
                     ),
                     
