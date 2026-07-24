@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sign_pain/model/user_data.dart';
+import 'package:sign_pain/theme/app_colors.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
 
 class EditAccountScreen extends StatefulWidget {
@@ -189,6 +190,18 @@ class _EditAccountScreen extends State<EditAccountScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
+                Icon(Icons.account_circle_outlined, size: 100), // if in future there are profile pics, they go here
+                SizedBox(height: 10),
+                Text(
+                  widget.user.email, 
+                  style: 
+                    TextStyle(
+                      color: AppColors.primaryOrange,
+                      fontSize: 20,
+                      fontWeight: .bold
+                  )
+                ),
+                SizedBox(height: 80),
                 TextField(
                   controller: nameController,
                   obscureText: false,
@@ -203,7 +216,7 @@ class _EditAccountScreen extends State<EditAccountScreen> {
                   textInputAction: TextInputAction.next,
                   maxLength: 25,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 25),
                 TextFormField(
                   controller: birthDateController,
                   readOnly: true, // stops the keyboard from popping up
@@ -224,7 +237,7 @@ class _EditAccountScreen extends State<EditAccountScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 25),
                 TextField(
                   controller: healthIdentifierController,
                   obscureText: false,
