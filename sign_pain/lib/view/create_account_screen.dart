@@ -139,7 +139,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                                     ),
                                     keyboardType: TextInputType.name,
                                     autofillHints: [AutofillHints.name],
-                                    textInputAction: TextInputAction.next
+                                    textInputAction: TextInputAction.next,
+                                    maxLength: 25,
                                   ),
                                   const SizedBox(height: 10),
                                   TextFormField(

@@ -93,7 +93,7 @@ class PdfService {
           style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
         ),
         pw.Text(
-          'Nº de utente SNS: ${user.healthIdentifer}',
+          'Nº de utente SNS: ${user.healthIdentifier}',
           style: pw.TextStyle(fontSize: 16, color: PdfColors.grey800),
         ),
         pw.Text(

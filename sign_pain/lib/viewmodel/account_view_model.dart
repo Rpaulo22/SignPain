@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:sign_pain/model/user_data.dart';
 import 'package:sign_pain/utils/app_exception.dart';
 
@@ -28,19 +29,19 @@ class AccountViewModel extends ChangeNotifier{
 
         final name = data['name'] as String;
         final email = data['email'] as String;
-        final healthIdentifer = data['healthIdentifier'] ?? "111111111";
+        final healthIdentifier = data['healthIdentifier'] ?? "111111111";
 
         final timestamp = data['birthDate'];
         final DateTime birthDate = (timestamp is Timestamp) 
             ? timestamp.toDate() 
             : DateTime(2000, 1, 1);
               
-        return UserData(email: email, fullName: name, healthIdentifer: healthIdentifer, birthDate: birthDate);
+        return UserData(userID: userID, email: email, fullName: name, healthIdentifier: healthIdentifier, birthDate: birthDate);
       }
-      return UserData(email: "", fullName: "Utilizador", healthIdentifer: "111111111", birthDate: DateTime(2000, 1, 1));
+      return UserData(userID: userID, email: "", fullName: "Utilizador", healthIdentifier: "111111111", birthDate: DateTime(2000, 1, 1));
 
     } catch (e) { // could not retrieve user info
-      return UserData(email: "", fullName: "Utilizador", healthIdentifer: "111111111", birthDate: DateTime(2000, 1, 1));
+      return UserData(userID: userID, email: "", fullName: "Utilizador", healthIdentifier: "111111111", birthDate: DateTime(2000, 1, 1));
     }
   }
 
@@ -135,8 +136,9 @@ class AccountViewModel extends ChangeNotifier{
 
   // Given a new user's information (email, phone number, password and name), attempts to create a new account
   // and asks for verification of phone number. If it is verified, it then logs in user
-  Future<void> createUser(String emailAddress, String phoneNumber, String password, String name, String healthIdentifer, DateTime? birthDate) async {
+  Future<void> createUser(String emailAddress, String phoneNumber, String password, String name, String healthIdentifier, DateTime? birthDate) async {
     var hasNumber = true;
+    final maximumBirthDate = DateTime.now().subtract(Duration(days: 365*6)); // minimum 6 years old (for now, up to debate)
 
     // allows the app to display loading circle
     isLoading = true;
@@ -153,6 +155,11 @@ class AccountViewModel extends ChangeNotifier{
       notifyListeners();
       throw AppException("Por favor indique o seu nome");
     }
+    if (name.length > 25) {
+      isLoading = false;
+      notifyListeners();
+      throw AppException("Nome demasiado longo. Limite de 25 caracteres");
+    }
     if (phoneNumber.isNotEmpty && (phoneNumber.length != 9 || phoneNumber[0] != '9')) { // phone number must be a valid potential portuguese phone number
       isLoading = false;
       notifyListeners();
@@ -163,11 +170,18 @@ class AccountViewModel extends ChangeNotifier{
       notifyListeners();
       hasNumber = false;
     }
-    // if (healthIdentifer) ADD check for correctness
+    if (!isValidSnsNumber(healthIdentifier)) {
+      isLoading = false;
+      notifyListeners();
+      throw AppException("Nº de utente SNS inválido");
+    }    
     if (birthDate == null) {
       isLoading = false;
       notifyListeners();
       throw AppException("Por favor indique o seu dia de nascimento");
+    }
+    if (birthDate.isAfter(maximumBirthDate)) {
+      throw AppException("Data de nascimento inválida. No máximo ${DateFormat("dd/MM/yyyy").format(maximumBirthDate)}");
     }
 
     try {
@@ -179,12 +193,12 @@ class AccountViewModel extends ChangeNotifier{
       User? newUser = credential.user;
 
       Map<String,dynamic> userMap = {
-        'name': name,
+        'name': name.trim(),
         'email': emailAddress,
         'createdAt': DateTime.now(),
         'phoneVerified': false,
         'medicalConditions': [],
-        'healthIdentifier': healthIdentifer,
+        'healthIdentifier': healthIdentifier,
         'birthDate': birthDate
       };
 
@@ -376,5 +390,78 @@ class AccountViewModel extends ChangeNotifier{
       notifyListeners();
       throw AppException('Erro no login: ${e.message}');
     }
+  }
+
+  // update the user's information
+  Future<void> updateUserInfo(String userID, String fullName, String healthIdentifier, DateTime birthDate) async {
+    final maximumBirthDate = DateTime.now().subtract(Duration(days: 365*6)); // minimum age of +/ 6 years i.g. (debatable, up to changes)
+    if (fullName.length > 25 || fullName.isEmpty) {
+      throw AppException("Nome inválido. Limite é de 25 caracteres");
+    }
+    if (birthDate.isAfter(maximumBirthDate)) {
+      throw AppException("Data de nascimento inválida. No máximo ${DateFormat("dd/MM/yyyy").format(maximumBirthDate)}");
+    }
+    if (!isValidSnsNumber(healthIdentifier)) {
+      throw AppException("Nº de Utente SNS inválido.");
+    }
+
+
+    var db = FirebaseFirestore.instance;
+
+    final userMap = {
+      "name": fullName,
+      "birthDate": birthDate,
+      "healthIdentifier": healthIdentifier,
+    };
+
+    try {
+      await db.collection('Users')
+        .doc(userID)
+        .set(userMap, SetOptions(merge: true));
+    }
+    catch (e) {
+      throw AppException("Erro a atualizar conta. Tente novamente");
+    }
+
+  }
+
+  // given a number, calculates if it is a valid portuguese health identifier number
+  bool isValidSnsNumber(String? rawInput) {
+    if (rawInput == null) return false;
+
+    final input = rawInput.trim();
+
+    // must be exactly 9 digits
+    if (!RegExp(r'^\d{9}$').hasMatch(input)) {
+      return false;
+    }
+
+    // first digit must be a valid region code (1, 2, 3, 4, 5, 6, 7, or 9)
+    final firstDigit = int.parse(input[0]);
+    if (firstDigit == 0 || firstDigit == 8) {
+      return false;
+    }
+
+    // calculate modulus 11 checksum (last, 9th digit)
+    int sum = 0;
+    for (int i = 0; i < 8; i++) {
+      int digit = int.parse(input[i]);
+      int weight = 9 - i; // Weights: 9, 8, 7, 6, 5, 4, 3, 2
+      sum += digit * weight;
+    }
+
+    final remainder = sum % 11;
+    int expectedCheckDigit;
+
+    // if the remainder is 0 or 1, the check digit must be 0, otherwise its 11 - remainder
+    if (remainder == 0 || remainder == 1) {
+      expectedCheckDigit = 0;
+    } else {
+      expectedCheckDigit = 11 - remainder;
+    }
+
+    final actualCheckDigit = int.parse(input[8]);
+
+    return actualCheckDigit == expectedCheckDigit;
   }
 }

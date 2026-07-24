@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:sign_pain/main.dart';
 import 'package:sign_pain/model/user_data.dart';
 import 'package:sign_pain/theme/app_colors.dart';
+import 'package:sign_pain/view/edit_account_screen.dart';
 import 'package:sign_pain/view/login_screen.dart';
 import 'package:sign_pain/viewmodel/account_view_model.dart';
 
@@ -148,7 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         )
                                       ),
                                       TextSpan(
-                                        text: userData.healthIdentifer,
+                                        text: userData.healthIdentifier,
                                         style: TextStyle(
                                           color: AppColors.primaryOrange
                                         )
@@ -158,8 +159,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 )
                               ]
                             ),
-                            
                             SizedBox(height: 20),
+                            TextButton(
+                              onPressed: () async {
+                                await Navigator.of(context, rootNavigator: true).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => EditAccountScreen(user: userData),
+                                  ),
+                                );
+
+                                setState(() {
+                                  // rebuilds this screen so it reads the updated userData
+                                });
+                              }, 
+                              child: Text(
+                                "Editar conta", 
+                                style: TextStyle(
+                                  color: Colors.green
+                                ),
+                              )
+                            ),
+
+                            SizedBox(height: 10),
                             TextButton(
                               onPressed: () async {
                                 showDialog(
