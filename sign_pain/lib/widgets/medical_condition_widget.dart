@@ -1,7 +1,10 @@
 import 'package:body_part_selector/body_part_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sign_pain/model/medical_condition_data.dart';
 import 'package:sign_pain/model/pain_form_data.dart';
+import 'package:sign_pain/viewmodel/conditions_view_model.dart';
+import 'package:sign_pain/widgets/pain_descriptor_widget.dart';
 
 class MedicalConditionWidget extends StatefulWidget{
   const MedicalConditionWidget({super.key, required this.medData});
@@ -16,7 +19,11 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
 
   @override 
   Widget build(BuildContext context) {
+    final painDescriptorsData = context.read<ConditionsViewModel>().painDescriptors;
     final medData = widget.medData;
+
+    final commonDescriptorsData = painDescriptorsData.where((descriptor) => medData.commonDescriptors.contains(descriptor.id));
+    final uncommonDescriptorsData = painDescriptorsData.where((descriptor) => medData.uncommonDescriptors.contains(descriptor.id));
 
     BodyParts parts = BodyPartsMapper.fromList(medData.bodyPartsAffected); // BodyParts object which holds the body parts affected by the condition for visualization purposes
 
@@ -91,12 +98,8 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
                 child: Wrap(
                   spacing: 8.0,    // Horizontal gap between tags
                   runSpacing: 8.0, // Vertical gap between lines
-                  children: medData.commonDescriptors.map((cd) {
-                    return Chip(
-                      backgroundColor: Theme.of(context).colorScheme.tertiary,
-                      label: Text("$cd ${descriptorIconMap[cd]}", style: TextStyle(color: Theme.of(context).colorScheme.onTertiary)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    );
+                  children: commonDescriptorsData.map((pd) {
+                    return PainDescriptorWidget(painDescriptorData: pd);
                   }).toList(),
                 )
               )
@@ -115,12 +118,8 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
                 child: Wrap(
                   spacing: 8.0,    // Horizontal gap between tags
                   runSpacing: 8.0, // Vertical gap between lines
-                  children: medData.uncommonDescriptors.map((cd) {
-                    return Chip(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      label: Text("$cd ${descriptorIconMap[cd]}", style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    );
+                  children: uncommonDescriptorsData.map((pd) {
+                    return PainDescriptorWidget(painDescriptorData: pd);
                   }).toList(),
                 )
               )

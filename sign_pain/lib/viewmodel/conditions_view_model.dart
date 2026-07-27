@@ -2,11 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sign_pain/model/medical_condition_data.dart';
+import 'package:sign_pain/model/pain_descriptor_data.dart';
 import 'package:sign_pain/utils/app_exception.dart';
 
 class ConditionsViewModel extends ChangeNotifier{
   List<MedicalConditionData> _medicalConditions = [];
   List<MedicalConditionData> get medicalConditions => _medicalConditions;
+
+  List<PainDescriptorData> _painDescriptors = [];
+  List<PainDescriptorData> get painDescriptors => _painDescriptors;
 
   List<String> _userMedicalConditions = [];
   List<String> get userMedicalConditions => _userMedicalConditions;
@@ -25,6 +29,7 @@ class ConditionsViewModel extends ChangeNotifier{
     try {
       await getMedicalConditions();
       await getUserMedicalData(userID);
+      await getPainDescriptorData();
       _hasFetched = true;
     } 
     catch (_) {
@@ -131,5 +136,33 @@ class ConditionsViewModel extends ChangeNotifier{
       notifyListeners();
       throw AppException("Erro ao remover condição médica. Verifique a sua ligação.");
     } 
+  }
+  
+  Future<void> getPainDescriptorData() async {
+    var db = FirebaseFirestore.instance;
+    List<PainDescriptorData> data = [];
+
+    try {
+      final querySnapshot = await db
+          .collection("PainDescriptors")
+          .get();
+      // loop through results
+      for (var docSnapshot in querySnapshot.docs) {
+        var _data = docSnapshot.data(); 
+
+        var id = docSnapshot.id;
+        var descriptorName = _data['descriptorName'] as String;
+        var associatedSymbol = _data['associatedSymbol'] as String;
+        var description = _data['description'] as String;
+        var videoURL = _data['videoURL'] as String;
+
+        PainDescriptorData descriptorData = PainDescriptorData(id, descriptorName, associatedSymbol, description, videoURL);
+        data.add(descriptorData);
+      }
+    } catch(e) {
+      throw AppException("Erro a carregar informação médica. Por favor tente novamente mais tarde");
+    }
+
+    _painDescriptors = data;
   }
 }

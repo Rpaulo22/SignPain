@@ -38,6 +38,7 @@ class _PainInfoScreenState extends State<PainInfoScreen> {
           else {
             final userMedicalConditionsIDs = conditionsViewModel.userMedicalConditions;
             final allMedicalConditions = conditionsViewModel.medicalConditions;
+
             final allMedicalConditionsIDs = allMedicalConditions.map((entry) => entry.id).toList();
 
             final userMedicalConditions = allMedicalConditions.where((entry) => userMedicalConditionsIDs.contains(entry.id)).toList();
