@@ -25,8 +25,10 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
     final commonDescriptorsData = painDescriptorsData.where((descriptor) => medData.commonDescriptors.contains(descriptor.id));
     final uncommonDescriptorsData = painDescriptorsData.where((descriptor) => medData.uncommonDescriptors.contains(descriptor.id));
 
-    BodyParts parts = BodyPartsMapper.fromList(medData.bodyPartsAffected); // BodyParts object which holds the body parts affected by the condition for visualization purposes
-
+    // BodyParts object which holds the body parts affected by the condition for visualization purposes (front and back separately)
+    BodyParts partsFront = BodyPartsMapper.frontFromList(medData.bodyPartsAffected); 
+    BodyParts partsBack = BodyPartsMapper.backFromList(medData.bodyPartsAffected);
+    
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).colorScheme.onSurface),
@@ -77,7 +79,7 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
                   )
                 ),
                 TextSpan(
-                  text: medData.causes.join(", "),
+                  text: medData.causes,
                   style: TextStyle(
                     fontSize: 16
                   )
@@ -152,11 +154,49 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
 
           SizedBox(
             height: 400,
-            child: BodyPartSelector(
-              bodyParts: parts, 
-              onSelectionUpdated: (parts) {},
-              side: defineSide(medData.side)
-            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Expanded(
+                  child: SafeArea(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // The body map fills the background
+                        BodyPartSelector(
+                          bodyParts: partsFront,
+                          onSelectionUpdated: (_) {},
+                          side: BodySide.front
+                        ),
+                        const Positioned(
+                          bottom: 15,
+                          child: Text("Frente", style: TextStyle(fontWeight: FontWeight.bold))
+                        )
+                      ]
+                    )
+                  )
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: SafeArea(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        BodyPartSelector(
+                          bodyParts: partsBack,
+                          onSelectionUpdated: (_) {},
+                          side: BodySide.back
+                        ),
+                        const Positioned(
+                          bottom: 15,
+                          child: Text("Trás", style: TextStyle(fontWeight: FontWeight.bold))
+                        )
+                      ]
+                    )
+                  )
+                )
+              ]
+            )
           ),
         ],
       )

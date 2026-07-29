@@ -53,23 +53,22 @@ class ConditionsViewModel extends ChangeNotifier{
       for (var docSnapshot in querySnapshot.docs) {
         var _data = docSnapshot.data(); 
         
-        var id = _data['id'] as String;
+        var id = docSnapshot.id;
         var nameMap = _data['name'] as Map<String, dynamic>;
         var descriptionMap = _data['description'] as Map<String, dynamic>;
         var causesMap = _data['causes'] as Map<String, dynamic>;
         var treatmentMap = _data['treatment'] as Map<String, dynamic>;
         var descriptorsMap = _data['painDescriptors'] as Map<String, dynamic>;
         var bodyPartsAffected = List<String>.from(_data['bodyPartsAffected'] ?? []) ;
-        var side = _data['side'] as String;
 
         var name = nameMap['text'] as String;
         var description = descriptionMap['text'] as String;
-        var causes = List<String>.from(causesMap['text'] ?? []);
+        var causes = causesMap['text'] as String;
         var treatment = treatmentMap['text'] as String;
         var commonDescriptors = List<String>.from(descriptorsMap['common'] ?? []);
         var uncommonDescriptors = List<String>.from(descriptorsMap['uncommon'] ?? []);
 
-        MedicalConditionData medData = MedicalConditionData(id, name, description, causes, commonDescriptors, uncommonDescriptors, treatment, bodyPartsAffected, side);
+        MedicalConditionData medData = MedicalConditionData(id, name, description, causes, commonDescriptors, uncommonDescriptors, treatment, bodyPartsAffected);
         data.add(medData);
       }
     } catch(e) {

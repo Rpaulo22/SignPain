@@ -192,7 +192,7 @@ class _PainDescriptorsScreenState extends State<PainDescriptorsScreen> {
                           maxLines: null,
                           textAlignVertical: .top,
                         ),
-                        Text("INSERIR CAIXA DE VIDEO"),
+                        Text("INSERIR CAIXAS DE VIDEOS", style: TextStyle(fontWeight: .bold, fontSize: 16)),
                         ElevatedButton(
                           onPressed: () async {
                             try {

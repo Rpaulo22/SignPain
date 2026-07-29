@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sign_pain_admin/theme/app_colors.dart';
 import 'package:sign_pain_admin/view/login_screen.dart';
+import 'package:sign_pain_admin/view/medical_conditions_screen.dart';
 import 'package:sign_pain_admin/view/pain_descriptors_screen.dart';
 import 'package:sign_pain_admin/viewmodel/account_view_model.dart';
 
@@ -49,7 +50,13 @@ class _LandingScreenState extends State<LandingScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => MedicalConditionsScreen(title: "Condições médicas"),
+                    ),
+                  );
+                },
                 child: Padding(
                   padding: EdgeInsetsGeometry.all(16), 
                   child: Text("Condições Médicas", style: TextStyle(fontSize: 20))

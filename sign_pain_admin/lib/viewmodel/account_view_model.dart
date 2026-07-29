@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sign_pain_admin/app_exception.dart';
+import 'package:sign_pain_admin/utils/app_exception.dart';
 
 class AccountViewModel extends ChangeNotifier {
 

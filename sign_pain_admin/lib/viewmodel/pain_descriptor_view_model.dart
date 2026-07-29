@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:sign_pain_admin/app_exception.dart';
+import 'package:sign_pain_admin/utils/app_exception.dart';
 import 'package:sign_pain_admin/model/pain_descriptor_data.dart';
 import 'package:emoji_regex/emoji_regex.dart';
 
