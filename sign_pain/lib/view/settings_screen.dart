@@ -208,9 +208,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                               if (!context.mounted) return;
 
                                               // Send user back to Login
-                                              Navigator.pushReplacement(
+                                              Navigator.pushAndRemoveUntil(
                                                 context,
-                                                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                                                MaterialPageRoute(
+                                                  builder: (context) => const LoginScreen(),
+                                                ),
+                                                (Route<dynamic> route) => false
                                               );
                                             } catch (e) {
                                               ScaffoldMessenger.of(context).showSnackBar(

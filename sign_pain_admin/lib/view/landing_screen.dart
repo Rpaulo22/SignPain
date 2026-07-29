@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sign_pain_admin/theme/app_colors.dart';
+import 'package:sign_pain_admin/view/login_screen.dart';
 import 'package:sign_pain_admin/view/pain_descriptors_screen.dart';
+import 'package:sign_pain_admin/viewmodel/account_view_model.dart';
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key, required this.title});
@@ -22,10 +24,10 @@ class _LandingScreenState extends State<LandingScreen> {
         centerTitle: true
       ),
       body: Column(
-        mainAxisAlignment: .start,
+        mainAxisAlignment: .spaceBetween,
         children: [
           Padding(
-            padding: EdgeInsetsGeometry.symmetric(vertical: 50),
+            padding: EdgeInsetsGeometry.directional(top: 50),
             child: SizedBox(
               height: 200,
               child: Image(
@@ -35,7 +37,6 @@ class _LandingScreenState extends State<LandingScreen> {
             )
           ),
           Text("Bem vindo à ferramenta de administração de conteúdo do SignPain", style: TextStyle(fontSize: 28, color: AppColors.primaryOrange)),
-          SizedBox(height: 80),
           Row(
             mainAxisAlignment: .spaceEvenly,
             children: [
@@ -77,6 +78,27 @@ class _LandingScreenState extends State<LandingScreen> {
                 )
               )
             ],
+          ),
+          
+          TextButton(
+            onPressed: () async {
+              try {
+                await AccountViewModel().signOut();
+
+                if (!context.mounted) return;
+
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen()
+                  ),
+                  (Route<dynamic> route) => false
+                );
+              }
+              catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+              }
+            },
+            child: Text("Terminar sessão", style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: .bold)),
           )
         ],
       )

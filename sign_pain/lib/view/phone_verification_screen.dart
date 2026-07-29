@@ -137,11 +137,12 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
 
       if (!mounted) return;
 
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
           builder: (context) => const MainNavigationScreen(),
         ),
+        (Route<dynamic> route) => false
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
