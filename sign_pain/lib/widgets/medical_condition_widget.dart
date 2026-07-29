@@ -119,7 +119,7 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
                   spacing: 8.0,    // Horizontal gap between tags
                   runSpacing: 8.0, // Vertical gap between lines
                   children: uncommonDescriptorsData.map((pd) {
-                    return PainDescriptorWidget(painDescriptorData: pd);
+                    return PainDescriptorWidget(painDescriptorData: pd, isCommon: false);
                   }).toList(),
                 )
               )
@@ -172,24 +172,4 @@ class _MedicalConditionWidgetState extends State<MedicalConditionWidget> {
       _ => BodySide.front 
     };
   }
-
-  static const Map<String, String> descriptorIconMap = {
-    "Ardor": "🔥",
-    "Formigueiro": "🐜",
-    "Frio": "❄️",
-    "Mecânica": "⚙️",
-    "Peso": "🏋️",
-    "Cansaço": "🥱",
-    "Choque": "⚡",
-    "Moedeira": "🔨",  
-    "Tensão": "🗜️",        
-    "Latejante": "💓",         
-    "Perfurante": "🗡️",    
-    "Localizada": "🎯",    
-    "Difusa": "🌫️",        
-    "Irradiada": "🔆",     
-    "Aguda": "🪡",          
-    "Intermitente": "🌊",   
-    "Rigidez": "🧱",
-  };
 }
