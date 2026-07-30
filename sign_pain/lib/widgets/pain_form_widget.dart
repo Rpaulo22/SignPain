@@ -15,6 +15,8 @@ class PainFormWidget extends StatelessWidget {
     required this.data
   });
 
+  static const heightDivider = 7.5;
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -26,13 +28,10 @@ class PainFormWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(12)
         ),
         padding: EdgeInsetsDirectional.all(10),
-        child: Column(
-          mainAxisAlignment: .spaceBetween,
+        child: Row(
+          mainAxisSize: .max,
           children: [
-            Row(
-              mainAxisSize: .max,
-              crossAxisAlignment: .center,
-              mainAxisAlignment: .spaceBetween,
+            Column(
               children: [
                 RichText(
                   text: TextSpan(
@@ -48,27 +47,33 @@ class PainFormWidget extends StatelessWidget {
                     ]
                   )
                 ),
-                Expanded(
-                  child: Text(
+                SizedBox(height: heightDivider),
+                Text(DateFormat("HH:mm").format(data.date), style: TextStyle(fontWeight: .bold, fontSize: 16))
+              ]
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                children: [
+                  Text(
                     data.bodyParts.isNotEmpty 
                       ? BodyPartsMapper.listToPortuguese(data.bodyParts).join(", ") 
                       : "Dor não situada", 
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 15,
+                      fontSize: 16,
                       color: Theme.of(context).colorScheme.onSurface
                     ),
                     overflow: .ellipsis,
                     textAlign: .center,
-                  )
-                ),
-                Text(DateFormat("HH:mm").format(data.date), style: TextStyle(fontWeight: .bold, fontSize: 16))
-              ]
+                  ),
+                  if (data.tookMedication!) ...[
+                    SizedBox(height: heightDivider),
+                    Text("✅ Medicação", style: TextStyle(fontWeight: .bold, fontSize: 13))
+                  ]
+                ]
+              )
             ),
-            if (data.tookMedication!) ...[
-              const SizedBox(height: 10),
-              Text("✅ Medicação", style: TextStyle(fontWeight: .bold, fontSize: 12))
-            ]
           ]
         )
       )
