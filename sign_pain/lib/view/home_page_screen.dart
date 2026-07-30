@@ -387,7 +387,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                             )
                         ],
                         color: AppColors.primaryOrange,
-                        barWidth: 4,
+                        barWidth: 2,
                         isStrokeCapRound: true,
                         dotData: FlDotData(
                           show: chartIntervalMode != 0,

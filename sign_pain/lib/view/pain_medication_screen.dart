@@ -54,8 +54,8 @@ class _PainMedicationScreenState extends State<PainMedicationScreen> {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          const Text('Cancelar registo da dor?', style: TextStyle(fontSize: 20, fontWeight: .bold)),
-                          const Text('Irá perder estes dados.', style: TextStyle(fontSize: 18)),
+                          const Text('Cancelar?', style: TextStyle(fontSize: 20, fontWeight: .bold)),
+                          Text((!widget.editing) ? 'Irá perder estes dados.' : 'Alterações não serão gravadas.', style: TextStyle(fontSize: 18), textAlign: .center),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -242,8 +242,8 @@ class _PainMedicationScreenState extends State<PainMedicationScreen> {
             children: <Widget>[
               const Text('Gravar?', textScaler: TextScaler.linear(2)),
               Text("Nível: ${widget.formData.painLevel}/10"),
-              Text("Descrição: ${widget.formData.descriptors.join(", ")}"),
-              Text("Parte(s) do corpo: ${BodyPartsMapper.listToPortuguese(widget.formData.bodyParts).join(", ")}"),
+              Text("Descrição: ${widget.formData.descriptors.join(", ")}", textAlign: .center),
+              Text("Parte(s) do corpo: ${BodyPartsMapper.listToPortuguese(widget.formData.bodyParts).join(", ")}", textAlign: .center),
               Text("Frequência: ${painFrequencyToStringPT(widget.formData.frequency)}"),
               Text("Medicação: ${widget.formData.tookMedication! ? "Sim" : "Não"}"),
               Row(
@@ -328,7 +328,7 @@ class _PainMedicationScreenState extends State<PainMedicationScreen> {
   SnackBar snackBar(String message) { 
     return SnackBar(
       content: Text(message),
-      duration: const Duration(milliseconds: 5000),
+      duration: const Duration(milliseconds: 3000),
     );
   }
 

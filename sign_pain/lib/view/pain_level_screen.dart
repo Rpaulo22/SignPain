@@ -60,8 +60,8 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          const Text('Cancelar registo da dor?', style: TextStyle(fontSize: 20, fontWeight: .bold)),
-                          const Text('Irá perder estes dados.', style: TextStyle(fontSize: 18)),
+                          const Text('Cancelar?', style: TextStyle(fontSize: 20, fontWeight: .bold)),
+                          Text((!widget.editing) ? 'Irá perder estes dados.' : 'Alterações não serão gravadas.', style: TextStyle(fontSize: 18), textAlign: .center),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -138,7 +138,7 @@ class _PainLevelScreenState extends State<PainLevelScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             FilterChip(
-                              label: const Text("Termómetro 🌡️"),
+                              label: const Text("Escala 🌡️"),
                               selected: scaleMode == 0,
                               onSelected: (_) => scaleNotifier.value = 0,
                             ),

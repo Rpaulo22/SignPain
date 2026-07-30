@@ -22,41 +22,53 @@ class PainFormWidget extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(color: getPainColor(data.painLevel!)),
-          color: getPainColor(data.painLevel!).withAlpha(150),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12)
         ),
-        padding: EdgeInsetsDirectional.only(top: 15, bottom: 15, start: 10, end: 10),
-        child: Row(
-          mainAxisSize: .max,
-          crossAxisAlignment: .center,
+        padding: EdgeInsetsDirectional.all(10),
+        child: Column(
+          mainAxisAlignment: .spaceBetween,
           children: [
-            Text(
-              "Dor ${data.painLevel!}/10", 
-              style: TextStyle(
-                fontWeight: FontWeight.bold, 
-                fontSize: 18,
-                color: Theme.of(context).colorScheme.onPrimary
-              ),
-              textAlign: .center,
-            ),
-            VerticalDivider(
-              color: Theme.of(context).colorScheme.secondary,
-              width: 10,
-              thickness: 5,
-            ),
-            Expanded(
-              child: Text(
-                data.bodyParts.isNotEmpty 
-                  ? BodyPartsMapper.listToPortuguese(data.bodyParts).join(", ") 
-                  : "Dor não situada", 
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: Theme.of(context).colorScheme.onPrimary
+            Row(
+              mainAxisSize: .max,
+              crossAxisAlignment: .center,
+              mainAxisAlignment: .spaceBetween,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      fontSize: 18,
+                      color: Theme.of(context).colorScheme.onSurface
+                    ),
+                    children: <TextSpan>[
+                      TextSpan(text: "Dor "),
+                      TextSpan(text: data.painLevel.toString(), style: TextStyle(color: getPainColor(data.painLevel!))),
+                      TextSpan(text: "/10"),
+                    ]
+                  )
                 ),
-                textAlign: .center,
-              )
-            )
+                Expanded(
+                  child: Text(
+                    data.bodyParts.isNotEmpty 
+                      ? BodyPartsMapper.listToPortuguese(data.bodyParts).join(", ") 
+                      : "Dor não situada", 
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: Theme.of(context).colorScheme.onSurface
+                    ),
+                    overflow: .ellipsis,
+                    textAlign: .center,
+                  )
+                ),
+                Text(DateFormat("HH:mm").format(data.date), style: TextStyle(fontWeight: .bold, fontSize: 16))
+              ]
+            ),
+            if (data.tookMedication!) ...[
+              const SizedBox(height: 10),
+              Text("✅ Medicação", style: TextStyle(fontWeight: .bold, fontSize: 12))
+            ]
           ]
         )
       )
@@ -202,7 +214,7 @@ class PainFormWidget extends StatelessWidget {
                         TextButton(
                           onPressed: () {
                             Navigator.pop(dialogContext);
-                            Navigator.of(context).push(
+                            Navigator.of(context, rootNavigator: true).push(
                               MaterialPageRoute(
                                 builder: (context) => PainDateScreen(formData: data.copyWith(), editing: true), 
                               ),
