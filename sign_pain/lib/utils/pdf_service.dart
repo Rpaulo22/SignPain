@@ -64,7 +64,11 @@ class PdfService {
             pw.SizedBox(height: 20),
             _buildSummary(descendingRecords),
             pw.SizedBox(height: 20),
+
+            pw.Text("Últimos $maxEntries registos", style: pw.TextStyle(fontWeight: .bold, fontSize: 18)),
+            pw.SizedBox(height: 10),
             _buildDataTable(mostRecentRecords),
+            
             pw.SizedBox(height: 20),
             _buildGraphs(ascendingRecords, firstDay, lastDay)
           ];
@@ -195,6 +199,25 @@ class PdfService {
 
     final dataX = getDataX(chartRecords);
 
+    // entries where medication was took
+    final medRecords = chartRecords.where((r) => r.tookMedication == true).toList();
+
+    // those entries' points
+    final medPointsOnCurve = medRecords.map((r) => pw.PointChartValue(
+      r.date.millisecondsSinceEpoch.toDouble(),
+      r.painLevel!.toDouble(),
+    )).toList();
+
+    // the tiny dotted lines which will recreate the dotted line on these points
+    final List<pw.PointChartValue> verticalDottedLines = [];
+    for (var r in medRecords) {
+      final x = r.date.millisecondsSinceEpoch.toDouble();
+      // Add a dot every 0.3 units on the Y-axis to create the "dotted line" effect
+      for (double y = 0; y <= 10; y += 0.3) {
+        verticalDottedLines.add(pw.PointChartValue(x, y));
+      }
+    }
+
     final double minX = dataX.first;
     final double maxX = dataX.last;
 
@@ -243,6 +266,12 @@ class PdfService {
                 ), 
               ),
               datasets: [
+                if (verticalDottedLines.isNotEmpty && mode == .lastDayRecords) // do not show in big intervals as it overcrowds it
+                  pw.PointDataSet(
+                    color: PdfColors.cyan, // cyan for the dotted line
+                    pointSize: 1.2, // tiny size for the dots
+                    data: verticalDottedLines,
+                  ),
                 pw.LineDataSet(
                   color: PdfColors.orange,
                   lineWidth: 3,
@@ -256,8 +285,78 @@ class PdfService {
                     ),
                   ),
                 ),
+                if (medPointsOnCurve.isNotEmpty)
+                  pw.PointDataSet(
+                    color: PdfColors.cyan,
+                    pointSize: 3.0, // Big visible dot
+                    data: medPointsOnCurve,
+                  ),
               ],
             ),
+          ),
+
+          // labels below the chart
+          pw.SizedBox(height: 12),
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.center,
+            children: [
+
+              // pain level label
+              pw.Row(
+                children: [
+                  // Orange horizontal line representation
+                  pw.Container(
+                    width: 18,
+                    height: 3,
+                    color: PdfColors.orange,
+                  ),
+                  pw.SizedBox(width: 6),
+                  pw.Text(
+                    "Intensidade da Dor",
+                    style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey800),
+                  ),
+                ],
+              ),
+
+              pw.SizedBox(width: 20), // Spacing between legend items
+
+              // medication label
+              pw.Row(
+                children: [
+                  pw.Row(
+                    mainAxisSize: pw.MainAxisSize.min,
+                    children: [
+                      // Dotted vertical line representation
+                      pw.Column(
+                        mainAxisSize: pw.MainAxisSize.min,
+                        children: [
+                          pw.Container(width: 1.5, height: 2, color: PdfColors.cyan),
+                          pw.SizedBox(height: 1.5),
+                          pw.Container(width: 1.5, height: 2, color: PdfColors.cyan),
+                          pw.SizedBox(height: 1.5),
+                          pw.Container(width: 1.5, height: 2, color: PdfColors.cyan),
+                        ],
+                      ),
+                      pw.SizedBox(width: 3),
+                      // Solid dot
+                      pw.Container(
+                        width: 7,
+                        height: 7,
+                        decoration: const pw.BoxDecoration(
+                          color: PdfColors.cyan,
+                          shape: pw.BoxShape.circle,
+                        ),
+                      ),
+                    ],
+                  ),
+                  pw.SizedBox(width: 6),
+                  pw.Text(
+                    "Tomou Medicação",
+                    style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey800),
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       ),
