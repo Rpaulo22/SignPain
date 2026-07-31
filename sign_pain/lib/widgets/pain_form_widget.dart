@@ -28,53 +28,57 @@ class PainFormWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(12)
         ),
         padding: EdgeInsetsDirectional.all(10),
-        child: Row(
-          mainAxisSize: .max,
-          children: [
-            Column(
-              children: [
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold, 
-                      fontSize: 18,
-                      color: Theme.of(context).colorScheme.onSurface
-                    ),
-                    children: <TextSpan>[
-                      TextSpan(text: "Dor "),
-                      TextSpan(text: data.painLevel.toString(), style: TextStyle(color: getPainColor(data.painLevel!))),
-                      TextSpan(text: "/10"),
-                    ]
-                  )
-                ),
-                SizedBox(height: heightDivider),
-                Text(DateFormat("HH:mm").format(data.date), style: TextStyle(fontWeight: .bold, fontSize: 16))
-              ]
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: Column(
+        child: IntrinsicHeight(
+          child: Row(
+            mainAxisSize: .max,
+            children: [
+              Column(
+                crossAxisAlignment: .start,
                 children: [
-                  Text(
-                    data.bodyParts.isNotEmpty 
-                      ? BodyPartsMapper.listToPortuguese(data.bodyParts).join(", ") 
-                      : "Dor não situada", 
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Theme.of(context).colorScheme.onSurface
-                    ),
-                    overflow: .ellipsis,
-                    textAlign: .center,
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold, 
+                        fontSize: 18,
+                        color: Theme.of(context).colorScheme.onSurface
+                      ),
+                      children: <TextSpan>[
+                        TextSpan(text: "Dor "),
+                        TextSpan(text: data.painLevel.toString(), style: TextStyle(color: getPainColor(data.painLevel!))),
+                        TextSpan(text: "/10"),
+                      ]
+                    )
                   ),
-                  if (data.tookMedication!) ...[
-                    SizedBox(height: heightDivider),
-                    Text("✅ Medicação", style: TextStyle(fontWeight: .bold, fontSize: 13))
-                  ]
+                  SizedBox(height: heightDivider),
+                  Text(DateFormat("HH:mm").format(data.date), style: TextStyle(fontWeight: .bold, fontSize: 16))
                 ]
-              )
-            ),
-          ]
+              ),
+              VerticalDivider(width: 30, thickness: 1, color: getPainColor(data.painLevel!)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: .start,
+                  children: [
+                    Text(
+                      data.bodyParts.isNotEmpty 
+                        ? BodyPartsMapper.listToPortuguese(data.bodyParts).join(", ") 
+                        : "Dor não situada", 
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurface
+                      ),
+                      overflow: .ellipsis,
+                      textAlign: .center,
+                    ),
+                    if (data.tookMedication!) ...[
+                      SizedBox(height: heightDivider),
+                      Text("✅ Medicação", style: TextStyle(fontWeight: .bold, fontSize: 13))
+                    ]
+                  ]
+                )
+              ),
+            ]
+          )
         )
       )
     );
